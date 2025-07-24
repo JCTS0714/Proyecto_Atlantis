@@ -37,7 +37,7 @@ class ModeloCliente{
 
   /* MÉTODO PARA REGISTRAR CLIENTE */
   static public function mdlRegistrarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("INSERT INTO clientes(nombre, tipo, documento, telefono, correo, direccion, clasificacion, fecha_creacion) VALUES(:nombre, :tipo, :documento, :telefono, :correo, :direccion, :clasificacion, :fecha_creacion)");
+    $stmt = Conexion::conectar()->prepare("INSERT INTO clientes(nombre, tipo, documento, telefono, correo, direccion, fecha_creacion) VALUES(:nombre, :tipo, :documento, :telefono, :correo, :direccion, :fecha_creacion)");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -45,7 +45,6 @@ class ModeloCliente{
     $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
     $stmt->bindParam(":correo", $datos["correo"], PDO::PARAM_STR);
     $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
-    $stmt->bindParam(":clasificacion", $datos["clasificacion"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
 
     if($stmt->execute()){
@@ -60,7 +59,7 @@ class ModeloCliente{
 
   /* MÉTODO PARA EDITAR CLIENTE */
   static public function mdlEditarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, direccion = :direccion, clasificacion = :clasificacion, fecha_creacion = :fecha_creacion WHERE id = :id");
+    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, direccion = :direccion, fecha_creacion = :fecha_creacion WHERE id = :id");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -68,7 +67,6 @@ class ModeloCliente{
     $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
     $stmt->bindParam(":correo", $datos["correo"], PDO::PARAM_STR);
     $stmt->bindParam(":direccion", $datos["direccion"], PDO::PARAM_STR);
-    $stmt->bindParam(":clasificacion", $datos["clasificacion"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
     $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 

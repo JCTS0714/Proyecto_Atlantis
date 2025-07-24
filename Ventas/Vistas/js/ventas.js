@@ -1,12 +1,12 @@
 //**===========================================
 // CARGAR LA TABLA DINAMICA DE VENTAS PRODUCTOS
 // ============================================ */
-$.ajax({
+/* $.ajax({
     url: "ajax/datatable-ventas.ajax.php",
     success: function(respuesta) {
         console.log("respuesta",respuesta);
     }
-})
+}) */
 //DATATABLE
 $(".tablaVentas").DataTable({
 

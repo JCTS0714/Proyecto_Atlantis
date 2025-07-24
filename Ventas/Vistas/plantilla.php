@@ -148,7 +148,7 @@
   <script src="vistas/js/clientes.js"></script>
   <script src="vistas/js/proveedor.js"></script>
   <script src="vistas/js/ventas.js"></script>
-  <script src="vistas/js/crm.js"></script>
+  <script src="vistas/js/oportunidades.js"></script>
 
 
 </body>

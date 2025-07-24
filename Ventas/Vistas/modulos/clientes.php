@@ -31,7 +31,6 @@
               <th>Teléfono</th>
               <th>Correo</th>
               <th>Dirección</th>
-              <th>Clasificación</th>
               <th>Fecha Creación</th>
               <th>Acciones</th>
             </tr>
@@ -52,7 +51,6 @@
                     <td>'.$value["telefono"].'</td>
                     <td>'.$value["correo"].'</td>
                     <td>'.$value["direccion"].'</td>
-                    <td>'.$value["clasificacion"].'</td>
                     <td>'.$value["fecha_creacion"].'</td>
                     <td>
                       <div class="btn-group">
@@ -83,13 +81,26 @@
         </div>
         <div class="modal-body">
           <div class="box-body">
-            <!-- Nombre -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoNombre" placeholder="Ingresar nombre" required>
-              </div>
-            </div>
+            <!-- Campos de formulario -->
+            <?php
+              $campos = [
+                ["icon" => "user", "type" => "text", "name" => "nuevoNombre", "placeholder" => "Ingresar nombre"],
+                ["icon" => "address-card", "type" => "text", "name" => "nuevoDocumento", "placeholder" => "Ingresar documento"],
+                ["icon" => "mobile", "type" => "text", "name" => "nuevoTelefono", "placeholder" => "Ingresar teléfono"],
+                ["icon" => "envelope", "type" => "email", "name" => "nuevoCorreo", "placeholder" => "Ingresar correo"],
+                ["icon" => "home", "type" => "text", "name" => "nuevoDireccion", "placeholder" => "Ingresar dirección"]
+              ];
+              foreach ($campos as $campo) {
+                echo '
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-'.$campo["icon"].'"></i></span>
+                    <input type="'.$campo["type"].'" class="form-control input-lg" name="'.$campo["name"].'" placeholder="'.$campo["placeholder"].'" required>
+                  </div>
+                </div>';
+              }
+            ?>
+
             <!-- Tipo -->
             <div class="form-group">
               <div class="input-group">
@@ -101,46 +112,8 @@
                 </select>
               </div>
             </div>
-            <!-- Documento -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoDocumento" placeholder="Ingresar documento" required>
-              </div>
-            </div>
-            <!-- Teléfono -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" required>
-              </div>
-            </div>
-            <!-- Correo -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo" required>
-              </div>
-            </div>
-            <!-- Dirección -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoDireccion" placeholder="Ingresar dirección" required>
-              </div>
-            </div>
-            <!-- Clasificación -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-star"></i></span>
-                <select class="form-control input-lg" name="nuevaClasificacion" required>
-                  <option value="">Seleccionar clasificación</option>
-                  <option value="nuevo">Nuevo</option>
-                  <option value="recurrente">Recurrente</option>
-                  <option value="vip">VIP</option>
-                </select>
-              </div>
-            </div>
+
+
             <!-- Fecha de creación -->
             <div class="form-group">
               <div class="input-group">
@@ -148,12 +121,15 @@
                 <input type="date" class="form-control input-lg" name="nuevaFechaCreacion" required>
               </div>
             </div>
+
           </div>
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
           <button type="submit" class="btn btn-primary">Guardar Cliente</button>
         </div>
+
         <?php
           $crearCliente = new ControladorCliente();
           $crearCliente->ctrCrearCliente();
@@ -163,13 +139,9 @@
   </div>
 </div>
 
-<!--================================
-
- MODAL EDITAR USUARIO 
-
-====================================-->
-
-
+<!-- ==========================================
+     MODAL EDITAR CLIENTE
+=========================================== -->
 <div id="modalActualizarClientes" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -180,14 +152,29 @@
         </div>
         <div class="modal-body">
           <div class="box-body">
-            <!-- Nombre -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control input-lg" id="editarNombre" name="editarNombre" value="" required>
-                <input type="hidden" id="idCliente" name="idCliente">
-              </div>
-            </div>
+            <input type="hidden" id="idCliente" name="idCliente">
+
+            <!-- Campos editables similares -->
+            <?php
+              $camposEditar = [
+                ["icon" => "user", "type" => "text", "id" => "editarNombre", "name" => "editarNombre"],
+                ["icon" => "address-card", "type" => "text", "id" => "editarDocumento", "name" => "editarDocumento"],
+                ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono"],
+                ["icon" => "envelope", "type" => "email", "id" => "editarCorreo", "name" => "editarCorreo"],
+                ["icon" => "home", "type" => "text", "id" => "editarDireccion", "name" => "editarDireccion"],
+                ["icon" => "calendar", "type" => "date", "id" => "editarFechaCreacion", "name" => "editarFechaCreacion"]
+              ];
+              foreach ($camposEditar as $campo) {
+                echo '
+                <div class="form-group">
+                  <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-'.$campo["icon"].'"></i></span>
+                    <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" required>
+                  </div>
+                </div>';
+              }
+            ?>
+
             <!-- Tipo -->
             <div class="form-group">
               <div class="input-group">
@@ -199,104 +186,25 @@
                 </select>
               </div>
             </div>
-            <!-- Documento -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
-                <input type="text" class="form-control input-lg" id="editarDocumento" name="editarDocumento" value="" required>
-              </div>
-            </div>
-            <!-- Teléfono -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" value="" required>
-              </div>
-            </div>
-            <!-- Correo -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" class="form-control input-lg" id="editarCorreo" name="editarCorreo" value="" required>
-              </div>
-            </div>
-            <!-- Dirección -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" id="editarDireccion" name="editarDireccion" value="" required>
-              </div>
-            </div>
-            <!-- Clasificación -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-star"></i></span>
-                <select class="form-control input-lg" id="editarClasificacion" name="editarClasificacion" required>
-                  <option value="">Seleccionar clasificación</option>
-                  <option value="nuevo">Nuevo</option>
-                  <option value="recurrente">Recurrente</option>
-                  <option value="vip">VIP</option>
-                </select>
-              </div>
-            </div>
-            <!-- Fecha de creación -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion" value="" required>
-              </div>
-            </div>
+
+            
+
           </div>
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
           <button type="submit" class="btn btn-primary">Editar Cliente</button>
         </div>
+
         <?php
           $editarCliente = new ControladorCliente();
           $editarCliente->ctrEditarCliente();
-        ?>
-        <?php
-         $eliminarCliente = new ControladorCliente();
-         $eliminarCliente->ctrEliminarCliente();
+
+          $eliminarCliente = new ControladorCliente();
+          $eliminarCliente->ctrEliminarCliente();
         ?>
       </form>
     </div>
   </div>
 </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Editar Cliente</button>
-        </div>
-         <!--==========================
-
-          LLAMAR AL MÉTODO PARA EDITAR A UN CLIENTE
-
-          ==============================-->
-
-        <?php
-          $editarCliente = new ControladorCliente();
-          $editarCliente->ctrEditarCliente();
-        ?>
-        <!-- LLAMAR AL MÉTODO PARA ELIMINAR LA CATEGORÍA -->
-
-         <?php
-
-         $eliminarCliente = new ControladorCliente();
-
-         $eliminarCliente->ctrEliminarCliente();
-
-         ?>
-
-
-        </form>
-      </div>
-    </div>
-</div>
-
