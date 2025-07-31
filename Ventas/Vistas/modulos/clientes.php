@@ -15,9 +15,9 @@
   <section class="content">
     <div class="box">
       <div class="box-header with-border">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarCliente">
+<!--         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarCliente">
           Agregar Cliente
-        </button>
+        </button> -->
       </div>
 
       <div class="box-body">
@@ -30,18 +30,25 @@
               <th>Documento</th>
               <th>Teléfono</th>
               <th>Correo</th>
-              <th>Dirección</th>
+              <th>Ciudad</th>
+              <th>Migración</th>
+              <th>Referencia</th>
+              <th>Fecha Contacto</th>
+              <th>Empresa</th>
               <th>Fecha Creación</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <?php
-              $item = null;
-              $valor = null;
+              <?php
+              $item = "estado";
+              $valor = 1; // Clientes
               $clientes = ControladorCliente::ctrMostrarCliente($item, $valor);
 
               foreach ($clientes as $key => $value) {
+                $estadoTexto = ($value["estado"] == 0) ? "Prospecto" : "Cliente";
+                $btnClass = ($value["estado"] == 0) ? "btn-warning" : "btn-success";
+
                 echo '
                   <tr>
                     <td>'.($key + 1).'</td>
@@ -50,8 +57,13 @@
                     <td>'.$value["documento"].'</td>
                     <td>'.$value["telefono"].'</td>
                     <td>'.$value["correo"].'</td>
-                    <td>'.$value["direccion"].'</td>
+                    <td>'.$value["ciudad"].'</td>
+                    <td>'.$value["migracion"].'</td>
+                    <td>'.$value["referencia"].'</td>
+                    <td>'.$value["fecha_contacto"].'</td>
+                    <td>'.$value["empresa"].'</td>
                     <td>'.$value["fecha_creacion"].'</td>
+<td><button class="btn ' . (($value["estado"] == 1) ? "btn-success" : "btn-warning") . ' btn-xs btnEstadoCliente" idCliente="' . $value["id"] . '" estadoCliente="' . $value["estado"] . '" style="min-width: 90px;">' . (($value["estado"] == 1) ? "Cliente" : "Prospecto") . '</button></td>
                     <td>
                       <div class="btn-group">
                         <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
@@ -68,76 +80,6 @@
   </section>
 </div>
 
-<!-- ===============================================
-     MODAL AGREGAR CLIENTE
-================================================== -->
-<div id="modalAgregarCliente" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#3c8dbc; color:white;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Agregar Cliente</h4>
-        </div>
-        <div class="modal-body">
-          <div class="box-body">
-            <!-- Campos de formulario -->
-            <?php
-              $campos = [
-                ["icon" => "user", "type" => "text", "name" => "nuevoNombre", "placeholder" => "Ingresar nombre"],
-                ["icon" => "address-card", "type" => "text", "name" => "nuevoDocumento", "placeholder" => "Ingresar documento"],
-                ["icon" => "mobile", "type" => "text", "name" => "nuevoTelefono", "placeholder" => "Ingresar teléfono"],
-                ["icon" => "envelope", "type" => "email", "name" => "nuevoCorreo", "placeholder" => "Ingresar correo"],
-                ["icon" => "home", "type" => "text", "name" => "nuevoDireccion", "placeholder" => "Ingresar dirección"]
-              ];
-              foreach ($campos as $campo) {
-                echo '
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-'.$campo["icon"].'"></i></span>
-                    <input type="'.$campo["type"].'" class="form-control input-lg" name="'.$campo["name"].'" placeholder="'.$campo["placeholder"].'" required>
-                  </div>
-                </div>';
-              }
-            ?>
-
-            <!-- Tipo -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-users"></i></span>
-                <select class="form-control input-lg" name="nuevoTipo" required>
-                  <option value="">Seleccionar tipo</option>
-                  <option value="persona">Persona</option>
-                  <option value="empresa">Empresa</option>
-                </select>
-              </div>
-            </div>
-
-
-            <!-- Fecha de creación -->
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" name="nuevaFechaCreacion" required>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Guardar Cliente</button>
-        </div>
-
-        <?php
-          $crearCliente = new ControladorCliente();
-          $crearCliente->ctrCrearCliente();
-        ?>
-      </form>
-    </div>
-  </div>
-</div>
 
 <!-- ==========================================
      MODAL EDITAR CLIENTE
@@ -161,8 +103,12 @@
                 ["icon" => "address-card", "type" => "text", "id" => "editarDocumento", "name" => "editarDocumento"],
                 ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono"],
                 ["icon" => "envelope", "type" => "email", "id" => "editarCorreo", "name" => "editarCorreo"],
-                ["icon" => "home", "type" => "text", "id" => "editarDireccion", "name" => "editarDireccion"],
-                ["icon" => "calendar", "type" => "date", "id" => "editarFechaCreacion", "name" => "editarFechaCreacion"]
+              ["icon" => "home", "type" => "text", "id" => "editarCiudad", "name" => "editarCiudad"],
+              ["icon" => "globe", "type" => "text", "id" => "editarMigracion", "name" => "editarMigracion"],
+              ["icon" => "link", "type" => "text", "id" => "editarReferencia", "name" => "editarReferencia"],
+              ["icon" => "calendar", "type" => "date", "id" => "editarFechaContacto", "name" => "editarFechaContacto"],
+              ["icon" => "building", "type" => "text", "id" => "editarEmpresa", "name" => "editarEmpresa"],
+              ["icon" => "calendar", "type" => "date", "id" => "editarFechaCreacion", "name" => "editarFechaCreacion"]
               ];
               foreach ($camposEditar as $campo) {
                 echo '
@@ -181,8 +127,8 @@
                 <span class="input-group-addon"><i class="fa fa-users"></i></span>
                 <select class="form-control input-lg" id="editarTipo" name="editarTipo" required>
                   <option value="">Seleccionar tipo</option>
-                  <option value="persona">Persona</option>
-                  <option value="empresa">Empresa</option>
+                  <option value="DNI">DNI</option>
+                  <option value="RUC">RUC</option>
                 </select>
               </div>
             </div>

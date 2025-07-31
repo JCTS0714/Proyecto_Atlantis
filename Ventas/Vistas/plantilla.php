@@ -112,6 +112,7 @@
             $_GET["ruta"]=="crear-venta" ||
             $_GET["ruta"]=="reportes"    ||
             $_GET["ruta"]=="proveedor"   ||
+            $_GET["ruta"]=="prospectos"   ||
             $_GET["ruta"]=="crm" ||
             $_GET["ruta"]=="salir"    
             ){
@@ -149,6 +150,7 @@
   <script src="vistas/js/proveedor.js"></script>
   <script src="vistas/js/ventas.js"></script>
   <script src="vistas/js/oportunidades.js"></script>
+  <script src="vistas/js/prospectos.js"></script>
 
 
 </body>

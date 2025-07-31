@@ -109,11 +109,11 @@
 
        if ($value["estado"] == 1) {
   // Activado
-  echo '<td><button class="btn btn-success btn-xs btnActivar" idUsuario="'.$value["id"].'" estadoUsuario="1">Activado</button></td>';
-} else {
-  // Desactivado
-  echo '<td><button class="btn btn-danger btn-xs btnActivar" idUsuario="'.$value["id"].'" estadoUsuario="0">Desactivado</button></td>';
-}
+          echo '<td><button class="btn btn-success btn-xs btnActivar" idUsuario="'.$value["id"].'" estadoUsuario="1">Activado</button></td>';
+        } else {
+          // Desactivado
+          echo '<td><button class="btn btn-danger btn-xs btnActivar" idUsuario="'.$value["id"].'" estadoUsuario="0">Desactivado</button></td>';
+        }
     
         echo '<td>'.$value["ultimo_login"].'</td>
         <td>

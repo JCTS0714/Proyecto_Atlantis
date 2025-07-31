@@ -55,35 +55,27 @@ static public function ctrActualizarEstadoOportunidad() {
     }
 
     static public function ctrEliminarOportunidad() {
-        if (isset($_GET["idOportunidadEliminar"])) {
+        header('Content-Type: application/json');
+        if (isset($_POST["id"])) {
             $tabla = "oportunidades";
-            $respuesta = ModeloCRM::mdlEliminarOportunidad($tabla, $_GET["idOportunidadEliminar"]);
+            $respuesta = ModeloCRM::mdlEliminarOportunidad($tabla, $_POST["id"]);
 
             if ($respuesta == "ok") {
-                echo '
-                <script>
-                    Swal.fire({
-                        icon: "success",
-                        title: "¡Oportunidad eliminada correctamente!",
-                        showConfirmButton: true,
-                        confirmButtonText: "Cerrar"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location = "crm";
-                        }
-                    });
-                </script>';
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "¡Oportunidad eliminada correctamente!"
+                ]);
             } else {
-                echo '
-                <script>
-                    Swal.fire({
-                        icon: "error",
-                        title: "¡Error al eliminar la oportunidad!",
-                        showConfirmButton: true,
-                        confirmButtonText: "Cerrar"
-                    });
-                </script>';
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "¡Error al eliminar la oportunidad!"
+                ]);
             }
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Parámetro id no recibido"
+            ]);
         }
     }
 

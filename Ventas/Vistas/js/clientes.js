@@ -1,26 +1,183 @@
-$(document).on("click", ".btnEditarCliente", function() {
-    var idCliente = $(this).attr("idCliente");
-    var datos = new FormData();
-    datos.append("idCliente", idCliente);
+$(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", function(event) {
+  event.preventDefault();
+  console.log("Click en botón estado cliente/prospecto");
+  var $btn = $(this);
+  var idCliente = $btn.attr("idCliente");
+  var estadoCliente = parseInt($btn.attr("estadoCliente"));
 
-    $.ajax({
+  if (!idCliente || isNaN(estadoCliente)) {
+    console.error("Atributos idCliente o estadoCliente inválidos en el botón.");
+    return;
+  }
+
+  // Calcula el nuevo estado
+  var nuevoEstado = estadoCliente === 1 ? 0 : 1;
+
+  // Confirmación con SweetAlert
+  Swal.fire({
+    title: '¿Está seguro de cambiar el estado?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, cambiar',
+    cancelButtonText: 'No, cancelar'
+  }).then((result) => {
+    console.log("Resultado SweetAlert:", result);
+    if (result.isConfirmed) {
+      // Envía el nuevo estado al backend
+      var datos = new FormData();
+      datos.append("activarId", idCliente);
+      datos.append("activarEstado", nuevoEstado);
+
+      $.ajax({
         url: "ajax/clientes.ajax.php",
         method: "POST",
         data: datos,
         cache: false,
         contentType: false,
         processData: false,
-        dataType: "json",
         success: function(respuesta) {
-            $("#idCliente").val(respuesta["id"]);
-            $("#editarNombre").val(respuesta["nombre"]);
-            $("#editarTipo").val(respuesta["tipo"]);
-            $("#editarDocumento").val(respuesta["documento"]);
-            $("#editarTelefono").val(respuesta["telefono"]);
-            $("#editarCorreo").val(respuesta["correo"]);
-            $("#editarDireccion").val(respuesta["direccion"]);
-            $("#editarClasificacion").val(respuesta["clasificacion"]);
-            $("#editarFechaCreacion").val(respuesta["fecha_creacion"]);
+          console.log("Respuesta ajax:", respuesta);
+          if (respuesta == "ok" || respuesta == 1) {
+            // Actualiza el botón y el atributo para reflejar el nuevo estado
+            if (nuevoEstado === 1) {
+              $btn.removeClass("btn-warning").addClass("btn-success").html("Cliente").attr("estadoCliente", 1);
+            } else {
+              $btn.removeClass("btn-success").addClass("btn-warning").html("Prospecto").attr("estadoCliente", 0);
+            }
+            // Recargar la página para reflejar cambios en la vista
+            location.reload();
+          } else {
+            alert("Error al actualizar el estado. Intente nuevamente.");
+          }
+        },
+        error: function() {
+          alert("Error en la comunicación con el servidor.");
         }
-    });
+      });
+    }
+  });
 });
+
+// Manejador para botón editar cliente
+$(document).on("click", ".btnEditarCliente", function() {
+  var idCliente = $(this).attr("idCliente");
+  var datos = new FormData();
+  datos.append("idCliente", idCliente);
+
+  $.ajax({
+    url: "ajax/clientes.ajax.php",
+    method: "POST",
+    data: datos,
+    cache: false,
+    contentType: false,
+    processData: false,
+    dataType: "json",
+    success: function(respuesta) {
+      console.log("Respuesta ajax editar cliente:", respuesta); // Log para diagnóstico
+      $("#idCliente").val(respuesta["id"]);
+      $("#editarNombre").val(respuesta["nombre"]);
+      $("#editarTipo").val(respuesta["tipo"]);
+      $("#editarDocumento").val(respuesta["documento"]);
+      $("#editarTelefono").val(respuesta["telefono"]);
+      $("#editarCorreo").val(respuesta["correo"]);
+      $("#editarCiudad").val(respuesta["ciudad"]);
+      $("#editarMigracion").val(respuesta["migracion"]);
+      $("#editarReferencia").val(respuesta["referencia"]);
+      $("#editarFechaContacto").val(respuesta["fecha_contacto"]);
+      $("#editarEmpresa").val(respuesta["empresa"]);
+      $("#editarFechaCreacion").val(respuesta["fecha_creacion"]);
+      $("#modalActualizarClientes").modal("show");
+    }
+  });
+});
+
+// Manejador para botón eliminar cliente
+$(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente", function() {
+  var idCliente = $(this).attr("idCliente");
+
+  Swal.fire({
+    title: '¿Está seguro de eliminar el cliente?',
+    text: "Esta acción no se puede deshacer.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'No, cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location = "index.php?ruta=clientes&idClienteEliminar=" + idCliente;
+    }
+  });
+});
+
+// Validar formulario agregar cliente/prospecto
+$("form").on("submit", function(e) {
+  var tipoSelector = $(this).find("select[name='nuevoTipo'], select[name='editarTipo']");
+  var documentoSelector = $(this).find("input[name='nuevoDocumento'], input[name='editarDocumento']");
+
+  if (!validarDocumento(tipoSelector, documentoSelector)) {
+    e.preventDefault();
+  }
+});
+
+// Función para ajustar maxlength y permitir solo números en campo documento según tipo seleccionado
+function configurarValidacionDocumento(tipoSelector, documentoSelector) {
+  var $tipo = $(tipoSelector);
+  var $documento = $(documentoSelector);
+
+  function ajustar() {
+    var tipo = $tipo.val();
+    if (tipo === "DNI") {
+      $documento.attr("maxlength", 8);
+    } else if (tipo === "RUC") {
+      $documento.attr("maxlength", 11);
+    } else {
+      $documento.removeAttr("maxlength");
+    }
+  }
+
+  function permitirSoloNumeros(e) {
+    var charCode = e.which ? e.which : e.keyCode;
+    if (charCode < 48 || charCode > 57) {
+      e.preventDefault();
+    }
+  }
+
+  // Ajustar maxlength al cargar
+  ajustar();
+
+  // Cambiar maxlength al cambiar tipo
+  $tipo.on("change", function() {
+    ajustar();
+    $documento.val(""); // Limpiar campo documento al cambiar tipo
+  });
+
+  // Permitir solo números en documento
+  $documento.on("keypress", permitirSoloNumeros);
+}
+
+// Configurar validación para modal agregar prospecto
+configurarValidacionDocumento("select[name='nuevoTipo']", "input[name='nuevoDocumento']");
+
+// Configurar validación para modal editar prospecto y cliente
+configurarValidacionDocumento("select[name='editarTipo']", "input[name='editarDocumento']");
+
+// Validación para campos DNI y RUC en formularios agregar y editar
+function validarDocumento(tipoSelector, documentoSelector) {
+  var tipo = $(tipoSelector).val();
+  var documento = $(documentoSelector).val();
+
+  var soloNumeros = /^[0-9]+$/;
+
+  if (tipo === "DNI") {
+    if (!soloNumeros.test(documento) || documento.length !== 8) {
+      alert("El DNI debe tener 8 dígitos numéricos.");
+      return false;
+    }
+  } else if (tipo === "RUC") {
+    if (!soloNumeros.test(documento) || documento.length !== 11) {
+      alert("El RUC debe tener 11 dígitos numéricos.");
+      return false;
+    }
+  }
+  return true;
+}

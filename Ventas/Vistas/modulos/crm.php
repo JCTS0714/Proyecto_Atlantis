@@ -30,6 +30,8 @@
     </section>
 
     <section class="content">
+      <button class="btn btn-primary" id="btn-nueva-oportunidad" style="margin-bottom: 15px; width: 100%; max-width: 230px;">+ Nueva Oportunidad</button>
+      <button class="btn btn-success" data-toggle="modal" data-target="#modalAgregarCliente" style="margin-bottom: 15px; width: 100%; max-width: 230px;">+ Nuevo Prospecto</button>
       <div class="row">
         <?php
         $estados = ["nuevo", "calificado", "propuesto", "ganado"];
@@ -42,9 +44,6 @@
           echo "<div class='box-body kanban-column' id='$estado' ondrop='drop(event)' ondragover='allowDrop(event)'>";
           echo "<!-- Tarjetas se cargarán aquí -->";
           echo '</div>';
-          if ($estado === 'nuevo') {
-            echo '<button class="btn btn-primary btn-block" id="btn-nueva-oportunidad">+ Nueva Oportunidad</button>';
-          }
           echo '</div></div>';
         }
         ?>
@@ -89,22 +88,9 @@
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-tags"></i></span>
-                <select class="form-control input-lg" id="cliente_id" name="idCliente" required>
-                  <option value="">Seleccionar cliente</option>
-                  <?php
-                  $item = null;
-                  $valor = null;
-                  $cliente = ControladorCliente::ctrMostrarCliente($item, $valor);
-                  
-                  if(!empty($cliente) && is_array($cliente)) {
-                    foreach ($cliente as $cliente) {
-                      echo '<option value="'.$cliente['id'].'">'.$cliente['nombre'].'</option>';
-                    }
-                  } else {
-                    echo '<option value="">No hay cliente disponibles</option>';
-                  }
-                  ?>
-                </select>
+          <select class="form-control input-lg" id="cliente_id" name="idCliente" required style="width: 100%;">
+            <option value="">Seleccionar cliente</option>
+          </select>
               </div>
             </div>
           </div>
@@ -117,10 +103,124 @@
     </div>
   </div>
 
+  <!-- Modal para agregar cliente -->
+  <div id="modalAgregarCliente" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form role="form" method="post" enctype="multipart/form-data">
+          <div class="modal-header" style="background:#3c8dbc; color:white;">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Agregar Cliente</h4>
+          </div>
+          <div class="modal-body">
+            <div class="box-body">
+              <!-- Campos de formulario -->
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoNombre" placeholder="Ingresar nombre" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-users"></i></span>
+                  <select class="form-control input-lg" name="nuevoTipo" required>
+                    <option value="">Seleccionar tipo</option>
+                    <option value="DNI">DNI</option>
+                    <option value="RUC">RUC</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoDocumento" placeholder="Ingresar documento" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-home"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoCiudad" placeholder="Ingresar ciudad" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-globe"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoMigracion" placeholder="Ingresar migración" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-link"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoReferencia" placeholder="Ingresar referencia" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  <input type="date" class="form-control input-lg" name="nuevoFechaContacto" placeholder="Ingresar fecha de contacto" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                  <input type="text" class="form-control input-lg" name="nuevoEmpresa" placeholder="Ingresar empresa" required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
+            <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+          </div>
+          <?php
+            $crearCliente = new ControladorCliente();
+            $crearCliente->ctrCrearCliente();
+          ?>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     $(document).ready(function () {
-      $('#cliente_id').select2();
-      loadClientes();
+      $('#cliente_id').select2({
+        placeholder: 'Buscar cliente',
+        minimumInputLength: 1,
+        dropdownParent: $('#modal-nueva-oportunidad'),
+        ajax: {
+          url: '/Proyecto_atlantis/Ventas/ajax/clientes_oportunidades.ajax.php',
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            console.log("Search term:", params.term);
+            return {
+              q: params.term // término de búsqueda
+            };
+          },
+          processResults: function (data) {
+            return {
+              results: data.map(function(cliente) {
+                return { id: cliente.id, text: cliente.nombre };
+              })
+            };
+          },
+          cache: true
+        }
+      });
+      // Ya no se usa loadClientes porque select2 carga dinámicamente
       loadOportunidades();
 
       $('#btn-nueva-oportunidad').on('click', function () {

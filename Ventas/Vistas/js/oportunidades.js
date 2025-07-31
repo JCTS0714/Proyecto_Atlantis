@@ -28,10 +28,10 @@ function agregarTarjeta(oportunidad) {
                 '<h5 class="card-title">' + oportunidad.titulo + '</h5>' +
                 '<p class="card-text">' + oportunidad.descripcion + '</p>' +
                 '<p class="card-text">Valor: ' + oportunidad.valor_estimado + ' - Probabilidad: ' + oportunidad.probabilidad + '%</p>' +
-                '<button class="btn btn-success" onclick="cambiarEstado(' + oportunidad.id + ', \'calificado\')">Calificado</button>' +
-                '<button class="btn btn-warning" onclick="cambiarEstado(' + oportunidad.id + ', \'propuesto\')">Propuesto</button>' +
-                '<button class="btn btn-info" onclick="cambiarEstado(' + oportunidad.id + ', \'ganado\')">Ganado</button>' +
-                '<button class="btn btn-danger" onclick="eliminarOportunidad(' + oportunidad.id + ')">Eliminar</button>' +
+                '<button class="btn btn-success btn-cambiar-estado" data-id="' + oportunidad.id + '" data-estado="calificado">Calificado</button>' +
+                '<button class="btn btn-warning btn-cambiar-estado" data-id="' + oportunidad.id + '" data-estado="propuesto">Propuesto</button>' +
+                '<button class="btn btn-info btn-cambiar-estado" data-id="' + oportunidad.id + '" data-estado="ganado">Ganado</button>' +
+                '<button class="btn btn-danger btn-eliminar-oportunidad" data-id="' + oportunidad.id + '">Eliminar</button>' +
             '</div>' +
         '</div>';
     $('#' + oportunidad.estado).append(tarjeta);
@@ -117,17 +117,82 @@ function cambiarEstado(id, nuevoEstado) {
 
 function eliminarOportunidad(id) {
     console.log("eliminarOportunidad llamado con id:", id);
+    Swal.fire({
+        title: "¿Estás seguro de eliminar la tarjeta?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        cancelButtonText: "Cancelar",
+        confirmButtonText: "Sí, eliminar"
+    }).then((result) => {
+        if (result.isConfirmed) {
     $.ajax({
         url: '/Proyecto_atlantis/Ventas/ajax/oportunidades.ajax.php',
         method: 'POST',
         data: { action: 'eliminarOportunidad', id: id },
+        dataType: 'json',
         success: function(response) {
             console.log("Respuesta eliminarOportunidad:", response);
-            loadOportunidades();
+            if (response.status === "success") {
+                loadOportunidades();
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: response.message,
+                    confirmButtonText: "Cerrar"
+                });
+            }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.error("Error en eliminarOportunidad:", textStatus, errorThrown);
             alert("Error al eliminar oportunidad: " + textStatus);
+        }
+    });
+        }
+    });
+}
+
+$(document).on('click', '.btn-cambiar-estado', function() {
+    var id = $(this).data('id');
+    var estado = $(this).data('estado');
+    cambiarEstado(id, estado);
+});
+
+$(document).on('click', '.btn-eliminar-oportunidad', function() {
+    var id = $(this).data('id');
+    console.log("Click en botón eliminar oportunidad con id:", id);
+    eliminarOportunidad(id);
+});
+
+function eliminarOportunidad(id) {
+    console.log("eliminarOportunidad llamado con id:", id);
+    Swal.fire({
+        title: "¿Estás seguro de eliminar la tarjeta?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        cancelButtonText: "Cancelar",
+        confirmButtonText: "Sí, eliminar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/Proyecto_atlantis/Ventas/ajax/oportunidades.ajax.php',
+                method: 'POST',
+                data: { action: 'eliminarOportunidad', id: id },
+                success: function(response) {
+                    console.log("Respuesta eliminarOportunidad:", response);
+                    loadOportunidades();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error en eliminarOportunidad:", textStatus, errorThrown);
+                    alert("Error al eliminar oportunidad: " + textStatus);
+                }
+            });
         }
     });
 }
