@@ -1,20 +1,22 @@
 <?php
-class ControladorCliente {
+class ControladorProspectos {
 
-    /** MÉTODO PARA REGISTRAR UN NUEVO CLIENTE */
-    static public function ctrCrearCliente() {
+    /** MÉTODO PARA MOSTRAR PROSPECTOS */
+    static public function ctrMostrarProspectos($item, $valor) {
+        $tabla = "clientes";
+        $itemEstado = "estado";
+        $valorEstado = 0; // Prospectos
+        $respuesta = ModeloCliente::MdlMostrarCliente($tabla, $item, $valor);
+        // Filtrar solo prospectos
+        $prospectos = array_filter($respuesta, function($cliente) use ($itemEstado, $valorEstado) {
+            return isset($cliente[$itemEstado]) && $cliente[$itemEstado] == $valorEstado;
+        });
+        return $prospectos;
+    }
+
+    /** MÉTODO PARA REGISTRAR UN NUEVO PROSPECTO */
+    static public function ctrCrearProspecto() {
         if (isset($_POST["nuevoNombre"])) {
-            // Agregar log para depuración
-            error_log("Datos recibidos en ctrCrearCliente: " . print_r($_POST, true));
-            error_log("Validando campos obligatorios para registrar cliente/prospecto: nombre, tipo, documento, telefono, fecha_contacto, empresa");
-
-            // Log visible para depuración en pantalla
-            echo '<pre style="background:#f8d7da; color:#721c24; padding:10px; border-radius:5px; font-family: monospace;">';
-            echo "Datos recibidos en ctrCrearCliente:\n";
-            print_r($_POST);
-            echo "\nValidando campos obligatorios para registrar cliente/prospecto: nombre, tipo, documento, telefono, fecha_contacto, empresa\n";
-            echo '</pre>';
-
             $tipo = $_POST["nuevoTipo"];
             $documento = $_POST["nuevoDocumento"];
             $documentoValido = false;
@@ -25,9 +27,8 @@ class ControladorCliente {
                 $documentoValido = true;
             }
 
-            // Ajustar validaciones para permitir espacios y caracteres comunes en nombre y empresa
             if (
-                preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\s\.\-]+$/u', $_POST["nuevoNombre"]) &&
+                preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\s]+$/', $_POST["nuevoNombre"]) &&
                 in_array($tipo, ["DNI", "RUC"]) &&
                 $documentoValido &&
                 (empty($_POST["nuevoCorreo"]) || filter_var($_POST["nuevoCorreo"], FILTER_VALIDATE_EMAIL)) &&
@@ -36,7 +37,7 @@ class ControladorCliente {
                 (empty($_POST["nuevoMigracion"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["nuevoMigracion"])) &&
                 (empty($_POST["nuevoReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["nuevoReferencia"])) &&
                 preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["nuevoFechaContacto"]) &&
-                preg_match('/^[\p{L}\p{N}\s\.\-]+$/u', $_POST["nuevoEmpresa"])
+                preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["nuevoEmpresa"])
             ) {
                 $tabla = "clientes";
                 $datos = array(
@@ -56,13 +57,7 @@ class ControladorCliente {
                 $respuesta = ModeloCliente::mdlRegistrarCliente($tabla, $datos);
 
                 if ($respuesta == "ok") {
-                    $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'clientes';
-                    if (!isset($_POST['ruta'])) {
-                        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-                        if (strpos($referer, 'prospectos.php') !== false) {
-                            $ruta = 'prospectos';
-                        }
-                    }
+                    $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'prospectos';
                     echo '<script>
                         swal.fire({
                             icon: "success",
@@ -71,19 +66,13 @@ class ControladorCliente {
                             confirmButtonText: "Cerrar",
                             showCloseButton: true
                         }).then((result) => {
-                            if (result.isConfirmed) {
+                            if (result.value) {
                                 window.location = "'.$ruta.'";
                             }
                         });
                     </script>';
                 } else {
-                    $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'clientes';
-                    if (!isset($_POST['ruta'])) {
-                        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-                        if (strpos($referer, 'prospectos.php') !== false) {
-                            $ruta = 'prospectos';
-                        }
-                    }
+                    $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'prospectos';
                     echo '<script>
                         swal.fire({
                             icon: "error",
@@ -92,20 +81,14 @@ class ControladorCliente {
                             confirmButtonText: "Cerrar",
                             showCloseButton: true
                         }).then((result) => {
-                            if (result.isConfirmed) {
+                            if (result.value) {
                                 window.location = "'.$ruta.'";
                             }
                         });
                     </script>';
                 }
             } else {
-                $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'clientes';
-                if (!isset($_POST['ruta'])) {
-                    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-                    if (strpos($referer, 'prospectos.php') !== false) {
-                        $ruta = 'prospectos';
-                    }
-                }
+                $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'prospectos';
                 echo '<script>
                     swal.fire({
                         icon: "error",
@@ -114,7 +97,7 @@ class ControladorCliente {
                         confirmButtonText: "Cerrar",
                         showCloseButton: true
                     }).then((result) => {
-                        if (result.isConfirmed) {
+                        if (result.value) {
                             window.location = "'.$ruta.'";
                         }
                     });
@@ -123,28 +106,8 @@ class ControladorCliente {
         }
     }
 
-    /**============================
-     * MÉTODO PARA MOSTRAR CLIENTE
-     * ============================ */
-    static public function ctrMostrarCliente($item, $valor) {
-        $tabla = "clientes";
-        $respuesta = ModeloCliente::MdlMostrarCliente($tabla, $item, $valor);
-        return $respuesta;
-    }
-
-    /**============================
-     * NUEVO MÉTODO PARA MOSTRAR CLIENTE POR ID
-     * ============================ */
-    static public function ctrMostrarClientePorId($id) {
-        $tabla = "clientes";
-        $respuesta = ModeloCliente::mdlMostrarCliente($tabla, "id", $id);
-        return $respuesta;
-    }
-
-    /**============================
-     * MÉTODO PARA EDITAR CLIENTE
-     * ============================ */
-    static public function ctrEditarCliente(){
+    /** MÉTODO PARA EDITAR PROSPECTO */
+    static public function ctrEditarProspecto(){
         if(isset($_POST["editarNombre"])){
             $tabla = "clientes";
             $datos = array(
@@ -158,8 +121,9 @@ class ControladorCliente {
                 "migracion" => $_POST["editarMigracion"],
                 "referencia" => $_POST["editarReferencia"],
                 "fecha_contacto" => $_POST["editarFechaContacto"],
-                "empresa" => $_POST["editarEmpresa"]
-                //"fecha_creacion" => $_POST["editarFechaCreacion"]
+                "empresa" => $_POST["editarEmpresa"],
+                "fecha_creacion" => $_POST["editarFechaCreacion"],
+                "estado" => 0
             );
             if (!preg_match('/^[0-9]{9}$/', $_POST["editarTelefono"])) {
                 echo '<script>
@@ -175,17 +139,11 @@ class ControladorCliente {
             $respuesta = ModeloCliente::mdlEditarCliente($tabla, $datos);
 
             if($respuesta == "ok"){
-                $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'clientes';
-                if (!isset($_POST['ruta'])) {
-                    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-                    if (strpos($referer, 'prospectos.php') !== false) {
-                        $ruta = 'prospectos';
-                    }
-                }
+                $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'prospectos';
                 echo '<script>
                     Swal.fire({
                         icon: "success",
-                        title: "¡El cliente ha sido editado correctamente!",
+                        title: "¡El prospecto ha sido editado correctamente!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
@@ -198,7 +156,7 @@ class ControladorCliente {
                 echo '<script>
                     Swal.fire({
                         icon: "error",
-                        title: "¡Error al editar el cliente!",
+                        title: "¡Error al editar el prospecto!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar"
                     });
@@ -206,30 +164,21 @@ class ControladorCliente {
             }
         }
     }
-    /**============================
-     * MÉTODO PARA MOSTRAR CLIENTES PARA OPORTUNIDAD
-     * ============================
-     */
-    static public function ctrMostrarClientesParaOportunidad($searchTerm = null) {
-        $tabla = "clientes";
-        $respuesta = ModeloCliente::mdlMostrarClientesParaOportunidad($searchTerm);
-        return $respuesta;
-    }
 
-    //**METODO PARA ELIMINAR CLIENTE */
-    static public function ctrEliminarCliente(){
+    /** MÉTODO PARA ELIMINAR PROSPECTO */
+    static public function ctrEliminarProspecto(){
         if(isset($_GET["idClienteEliminar"])){
             $tabla = "clientes";
             $datos = $_GET["idClienteEliminar"];
-            $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : 'clientes';
+            $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : 'prospectos';
 
-            // Verificar si el cliente tiene oportunidades asociadas antes de eliminar
+            // Verificar si el prospecto tiene oportunidades asociadas antes de eliminar
             $tieneOportunidades = ModeloCliente::mdlVerificarOportunidades($datos);
             if ($tieneOportunidades) {
                 echo '<script>
                     Swal.fire({
                         icon: "error",
-                        title: "¡No se puede eliminar el cliente porque tiene oportunidades asociadas! Primero elimine las oportunidades.",
+                        title: "¡No se puede eliminar el prospecto porque tiene oportunidades asociadas! Primero elimine las oportunidades.",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
@@ -246,7 +195,7 @@ class ControladorCliente {
                 echo '<script>
                     Swal.fire({
                         icon: "success",
-                        title: "¡El cliente ha sido eliminado correctamente!",
+                        title: "¡El prospecto ha sido eliminado correctamente!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
@@ -259,7 +208,7 @@ class ControladorCliente {
                 echo '<script>
                     Swal.fire({
                         icon: "error",
-                        title: "¡Error al eliminar el cliente!",
+                        title: "¡Error al eliminar el prospecto!",
                         showConfirmButton: true,
                         confirmButtonText: "Cerrar"
                     });

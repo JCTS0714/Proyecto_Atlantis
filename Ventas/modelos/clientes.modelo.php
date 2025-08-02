@@ -74,7 +74,7 @@ class ModeloCliente{
 
   /* MÉTODO PARA REGISTRAR CLIENTE */
   static public function mdlRegistrarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("INSERT INTO clientes(nombre, tipo, documento, telefono, correo, ciudad, migracion, referencia, fecha_contacto, empresa) VALUES(:nombre, :tipo, :documento, :telefono, :correo, :ciudad, :migracion, :referencia, :fecha_contacto, :empresa)");
+    $stmt = Conexion::conectar()->prepare("INSERT INTO clientes(nombre, tipo, documento, telefono, correo, ciudad, migracion, referencia, fecha_contacto, empresa, estado) VALUES(:nombre, :tipo, :documento, :telefono, :correo, :ciudad, :migracion, :referencia, :fecha_contacto, :empresa, :estado)");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -86,6 +86,7 @@ class ModeloCliente{
     $stmt->bindParam(":referencia", $datos["referencia"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_contacto", $datos["fecha_contacto"], PDO::PARAM_STR);
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
+    $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
 
     if($stmt->execute()){
       return "ok";
@@ -136,5 +137,14 @@ class ModeloCliente{
     }
     $stmt->closeCursor();
     $stmt = null;
+  }
+
+  /* MÉTODO PARA VERIFICAR SI UN CLIENTE TIENE OPORTUNIDADES */
+  static public function mdlVerificarOportunidades($idCliente) {
+    $stmt = Conexion::conectar()->prepare("SELECT COUNT(*) as total FROM oportunidades WHERE cliente_id = :cliente_id");
+    $stmt->bindParam(":cliente_id", $idCliente, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['total'] > 0;
   }
 }

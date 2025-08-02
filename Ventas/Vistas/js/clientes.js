@@ -60,6 +60,7 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
 
 // Manejador para botón editar cliente
 $(document).on("click", ".btnEditarCliente", function() {
+  console.log("Click en botón editar cliente detectado"); // Log para verificar evento
   var idCliente = $(this).attr("idCliente");
   var datos = new FormData();
   datos.append("idCliente", idCliente);
@@ -109,14 +110,58 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
   });
 });
 
-// Validar formulario agregar cliente/prospecto
-$("form").on("submit", function(e) {
-  var tipoSelector = $(this).find("select[name='nuevoTipo'], select[name='editarTipo']");
-  var documentoSelector = $(this).find("input[name='nuevoDocumento'], input[name='editarDocumento']");
+// Validar formulario agregar cliente/prospecto, excluyendo el formulario de nueva oportunidad
+$("form").not("#form-nueva-oportunidad").on("submit", function(e) {
+  // Solo aplicar validaciones en formularios específicos
+  var formAction = $(this).attr('action') || window.location.href;
+  
+  // Verificar si el formulario es de clientes o prospectos
+  var isClientesForm = formAction.indexOf('clientes') !== -1;
+  var isProspectosForm = formAction.indexOf('prospectos') !== -1;
+  var isModalForm = $(this).closest('.modal').length > 0;
+  
+  // Solo aplicar validaciones en formularios de clientes/prospectos
+  if ((isClientesForm || isProspectosForm || isModalForm) && !$(this).hasClass('login-form')) {
+    var tipoSelector = $(this).find("select[name='nuevoTipo'], select[name='editarTipo']");
+    var documentoSelector = $(this).find("input[name='nuevoDocumento'], input[name='editarDocumento']");
+    var telefonoSelector = $(this).find("input[name='nuevoTelefono'], input[name='editarTelefono']");
+    var correoSelector = $(this).find("input[name='nuevoCorreo'], input[name='editarCorreo']");
 
-  if (!validarDocumento(tipoSelector, documentoSelector)) {
-    e.preventDefault();
+    if (!validarDocumento(tipoSelector, documentoSelector) || !validarTelefono(telefonoSelector) || !validarCorreo(correoSelector)) {
+      e.preventDefault();
+    }
   }
+});
+
+// Validar correo: puede estar vacío o ser un email válido
+function validarCorreo(correoSelector) {
+  var correo = $(correoSelector).val();
+  if (correo === "") {
+    return true;
+  }
+  var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(correo)) {
+    alert("El correo electrónico no es válido.");
+    return false;
+  }
+  return true;
+}
+
+// Validar teléfono: solo 9 dígitos numéricos
+function validarTelefono(telefonoSelector) {
+  var telefono = $(telefonoSelector).val();
+  var soloNumeros = /^[0-9]{0,9}$/; // Permite vacío o 9 dígitos
+  if (telefono !== "" && !soloNumeros.test(telefono)) {
+    alert("El teléfono debe tener exactamente 9 dígitos numéricos.");
+    return false;
+  }
+  return true;
+}
+
+// Bloquear entrada de no números en campos de teléfono
+$("input[name='nuevoTelefono'], input[name='editarTelefono']").on("input", function(e) {
+  // Reemplazar cualquier caracter no numérico con vacío
+  $(this).val($(this).val().replace(/[^0-9]/g, ""));
 });
 
 // Función para ajustar maxlength y permitir solo números en campo documento según tipo seleccionado
@@ -160,6 +205,35 @@ configurarValidacionDocumento("select[name='nuevoTipo']", "input[name='nuevoDocu
 
 // Configurar validación para modal editar prospecto y cliente
 configurarValidacionDocumento("select[name='editarTipo']", "input[name='editarDocumento']");
+
+// Validar solo números en campos teléfono nuevo y editar
+$("input[name='nuevoTelefono'], input[name='editarTelefono']").on("keypress", function(e) {
+  var charCode = e.which ? e.which : e.keyCode;
+  if (charCode < 48 || charCode > 57) {
+    e.preventDefault();
+  }
+});
+
+// Ejecutar ajuste inicial al abrir modal editar para que la validación funcione con el valor actual
+$('#modalActualizarClientes').on('shown.bs.modal', function () {
+  var tipoSelector = "select[name='editarTipo']";
+  var documentoSelector = "input[name='editarDocumento']";
+  var $tipo = $(tipoSelector);
+  var $documento = $(documentoSelector);
+
+  function ajustar() {
+    var tipo = $tipo.val();
+    if (tipo === "DNI") {
+      $documento.attr("maxlength", 8);
+    } else if (tipo === "RUC") {
+      $documento.attr("maxlength", 11);
+    } else {
+      $documento.removeAttr("maxlength");
+    }
+  }
+
+  ajustar();
+});
 
 // Validación para campos DNI y RUC en formularios agregar y editar
 function validarDocumento(tipoSelector, documentoSelector) {

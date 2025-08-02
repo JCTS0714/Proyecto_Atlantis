@@ -7,7 +7,7 @@
         <div class="login-box-body">
             <p class="login-box-msg">Ingresar al Sistema</p>
 
-        <form method="post">
+        <form method="post" class="login-form">
             <div class="form-group has-feedback">
                 <input type="text" class="form-control" placeholder="Usuario" name="ingUsuario" requerid>
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>

@@ -8,6 +8,7 @@ require_once "controladores/usuarios.controlador.php";
 require_once "controladores/ventas.controlador.php";
 require_once "controladores/proveedor.controlador.php";
 require_once "controladores/ControladorOportunidad.php";
+require_once "controladores/prospectos.controlador.php";
 
 /**REQUERIMOS DE MODELOS */
 require_once "modelos/categorias.modelo.php";
