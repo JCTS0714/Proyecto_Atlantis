@@ -64,12 +64,13 @@
                     <td>'.$value["empresa"].'</td>
                     <td>'.$value["fecha_creacion"].'</td>
 <td><button class="btn ' . (($value["estado"] == 1) ? "btn-success" : "btn-warning") . ' btn-xs btnEstadoCliente" idCliente="' . $value["id"] . '" estadoCliente="' . $value["estado"] . '" style="min-width: 90px;">' . (($value["estado"] == 1) ? "Cliente" : "Prospecto") . '</button></td>
-                    <td>
-                      <div class="btn-group">
-                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-                        <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-times"></i></button>
-                      </div>
-                    </td>
+<td>
+  <div class="btn-group">
+    <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-times"></i></button>
+<a href="/Proyecto_atlantis/Ventas/index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
+  </div>
+</td>
                   </tr>';
               }
             ?>
@@ -101,21 +102,21 @@
               $camposEditar = [
                 ["icon" => "user", "type" => "text", "id" => "editarNombre", "name" => "editarNombre"],
                 ["icon" => "address-card", "type" => "text", "id" => "editarDocumento", "name" => "editarDocumento"],
-                ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono"],
+                ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono", "maxlength" => "9"],
                 ["icon" => "envelope", "type" => "email", "id" => "editarCorreo", "name" => "editarCorreo"],
-              ["icon" => "home", "type" => "text", "id" => "editarCiudad", "name" => "editarCiudad"],
-              ["icon" => "globe", "type" => "text", "id" => "editarMigracion", "name" => "editarMigracion"],
-              ["icon" => "link", "type" => "text", "id" => "editarReferencia", "name" => "editarReferencia"],
-              ["icon" => "calendar", "type" => "date", "id" => "editarFechaContacto", "name" => "editarFechaContacto"],
-              ["icon" => "building", "type" => "text", "id" => "editarEmpresa", "name" => "editarEmpresa"],
-              ["icon" => "calendar", "type" => "date", "id" => "editarFechaCreacion", "name" => "editarFechaCreacion"]
+                ["icon" => "home", "type" => "text", "id" => "editarCiudad", "name" => "editarCiudad"],
+                ["icon" => "globe", "type" => "text", "id" => "editarMigracion", "name" => "editarMigracion"],
+                ["icon" => "link", "type" => "text", "id" => "editarReferencia", "name" => "editarReferencia"],
+                ["icon" => "calendar", "type" => "date", "id" => "editarFechaContacto", "name" => "editarFechaContacto"],
+                ["icon" => "building", "type" => "text", "id" => "editarEmpresa", "name" => "editarEmpresa"],
+                ["icon" => "calendar", "type" => "date", "id" => "editarFechaCreacion", "name" => "editarFechaCreacion"]
               ];
               foreach ($camposEditar as $campo) {
                 echo '
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-'.$campo["icon"].'"></i></span>
-                    <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" required>
+                    <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" maxlength="'.($campo["maxlength"] ?? "").'" '.(in_array($campo["name"], ["editarNombre", "editarEmpresa", "editarTipo", "editarDocumento", "editarTelefono", "editarFechaContacto"]) ? "required" : "").'>
                   </div>
                 </div>';
               }

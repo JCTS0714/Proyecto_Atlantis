@@ -1,0 +1,8 @@
+/* Ajuste de padding para iconos grandes en el menú lateral */
+.main-sidebar .sidebar-menu > li > a > i.fa-2x {
+    padding-left: 1px;
+    padding-right: 1px;
+    display: inline-block;
+    width: 1px; /* Ajusta el ancho para que no se salga */
+    text-align: left; /* Alinea el icono a la izquierda */
+}
