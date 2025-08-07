@@ -110,6 +110,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
   });
 });
 
+<<<<<<< HEAD
 // Validar formulario agregar cliente/prospecto, excluyendo el formulario de nueva oportunidad y el formulario de login
 $("#modalActualizarClientes form, form").not("#form-nueva-oportunidad, .login-box-body form").on("submit", function(e) {
   var tipoSelector = $(this).find("select[name='nuevoTipo'], select[name='editarTipo']");
@@ -160,6 +161,31 @@ function validarTelefonoProspecto(telefonoSelector) {
   return true;
 }
 
+=======
+// Validar formulario agregar cliente/prospecto, excluyendo el formulario de nueva oportunidad
+$("form").not("#form-nueva-oportunidad").on("submit", function(e) {
+  // Solo aplicar validaciones en formularios específicos
+  var formAction = $(this).attr('action') || window.location.href;
+  
+  // Verificar si el formulario es de clientes o prospectos
+  var isClientesForm = formAction.indexOf('clientes') !== -1;
+  var isProspectosForm = formAction.indexOf('prospectos') !== -1;
+  var isModalForm = $(this).closest('.modal').length > 0;
+  
+  // Solo aplicar validaciones en formularios de clientes/prospectos
+  if ((isClientesForm || isProspectosForm || isModalForm) && !$(this).hasClass('login-form')) {
+    var tipoSelector = $(this).find("select[name='nuevoTipo'], select[name='editarTipo']");
+    var documentoSelector = $(this).find("input[name='nuevoDocumento'], input[name='editarDocumento']");
+    var telefonoSelector = $(this).find("input[name='nuevoTelefono'], input[name='editarTelefono']");
+    var correoSelector = $(this).find("input[name='nuevoCorreo'], input[name='editarCorreo']");
+
+    if (!validarDocumento(tipoSelector, documentoSelector) || !validarTelefono(telefonoSelector) || !validarCorreo(correoSelector)) {
+      e.preventDefault();
+    }
+  }
+});
+
+>>>>>>> b2e765b3318b27a44af7e57167922f29af51b6d3
 // Validar correo: puede estar vacío o ser un email válido
 function validarCorreo(correoSelector) {
   var correo = $(correoSelector).val();
@@ -177,7 +203,11 @@ function validarCorreo(correoSelector) {
 // Validar teléfono: solo 9 dígitos numéricos
 function validarTelefono(telefonoSelector) {
   var telefono = $(telefonoSelector).val();
+<<<<<<< HEAD
   var soloNumeros = /^[0-9]{9}$/; // Exige exactamente 9 dígitos
+=======
+  var soloNumeros = /^[0-9]{0,9}$/; // Permite vacío o 9 dígitos
+>>>>>>> b2e765b3318b27a44af7e57167922f29af51b6d3
   if (telefono !== "" && !soloNumeros.test(telefono)) {
     alert("El teléfono debe tener exactamente 9 dígitos numéricos.");
     return false;

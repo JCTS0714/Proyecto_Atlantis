@@ -179,6 +179,7 @@
                   <input type="date" class="form-control input-lg" name="nuevoFechaContacto" placeholder="Ingresar fecha de contacto" required>
                 </div>
               </div>
+<<<<<<< HEAD
               <!-- COSA QUE BORRO, ESTA IMPIDIENDO LA CREACION DE PROSPECTO -->
           <!--<div class="form-group">
             <div class="input-group">
@@ -186,6 +187,14 @@
                   <input type="text" class="form-control input-lg" id="cliente_id" name="idCliente" required style="width: 100%;">
             </div>
           </div>-->
+=======
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-building"></i></span>
+              <input type="text" class="form-control input-lg" id="cliente_id" name="idCliente" required style="width: 100%;">
+            </div>
+          </div>
+>>>>>>> b2e765b3318b27a44af7e57167922f29af51b6d3
             </div>
           </div>
           <div class="modal-footer">
