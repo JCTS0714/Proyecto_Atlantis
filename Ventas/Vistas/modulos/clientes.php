@@ -102,7 +102,15 @@
               $camposEditar = [
                 ["icon" => "user", "type" => "text", "id" => "editarNombre", "name" => "editarNombre"],
                 ["icon" => "address-card", "type" => "text", "id" => "editarDocumento", "name" => "editarDocumento"],
+<<<<<<< HEAD
                 ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono", "maxlength" => "9"],
+=======
+<<<<<<< HEAD
+                ["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono", "maxlength" => "9"],
+=======
+["icon" => "mobile", "type" => "text", "id" => "editarTelefono", "name" => "editarTelefono", "maxlength" => "9"],
+>>>>>>> b2e765b3318b27a44af7e57167922f29af51b6d3
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
                 ["icon" => "envelope", "type" => "email", "id" => "editarCorreo", "name" => "editarCorreo"],
                 ["icon" => "home", "type" => "text", "id" => "editarCiudad", "name" => "editarCiudad"],
                 ["icon" => "globe", "type" => "text", "id" => "editarMigracion", "name" => "editarMigracion"],
@@ -116,7 +124,15 @@
                 <div class="form-group">
                   <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-'.$campo["icon"].'"></i></span>
+<<<<<<< HEAD
                     <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" maxlength="'.($campo["maxlength"] ?? "").'" '.(in_array($campo["name"], ["editarNombre", "editarEmpresa", "editarTipo", "editarDocumento", "editarTelefono", "editarFechaContacto"]) ? "required" : "").'>
+=======
+<<<<<<< HEAD
+                    <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" maxlength="'.($campo["maxlength"] ?? "").'" '.(in_array($campo["name"], ["editarNombre", "editarEmpresa", "editarTipo", "editarDocumento", "editarTelefono", "editarFechaContacto"]) ? "required" : "").'>
+=======
+                    <input type="'.$campo["type"].'" class="form-control input-lg" id="'.$campo["id"].'" name="'.$campo["name"].'" '.(in_array($campo["name"], ["editarNombre", "editarEmpresa", "editarTipo", "editarDocumento", "editarTelefono", "editarFechaContacto"]) ? "required" : "").'>
+>>>>>>> b2e765b3318b27a44af7e57167922f29af51b6d3
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
                   </div>
                 </div>';
               }

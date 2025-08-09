@@ -170,8 +170,12 @@ class ControladorProspectos {
         if(isset($_GET["idClienteEliminar"])){
             $tabla = "clientes";
             $datos = $_GET["idClienteEliminar"];
+<<<<<<< HEAD
             // Forzar redirección a prospectos
             $ruta = 'prospectos';
+=======
+            $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : 'prospectos';
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
 
             // Verificar si el prospecto tiene oportunidades asociadas antes de eliminar
             $tieneOportunidades = ModeloCliente::mdlVerificarOportunidades($datos);

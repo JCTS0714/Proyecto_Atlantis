@@ -68,7 +68,11 @@
 <td>
   <div class="btn-group">
     <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
+<<<<<<< HEAD
     <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="prospectos"><i class="fa fa-times"></i></button>
+=======
+    <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-times"></i></button>
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
     <a href="/Proyecto_atlantis/Ventas/index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
   </div>
 </td>
@@ -262,7 +266,16 @@
                 <input type="text" class="form-control input-lg" id="editarEmpresa" name="editarEmpresa" required>
               </div>
             </div>
+<<<<<<< HEAD
             
+=======
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion">
+              </div>
+            </div>
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
           </div>
         </div>
         <div class="modal-footer">

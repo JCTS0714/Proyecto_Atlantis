@@ -16,12 +16,16 @@
                     <span>Usuarios</span>
                 </a>
             </li>
+<<<<<<< HEAD
             <li class="active">
                 <a href="calendario">
                     <i class="fa fa-calendar "></i>
                     <span>calendario</span>
                 </a>
             </li>
+=======
+
+>>>>>>> 27fc4213f1497e196cdabdb3c71cbf402171bd57
             <!-- Contactos -->
             <li class="treeview active">
                 <a href="#">
