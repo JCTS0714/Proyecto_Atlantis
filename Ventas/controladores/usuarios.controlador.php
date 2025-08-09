@@ -36,33 +36,42 @@ class ControladorUsuarios {
 
           if($respuesta["estado"] == 1){
 
+            // Generar token único de sesión
+            $sesion_token = bin2hex(random_bytes(32));
+
+             // Verificar si ya hay una sesión activa
+            if (!empty($respuesta["sesion_token"])) {
+              // Permitir si la sesión actual tiene el mismo token
+              if (isset($_SESSION["sesion_token"]) && $_SESSION["sesion_token"] === $respuesta["sesion_token"]) {
+                // Continuar con la sesión actual
+              } else {
+                echo '<br><div class="alert alert-warning">Este usuario ya tiene una sesión activa en otro lugar.</div>';
+                return;
+              }
+            }
+
             $_SESSION["iniciarSesion"] = "ok";
-            $_SESSION["id"] = $respuesta ["id"];
-            $_SESSION["nombre"] = $respuesta ["nombre"];
-            $_SESSION["usuario"] = $respuesta ["usuario"];
-            $_SESSION["foto"] = $respuesta ["foto"];
-            $_SESSION["perfil"] = $respuesta ["perfil"];
+            $_SESSION["id"] = $respuesta["id"];
+            $_SESSION["nombre"] = $respuesta["nombre"];
+            $_SESSION["usuario"] = $respuesta["usuario"];
+            $_SESSION["foto"] = $respuesta["foto"];
+            $_SESSION["perfil"] = $respuesta["perfil"];
+            $_SESSION["sesion_token"] = $sesion_token;
 
             date_default_timezone_set('America/Lima');
             $fecha = date('Y-m-d');
             $hora = date('H:i:s');
             $fechaActual = $fecha.' '.$hora;
 
-            $item1 = "ultimo_login";
-            $valor1 = $fechaActual;
+            // Generar fecha de expiración de sesión (ejemplo: 30 minutos desde ahora)
+            $fecha_expira = date('Y-m-d H:i:s', strtotime('+30 minutes'));
 
-            $item2 = "id";
-            $valor2 = $respuesta["id"];
+            // Actualizar último login, token de sesión y fecha de expiración
+            ModeloUsuarios::mdlActualizarUsuario($tabla, "ultimo_login", $fechaActual, "id", $respuesta["id"]);
+            ModeloUsuarios::mdlActualizarUsuario($tabla, "sesion_token", $sesion_token, "id", $respuesta["id"]);
+            ModeloUsuarios::mdlActualizarUsuario($tabla, "sesion_expira", $fecha_expira, "id", $respuesta["id"]);
 
-            $ultimoLogin = ModeloUsuarios::mdlActualizarUsuario($tabla, $item1, $valor1, $item2, $valor2);
-            ModeloUsuarios::mdlActualizarUsuario($tabla, "estado", 0, "id", $respuesta["id"]);
-
-            if($ultimoLogin == "ok"){
-              echo '<script>window.location = "inicio";</script>';
-            } else {
-              echo '<br><div class="alert alert-danger">No se pudo registrar el último login</div>';
-              error_log("Login error: No se pudo registrar el último login para usuario=".$_POST["ingUsuario"]);
-            }
+            echo '<script>window.location = "inicio";</script>';
 
           } else {
             echo '<br><div class="alert alert-danger">El usuario está inactivo</div>';

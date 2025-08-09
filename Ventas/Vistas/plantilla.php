@@ -1,5 +1,18 @@
 <?php
   session_start();
+  // Validar sesión activa única
+  if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
+    $tabla = "usuarios";
+    $item = "id";
+    $valor = $_SESSION["id"];
+    $usuario = ModeloUsuarios::MdlMostrarUsuarios($tabla, $item, $valor);
+
+    if ($usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
+      session_destroy();
+      echo '<script>window.location = "salir";</script>';
+      exit;
+    }
+  }
 ?>
 <!DOCTYPE html>
 <html lang="es-PE">
@@ -9,7 +22,7 @@
   <title> GRUPO | ATLANTIS</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-<!--=================================
+  <!--=================================
   PLUGINS DE CSS
 =====================================-->
   <!-- Bootstrap 3.3.7 -->
@@ -18,6 +31,30 @@
   <link rel="stylesheet" href="vistas/bower_components/font-awesome/css/font-awesome.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="vistas/bower_components/Ionicons/css/ionicons.min.css">
+
+  <?php if(isset($_GET["ruta"]) && ($_GET["ruta"] == "calendario" || $_GET["ruta"] == "Ventas/calendario")): ?>
+    <!-- fullCalendar -->
+    <link rel="stylesheet" href="vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <link rel="stylesheet" href="vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="vistas/bower_components/jquery-ui/jquery-ui.min.css">
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="vistas/bower_components/select2/dist/css/select2.min.css">
+  <?php endif; ?>
+  <!-- jQuery 3 -->
+  <script src="vistas/bower_components/jquery/dist/jquery.min.js"></script>
+  <?php if(isset($_GET["ruta"]) && ($_GET["ruta"] == "calendario" || $_GET["ruta"] == "Ventas/calendario")): ?>
+    <!-- jQuery UI -->
+    <script src="vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <!-- fullCalendar -->
+    <script src="vistas/bower_components/moment/moment.js"></script>
+    <script src="vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="vistas/bower_components/select2/dist/js/select2.min.js"></script>
+    <!-- Calendario JS -->
+    <script src="vistas/js/calendario.js"></script>
+  <?php endif; ?>
+
   <!-- Theme style -->
 
   <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
@@ -51,6 +88,19 @@
   =====================================-->
 <!-- jQuery 3 -->
 <script src="vistas/bower_components/jquery/dist/jquery.min.js"></script>
+
+<?php if(isset($_GET["ruta"]) && $_GET["ruta"] == "calendario"): ?>
+  <!-- jQuery UI -->
+  <script src="vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
+  <!-- fullCalendar -->
+  <script src="vistas/bower_components/moment/moment.js"></script>
+  <script src="vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+  <!-- Select2 JS -->
+  <script src="vistas/bower_components/select2/dist/js/select2.min.js"></script>
+  <!-- Calendario JS -->
+  <script src="vistas/js/calendario.js"></script>
+<?php endif; ?>
+
 <!-- Bootstrap 3.3.7 -->
 <script src="vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- SlimScroll -->
@@ -66,14 +116,6 @@
 <script src="vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
 
 <script src="vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-
-
-
-
-
-<script src="vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-
 <script src="vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -113,6 +155,7 @@
             $_GET["ruta"]=="reportes"    ||
             $_GET["ruta"]=="proveedor"   ||
             $_GET["ruta"]=="prospectos"   ||
+            $_GET["ruta"]=="calendario"   ||
             $_GET["ruta"]=="crm" ||
             $_GET["ruta"]=="salir"    
             ){
@@ -151,7 +194,8 @@
   <script src="vistas/js/ventas.js"></script>
   <script src="vistas/js/oportunidades.js"></script>
   <script src="vistas/js/prospectos.js"></script>
-
+  <script src="vistas/js/calendario.js"></script>
+  <script src="vistas/js/evento.js"></script>
 
 </body>
 </html>

@@ -8,6 +8,9 @@ require_once "controladores/usuarios.controlador.php";
 require_once "controladores/ventas.controlador.php";
 require_once "controladores/proveedor.controlador.php";
 require_once "controladores/ControladorOportunidad.php";
+require_once "controladores/prospectos.controlador.php";
+require_once "controladores/evento.controlador.php";
+require_once "controladores/calendario.controlador.php";
 
 /**REQUERIMOS DE MODELOS */
 require_once "modelos/categorias.modelo.php";
@@ -17,7 +20,8 @@ require_once "modelos/usuarios.modelo.php";
 require_once "modelos/ventas.modelo.php";
 require_once "modelos/proveedor.modelo.php";
 require_once "modelos/ModeloCRM.php";
-
+require_once "modelos/evento.modelo.php";
+require_once "modelos/calendario.modelo.php";
 
 
 

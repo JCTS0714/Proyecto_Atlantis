@@ -140,32 +140,38 @@
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                  <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" required>
+                  <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" maxlength="9" required>
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo" required>
+                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo">
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                  <input type="text" class="form-control input-lg" name="nuevoCiudad" placeholder="Ingresar ciudad" required>
+                  <input type="text" class="form-control input-lg" name="nuevoCiudad" placeholder="Ingresar ciudad">
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                  <input type="text" class="form-control input-lg" name="nuevoMigracion" placeholder="Ingresar migración" required>
+                  <input type="text" class="form-control input-lg" name="nuevoMigracion" placeholder="Ingresar migración">
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                  <input type="text" class="form-control input-lg" name="nuevoReferencia" placeholder="Ingresar referencia" required>
+                  <input type="text" class="form-control input-lg" name="nuevoReferencia" placeholder="Ingresar referencia">
                 </div>
+              </div>
+              <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                <input type="text" class="form-control input-lg" name="nuevoEmpresa" placeholder="Ingresar empresa" required>
+              </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
@@ -173,18 +179,20 @@
                   <input type="date" class="form-control input-lg" name="nuevoFechaContacto" placeholder="Ingresar fecha de contacto" required>
                 </div>
               </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-building"></i></span>
-                  <input type="text" class="form-control input-lg" name="nuevoEmpresa" placeholder="Ingresar empresa" required>
-                </div>
-              </div>
+              <!-- COSA QUE BORRO, ESTA IMPIDIENDO LA CREACION DE PROSPECTO -->
+          <!--<div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                  <input type="text" class="form-control input-lg" id="cliente_id" name="idCliente" required style="width: 100%;">
+            </div>
+          </div>-->
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
             <button type="submit" class="btn btn-primary">Guardar Cliente</button>
           </div>
+          <input type="hidden" name="ruta" value="crm" />
           <?php
             $crearCliente = new ControladorCliente();
             $crearCliente->ctrCrearCliente();
@@ -195,43 +203,99 @@
   </div>
 
   <script>
-    $(document).ready(function () {
-      $('#cliente_id').select2({
-        placeholder: 'Buscar cliente',
-        minimumInputLength: 1,
-        dropdownParent: $('#modal-nueva-oportunidad'),
-        ajax: {
-          url: '/Proyecto_atlantis/Ventas/ajax/clientes_oportunidades.ajax.php',
-          dataType: 'json',
-          delay: 250,
-          data: function (params) {
-            console.log("Search term:", params.term);
-            return {
-              q: params.term // término de búsqueda
-            };
-          },
-          processResults: function (data) {
-            return {
-              results: data.map(function(cliente) {
-                return { id: cliente.id, text: cliente.nombre };
-              })
-            };
-          },
-          cache: true
-        }
-      });
-      // Ya no se usa loadClientes porque select2 carga dinámicamente
-      loadOportunidades();
+$(document).ready(function () {
+  $('#cliente_id').select2({
+    placeholder: 'Buscar cliente',
+    minimumInputLength: 1,
+    dropdownParent: $('#modal-nueva-oportunidad'),
+    ajax: {
+      url: '/Proyecto_atlantis/Ventas/ajax/clientes_oportunidades.ajax.php',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        console.log("Search term:", params.term);
+        return {
+          q: params.term // término de búsqueda
+        };
+      },
+      processResults: function (data) {
+        return {
+          results: data.map(function(cliente) {
+            return { id: cliente.id, text: cliente.nombre };
+          })
+        };
+      },
+      cache: true
+    }
+  });
+  // Ya no se usa loadClientes porque select2 carga dinámicamente
+  loadOportunidades();
 
-      $('#btn-nueva-oportunidad').on('click', function () {
-        $('#modal-nueva-oportunidad').modal('show');
-      });
+  // Nueva funcionalidad: abrir modal con cliente preseleccionado y bloqueado si cliente_id está en URL
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
 
-      $('#form-nueva-oportunidad').on('submit', function (e) {
-        e.preventDefault();
-        crearOportunidad();
-      });
+  var clienteId = getUrlParameter('cliente_id');
+  if (clienteId) {
+    // Abrir modal
+    $('#modal-nueva-oportunidad').modal('show');
+
+    // Cargar el cliente preseleccionado en select2
+    var option = new Option('Cargando...', clienteId, true, true);
+    $('#cliente_id').append(option).trigger('change');
+
+    // Hacer una llamada AJAX para obtener el nombre del cliente y actualizar la opción
+    $.ajax({
+      type: 'GET',
+      url: '/Proyecto_atlantis/Ventas/ajax/clientes_oportunidades.ajax.php',
+      data: { id: clienteId },
+      dataType: 'json'
+    }).then(function (data) {
+      if (data && data.length > 0) {
+        var clienteNombre = data[0].nombre;
+        var newOption = new Option(clienteNombre, clienteId, true, true);
+        $('#cliente_id').empty().append(newOption).trigger('change');
+        // Deshabilitar el select2 para que no se pueda modificar
+        $('#cliente_id').prop('disabled', true);
+      }
     });
+
+    // Limpiar cliente_id de la URL para evitar reapertura del modal al recargar
+    if (window.history.replaceState) {
+      var url = new URL(window.location);
+      url.searchParams.delete('cliente_id');
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  }
+
+  // Limpiar y habilitar el select2 y resetear formulario cuando se cierra el modal
+  $('#modal-nueva-oportunidad').on('hidden.bs.modal', function () {
+    $('#cliente_id').val(null).trigger('change');
+    $('#cliente_id').prop('disabled', false);
+    // Resetear todos los campos del formulario
+    $('#form-nueva-oportunidad')[0].reset();
+  });
+
+  $('#btn-nueva-oportunidad').on('click', function () {
+    $('#modal-nueva-oportunidad').modal('show');
+  });
+
+  $('#form-nueva-oportunidad').on('submit', function (e) {
+    e.preventDefault();
+    crearOportunidad().then(function() {
+      // Actualizar la URL para eliminar cliente_id después de crear la oportunidad
+      if (window.history.replaceState) {
+        var url = new URL(window.location);
+        url.searchParams.delete('cliente_id');
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    });
+  });
+});
   </script>
 </body>
 </html>

@@ -1,23 +1,20 @@
 <header class="main-header">
-
-
-     <!-- Logo -->
+<!-- Logo -->
      <a href="#" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><b>A</b>LT</span>
+      <span class="logo-mini"><b>ATL</b></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><b>Admin</b>LTE</span>
+      <span class="logo-lg"><img src="vistas/img/plantilla/grupo-atlantis-20231202171034.png" class="img-responsive" style="width: 150px; height: 50px; margin: 0 auto;" alt="Logo"></span>
     </a>
 
     <!--==========
-    BARRA DE NAVEGACIÓN
+    BARRA DE NAVEGACIÓN 
     ===============-->
     <nav class="navbar navbar-static-top" role="navegation">
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
             <span class= "sr-only">Barra de navegación</span>
         </a>
   
-
 
     <!--==========
     PERFÍL DE USUARIO

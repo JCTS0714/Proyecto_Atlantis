@@ -44,7 +44,7 @@
             <?php
               $item = "estado";
               $valor = 0; // Prospectos
-              $prospectos = ControladorCliente::ctrMostrarCliente($item, $valor);
+              $prospectos = ControladorProspectos::ctrMostrarProspectos($item, $valor);
 
               foreach ($prospectos as $key => $value) {
                 $estadoTexto = ($value["estado"] == 0) ? "Prospecto" : "Cliente";
@@ -65,12 +65,13 @@
                     <td>'.$value["empresa"].'</td>
                     <td>'.$value["fecha_creacion"].'</td>
                     <td><button class="btn '.$btnClass.' btn-xs btnEstadoCliente" idCliente="'.$value["id"].'" estadoCliente="'.$value["estado"].'">'.$estadoTexto.'</button></td>
-                    <td>
-                      <div class="btn-group">
-                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-                        <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-times"></i></button>
-                      </div>
-                    </td>
+<td>
+  <div class="btn-group">
+    <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="prospectos"><i class="fa fa-times"></i></button>
+    <a href="/Proyecto_atlantis/Ventas/index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
+  </div>
+</td>
                   </tr>';
               }
             ?>
@@ -118,31 +119,31 @@
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" required>
+                <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" maxlength="9" required>
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo" required>
+                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo">
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoCiudad" placeholder="Ingresar ciudad" required>
+                <input type="text" class="form-control input-lg" name="nuevoCiudad" placeholder="Ingresar ciudad" >
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoMigracion" placeholder="Ingresar migración" required>
+                <input type="text" class="form-control input-lg" name="nuevoMigracion" placeholder="Ingresar migración" >
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                <input type="text" class="form-control input-lg" name="nuevoReferencia" placeholder="Ingresar referencia" required>
+                <input type="text" class="form-control input-lg" name="nuevoReferencia" placeholder="Ingresar referencia" >
               </div>
             </div>
             <div class="form-group">
@@ -155,6 +156,12 @@
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-building"></i></span>
                 <input type="text" class="form-control input-lg" name="nuevoEmpresa" placeholder="Ingresar empresa" required>
+              </div>
+            </div>
+            <div class="form-group" style="display:none;">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="date" class="form-control input-lg" name="nuevoFechaCreacion" placeholder="Ingresar fecha de creación">
               </div>
             </div>
           </div>
@@ -216,31 +223,31 @@
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" required>
+                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" maxlength="9" required>
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" class="form-control input-lg" id="editarCorreo" name="editarCorreo" required>
+                  <input type="email" class="form-control input-lg" id="editarCorreo" name="editarCorreo">
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCiudad" name="editarCiudad" required>
+                <input type="text" class="form-control input-lg" id="editarCiudad" name="editarCiudad" >
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                <input type="text" class="form-control input-lg" id="editarMigracion" name="editarMigracion" required>
+                <input type="text" class="form-control input-lg" id="editarMigracion" name="editarMigracion" >
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                <input type="text" class="form-control input-lg" id="editarReferencia" name="editarReferencia" required>
+                <input type="text" class="form-control input-lg" id="editarReferencia" name="editarReferencia">
               </div>
             </div>
             <div class="form-group">
@@ -255,24 +262,19 @@
                 <input type="text" class="form-control input-lg" id="editarEmpresa" name="editarEmpresa" required>
               </div>
             </div>
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion" required>
-              </div>
-            </div>
+            
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
           <button type="submit" class="btn btn-primary">Editar Prospecto</button>
         </div>
-        <?php
-          $editarCliente = new ControladorCliente();
-          $editarCliente->ctrEditarCliente();
+          <?php
+          $editarProspecto = new ControladorProspectos();
+          $editarProspecto->ctrEditarProspecto();
 
-          $eliminarCliente = new ControladorCliente();
-          $eliminarCliente->ctrEliminarCliente();
+          $eliminarProspecto = new ControladorProspectos();
+          $eliminarProspecto->ctrEliminarProspecto();
         ?>
       </form>
     </div>
