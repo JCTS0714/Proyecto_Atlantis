@@ -91,11 +91,9 @@ table tbody td {
   transition: opacity 0.3s ease;
 }
 
-/* Para cuando se oculta una columna */
-table thead th:hidden,
-table tbody td:hidden {
-  opacity: 0;
-  visibility: hidden;
+/* Para cuando se oculta una columna (mediante inline style display: none) */
+table thead th[style*="display: none"],
+table tbody td[style*="display: none"] {
   display: none !important;
 }
 
@@ -108,7 +106,6 @@ table tbody td:hidden {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  margin-bottom: 15px;
   transition: background-color 0.3s ease;
   display: inline-block;
   font-weight: 500;
@@ -132,9 +129,14 @@ table tbody td:hidden {
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 15px;
-  margin-bottom: 15px;
-  display: block;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1001;
+  min-width: 350px;
+  margin-top: 5px;
 }
 
 .column-toggle-panel.hidden {

@@ -154,9 +154,3 @@ table.dataTable tbody td {
     padding: 0 15px;
   }
 }
-
-/* Asegurar que las columnas ocultas no aparezcan */
-table.dataTable tbody td:not([style*="display: table-cell"]),
-table.dataTable thead th:not([style*="display: table-cell"]) {
-  display: none !important;
-}

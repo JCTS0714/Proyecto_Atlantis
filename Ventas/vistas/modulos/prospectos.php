@@ -18,26 +18,93 @@
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarProspecto">
           Agregar Prospecto
         </button>
+        <!-- Botón Mostrar/Ocultar Columnas -->
+        <div class="column-toggle-container">
+          <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
+            <i class="fa fa-columns"></i> Mostrar/Ocultar Columnas
+          </button>
+          <div class="column-toggle-panel hidden">
+            <h5>Mostrar/Ocultar Columnas</h5>
+            <div class="column-toggle-list">
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-numero" checked>
+                <label>#</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-nombre" checked>
+                <label>Nombre</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-tipo" checked>
+                <label>Tipo</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-documento" checked>
+                <label>Documento</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-telefono" checked>
+                <label>Teléfono</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-correo" checked>
+                <label>Correo</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-ciudad" checked>
+                <label>Ciudad</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-migracion" checked>
+                <label>Migración</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-referencia" checked>
+                <label>Referencia</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-fecha-contacto" checked>
+                <label>Fecha Contacto</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-empresa" checked>
+                <label>Empresa</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-fecha-creacion" checked>
+                <label>Fecha Creación</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-estado" checked>
+                <label>Estado</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-acciones" checked>
+                <label>Acciones</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="example2">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Tipo</th>
-              <th>Documento</th>
-              <th>Teléfono</th>
-              <th>Correo</th>
-              <th>Ciudad</th>
-              <th>Migración</th>
-              <th>Referencia</th>
-              <th>Fecha Contacto</th>
-              <th>Empresa</th>
-              <th>Fecha Creación</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th data-column="col-numero">#</th>
+              <th data-column="col-nombre">Nombre</th>
+              <th data-column="col-tipo">Tipo</th>
+              <th data-column="col-documento">Documento</th>
+              <th data-column="col-telefono">Teléfono</th>
+              <th data-column="col-correo">Correo</th>
+              <th data-column="col-ciudad">Ciudad</th>
+              <th data-column="col-migracion">Migración</th>
+              <th data-column="col-referencia">Referencia</th>
+              <th data-column="col-fecha-contacto">Fecha Contacto</th>
+              <th data-column="col-empresa">Empresa</th>
+              <th data-column="col-fecha-creacion">Fecha Creación</th>
+              <th data-column="col-estado">Estado</th>
+              <th data-column="col-acciones">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -52,29 +119,28 @@
 
                 echo '
                   <tr>
-                    <td>'.($key + 1).'</td>
-                    <td>'.$value["nombre"].'</td>
-                    <td>'.$value["tipo"].'</td>
-                    <td>'.$value["documento"].'</td>
-                    <td>'.$value["telefono"].'</td>
-                    <td>'.$value["correo"].'</td>
-                    <td>'.$value["ciudad"].'</td>
-                    <td>'.$value["migracion"].'</td>
-                    <td>'.$value["referencia"].'</td>
-                    <td>'.$value["fecha_contacto"].'</td>
-                    <td>'.$value["empresa"].'</td>
-                    <td>'.$value["fecha_creacion"].'</td>
-                    <td><button class="btn '.$btnClass.' btn-xs btnEstadoCliente" idCliente="'.$value["id"].'" estadoCliente="'.$value["estado"].'">'.$estadoTexto.'</button></td>
-<td>
-  <div class="btn-group">
-    <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-
-    <?php if($_SESSION["perfil"] !== "Vendedor"): ?>
-    <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="prospectos"><i class="fa fa-times"></i></button>
-    <?php endif; ?>
-    <a href="index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
-  </div>
-</td>
+                    <td data-column="col-numero">'.($key + 1).'</td>
+                    <td data-column="col-nombre">'.$value["nombre"].'</td>
+                    <td data-column="col-tipo">'.$value["tipo"].'</td>
+                    <td data-column="col-documento">'.$value["documento"].'</td>
+                    <td data-column="col-telefono">'.$value["telefono"].'</td>
+                    <td data-column="col-correo">'.$value["correo"].'</td>
+                    <td data-column="col-ciudad">'.$value["ciudad"].'</td>
+                    <td data-column="col-migracion">'.$value["migracion"].'</td>
+                    <td data-column="col-referencia">'.$value["referencia"].'</td>
+                    <td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>
+                    <td data-column="col-empresa">'.$value["empresa"].'</td>
+                    <td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>
+                    <td data-column="col-estado"><button class="btn '.$btnClass.' btn-xs btnEstadoCliente" idCliente="'.$value["id"].'" estadoCliente="'.$value["estado"].'">'.$estadoTexto.'</button></td>
+                    <td data-column="col-acciones">
+                      <div class="btn-group">
+                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
+                        <?php if($_SESSION["perfil"] !== "Vendedor"): ?>
+                        <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="prospectos"><i class="fa fa-times"></i></button>
+                        <?php endif; ?>
+                        <a href="index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
+                      </div>
+                    </td>
                   </tr>';
               }
             ?>

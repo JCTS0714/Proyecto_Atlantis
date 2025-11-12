@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once "../controladores/clientes.controlador.php";
 require_once "../modelos/clientes.modelo.php";
 
@@ -22,10 +24,50 @@ class AjaxClientes {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"])) {
+// ========================================
+// ENDPOINT PARA ELIMINAR CLIENTE (primero, antes de otros checks)
+// ========================================
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && isset($_POST["ruta"]) && !isset($_POST["activarId"])) {
+    session_start();
+    require_once "../modelos/clientes.modelo.php";
+    
+    $idCliente = $_POST["idCliente"];
+    $ruta = $_POST["ruta"];
+    
+    if (!is_numeric($idCliente) || empty($idCliente)) {
+        echo "error";
+        exit;
+    }
+    
+    // Verificar permisos: solo Administrador puede eliminar
+    if (isset($_SESSION["perfil"]) && $_SESSION["perfil"] == "Vendedor") {
+        echo "error: No tienes permisos para eliminar";
+        exit;
+    }
+    
+    // Verificar si el cliente tiene oportunidades asociadas
+    $tieneOportunidades = ModeloCliente::mdlVerificarOportunidades($idCliente);
+    if ($tieneOportunidades) {
+        echo "error: No se puede eliminar porque tiene oportunidades asociadas";
+        exit;
+    }
+    
+    // Proceder a eliminar
+    $tabla = "clientes";
+    $respuesta = ModeloCliente::mdlEliminarCliente($tabla, $idCliente);
+    
+    if ($respuesta == "ok") {
+        echo "ok";
+    } else {
+        echo "error";
+    }
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && !isset($_POST["ruta"]) && !isset($_POST["activarId"])) {
     $item = "id";
     $valor = $_POST["idCliente"];
-    $cliente = ControladorCliente::ctrMostrarCliente($item, $valor);
+    $cliente = ModeloCliente::MdlMostrarCliente("clientes", $item, $valor);
 
     header('Content-Type: application/json');
     if (is_array($cliente) && count($cliente) > 0) {

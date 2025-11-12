@@ -72,6 +72,7 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
 $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", function() {
   console.log("Click en botón editar cliente detectado"); // Log para verificar evento
   var idCliente = $(this).attr("idCliente");
+  console.log("ID Cliente obtenido:", idCliente);
   var datos = new FormData();
   datos.append("idCliente", idCliente);
 
@@ -85,6 +86,14 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
     dataType: "json",
     success: function(respuesta) {
       console.log("Respuesta ajax editar cliente:", respuesta); // Log para diagnóstico
+      console.log("Intentando llenar campo id:", respuesta["id"]);
+      
+      if (!respuesta || !respuesta["id"]) {
+        console.error("La respuesta no contiene datos válidos");
+        alert("Error: No se pudieron cargar los datos del cliente");
+        return;
+      }
+
       $("#idCliente").val(respuesta["id"]);
       $("#editarNombre").val(respuesta["nombre"]);
 
@@ -117,9 +126,120 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarFechaContacto").attr("placeholder", "Ingresar fecha de contacto");
       $("#editarEmpresa").attr("placeholder", "Ingresar empresa");
 
+      console.log("Mostrando modal");
       $("#modalActualizarClientes").modal("show");
+    },
+    error: function(xhr, status, error) {
+      console.error("Error en AJAX:", status, error);
+      console.error("Respuesta:", xhr.responseText);
+      alert("Error al cargar los datos del cliente");
     }
   });
+});
+
+// ========================================
+// MANEJADOR PARA ELIMINAR CLIENTE
+// ========================================
+$(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente", function(e) {
+  e.preventDefault();
+  console.log("Click en botón eliminar cliente detectado");
+  var idCliente = $(this).attr("idCliente");
+  var dataRuta = $(this).attr("data-ruta");
+  
+  if (!idCliente) {
+    console.error("ID de cliente no encontrado");
+    alert("Error: ID de cliente no encontrado");
+    return;
+  }
+
+  console.log("ID Cliente:", idCliente, "Ruta:", dataRuta);
+
+  // Confirmación con SweetAlert
+  if (typeof Swal === 'undefined') {
+    // Si Swal no está disponible, usar confirm tradicional
+    if (!confirm('¿Está seguro de que desea eliminar este cliente?')) {
+      return;
+    }
+    var datos = new FormData();
+    datos.append("idCliente", idCliente);
+    datos.append("ruta", dataRuta || "clientes");
+
+    $.ajax({
+      url: "ajax/clientes.ajax.php",
+      method: "POST",
+      data: datos,
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function(respuesta) {
+        console.log("Respuesta eliminar cliente:", respuesta);
+        if (respuesta == "ok" || respuesta == 1) {
+          alert('El cliente ha sido eliminado correctamente.');
+          location.reload();
+        } else {
+          alert('Error al eliminar el cliente: ' + respuesta);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Error AJAX:", error);
+        alert('Error en la comunicación con el servidor.');
+      }
+    });
+  } else {
+    // Usar SweetAlert si está disponible
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: "¡Esta acción no se puede deshacer!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var datos = new FormData();
+        datos.append("idCliente", idCliente);
+        datos.append("ruta", dataRuta || "clientes");
+
+        $.ajax({
+          url: "ajax/clientes.ajax.php",
+          method: "POST",
+          data: datos,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function(respuesta) {
+            console.log("Respuesta eliminar cliente:", respuesta);
+            if (respuesta == "ok" || respuesta == 1) {
+              Swal.fire({
+                title: 'Eliminado',
+                text: 'El cliente ha sido eliminado correctamente.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                title: 'Error',
+                text: 'Error al eliminar el cliente: ' + respuesta,
+                icon: 'error'
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error("Error AJAX:", error);
+            Swal.fire({
+              title: 'Error',
+              text: 'Error en la comunicación con el servidor.',
+              icon: 'error'
+            });
+          }
+        });
+      }
+    });
+  }
 });
 
 // Manejador para botón Reactivar en zona de espera

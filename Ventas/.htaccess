@@ -1,5 +1,14 @@
 Options All -Indexes
 
-RewriteEngine On
-
-RewriteRule ^([-a-zA-Z0-9]+)$ index.php?ruta=$1
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # No reescribir si es un archivo real
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # No reescribir si es una carpeta real
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Reescribir todas las rutas a index.php?ruta=
+    RewriteRule ^(.+)$ index.php?ruta=$1 [QSA,L]
+</IfModule>

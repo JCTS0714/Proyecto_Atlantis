@@ -1,28 +1,41 @@
   <?php
-    // Configurar cookie de sesión persistente (30 días)
-    session_set_cookie_params(30 * 24 * 60 * 60); // 30 días en segundos
-    session_start();
+    /**
+     * PLANTILLA PRINCIPAL - ATLANTIS CRM
+     * 
+     * Sistema de enrutamiento y gestión de plantilla
+     * Incluye validación de sesión y sesión_token único
+     * 
+     * @version 2.0
+     * @date 2025-11-12
+     */
 
-    // Validar sesión activa única
+    // Validación de sesión existente
     if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
       $tabla = "usuarios";
       $item = "id";
       $valor = $_SESSION["id"];
+      
+      // Obtener datos de usuario de BD
       $usuario = ModeloUsuarios::MdlMostrarUsuarios($tabla, $item, $valor);
 
-      if ($usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
+      // Validar token de sesión único (protección contra acceso múltiple)
+      if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
         session_destroy();
-        echo '<script>window.location = "salir";</script>';
+        echo '<script>
+          window.location.href = "/login";
+        </script>';
         exit;
       }
 
       // Si hay sesión pero no hay ruta específica, redirigir a inicio
       if (!isset($_GET["ruta"])) {
-        echo '<script>window.location = "inicio";</script>';
+        echo '<script>
+          window.location.href = "/inicio";
+        </script>';
         exit;
       }
     }
-  ?>
+?>
   <!DOCTYPE html>
   <html lang="es-PE">
   <head>
@@ -35,35 +48,40 @@
     PLUGINS DE CSS
   =====================================-->
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="vistas/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/vistas/bower_components/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="vistas/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="/vistas/bower_components/Ionicons/css/ionicons.min.css">
 
     <!-- fullCalendar -->
-    <link rel="stylesheet" href="vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
-    <link rel="stylesheet" href="vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
+    <link rel="stylesheet" href="/vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <link rel="stylesheet" href="/vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
     <!-- jQuery UI -->
-    <link rel="stylesheet" href="vistas/bower_components/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="/vistas/bower_components/jquery-ui/jquery-ui.min.css">
     <!-- Select2 CSS -->
-    <link rel="stylesheet" href="vistas/bower_components/select2/dist/css/select2.min.css">
-    <!-- Estilos personalizados para Kanban -->
-    <link rel="stylesheet" href="css/estilos_kanban.css">
-
-    <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
-
-    <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
-
+    <link rel="stylesheet" href="/vistas/bower_components/select2/dist/css/select2.min.css">
     
+    <!-- Column Toggle CSS - Sistema mostrar/ocultar columnas -->
+    <link rel="stylesheet" href="/css/column-toggle.css">
+    
+    <!-- Estilos personalizados para Kanban -->
+    <link rel="stylesheet" href="/css/estilos_kanban.css">
+    
+    <!-- Responsive Tables CSS -->
+    <link rel="stylesheet" href="/css/responsive-tables.css">
+
+    <link rel="stylesheet" href="/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
+    <link rel="stylesheet" href="/vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
 
     <!--=================================
     CAMBIAMOS LA HOJA DE ESTILO DE AdminLTE a solo.cc
   =====================================-->
-    <link rel="stylesheet" href="vistas/dist/css/AdminLTE.css">
+    <link rel="stylesheet" href="/vistas/dist/css/AdminLTE.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
         folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/vistas/dist/css/skins/_all-skins.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -74,8 +92,6 @@
 
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-
-    <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/datatables.bootstrap.min.css">
 
     <!-- Custom background style -->
     <style>
@@ -100,36 +116,42 @@
     ==========PLUGINS DE JAVASCRIP
     =====================================-->
   <!-- jQuery 3 -->
-  <script src="vistas/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/vistas/bower_components/jquery/dist/jquery.min.js"></script>
 
   <!-- jQuery UI -->
-  <script src="vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
+  <script src="/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
   <!-- fullCalendar -->
-  <script src="vistas/bower_components/moment/moment.js"></script>
-  <script src="vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+  <script src="/vistas/bower_components/moment/moment.js"></script>
+  <script src="/vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
   <!-- Select2 JS -->
-  <script src="vistas/bower_components/select2/dist/js/select2.min.js"></script>
+  <script src="/vistas/bower_components/select2/dist/js/select2.min.js"></script>
   <!-- Calendario JS -->
-  <script src="vistas/js/calendario.js"></script>
+  <script src="/vistas/js/calendario.js"></script>
     <!-- Chart.js para gráficos del dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- Bootstrap 3.3.7 -->
-  <script src="vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="/vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <!-- SlimScroll -->
-  <script src="vistas/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="/vistas/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
   <!-- FastClick -->
-  <script src="vistas/bower_components/fastclick/lib/fastclick.js"></script>
+  <script src="/vistas/bower_components/fastclick/lib/fastclick.js"></script>
   <!-- AdminLTE App -->
-  <script src="vistas/dist/js/adminlte.min.js"></script>
+  <script src="/vistas/dist/js/adminlte.min.js"></script>
   <!-- AdminLTE for demo purposes -->
-  <script src="vistas/dist/js/demo.js"></script>
+  <script src="/vistas/dist/js/demo.js"></script>
 
-  <script src="vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-  <script src="vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
-  <script src="vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+  <script src="/vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="/vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
+  <script src="/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Sistema de Mostrar/Ocultar Columnas v2 -->
+  <script src="/vistas/js/column-toggle-v2.js"></script>
+  
+  <!-- Responsive Tables Script -->
+  <script src="/vistas/js/responsive-tables.js"></script>
 
   </head>
   <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
@@ -201,21 +223,21 @@
       ?>
   <!-- ./wrapper -->
 
-  <script src="vistas/js/plantilla.js"></script>
-  <script src="vistas/js/usuarios.js"></script>
-  <script src="vistas/js/categorias.js"></script>
-  <script src="vistas/js/productos.js"></script>
-  <script src="vistas/js/clientes.js"></script>
-  <script src="vistas/js/incidencias.js"></script>
-  <script src="vistas/js/proveedor.js"></script>
-  <script src="vistas/js/ventas.js"></script>
-  <script src="vistas/js/oportunidades.js"></script>
-  <script src="vistas/js/prospectos.js"></script>
-  <script src="vistas/js/calendario.js"></script>
-  <script src="vistas/js/evento.js"></script>
-  <script src="vistas/js/dashboard.js"></script>
-  <script src="vistas/js/notificaciones.js"></script>
-  <script src="vistas/js/alarma.js"></script>
+  <script src="/vistas/js/plantilla.js"></script>
+  <script src="/vistas/js/usuarios.js"></script>
+  <script src="/vistas/js/categorias.js"></script>
+  <script src="/vistas/js/productos.js"></script>
+  <script src="/vistas/js/clientes.js"></script>
+  <script src="/vistas/js/incidencias.js"></script>
+  <script src="/vistas/js/proveedor.js"></script>
+  <script src="/vistas/js/ventas.js"></script>
+  <script src="/vistas/js/oportunidades.js"></script>
+  <script src="/vistas/js/prospectos.js"></script>
+  <script src="/vistas/js/calendario.js"></script>
+  <script src="/vistas/js/evento.js"></script>
+  <script src="/vistas/js/dashboard.js"></script>
+  <script src="/vistas/js/notificaciones.js"></script>
+  <script src="/vistas/js/alarma.js"></script>
 
   </body>
   </html>
