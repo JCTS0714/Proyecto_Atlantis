@@ -1,0 +1,9 @@
+/* Estilo para destacar eventos de actividad en el calendario */
+.actividad-destacada {
+  background-color: #ffeb3b !important; /* Fondo amarillo brillante */
+  border: 2px solid #fbc02d !important; /* Borde amarillo oscuro */
+  color: #000 !important; /* Texto negro para contraste */
+  font-weight: bold !important;
+  box-shadow: 0 0 8px 2px rgba(251, 192, 45, 0.7);
+  z-index: 9999 !important;
+}

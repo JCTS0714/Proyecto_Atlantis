@@ -1,0 +1,52 @@
+<?php
+// Script de debug para verificar usuarios y perfiles
+
+require_once "modelos/conexion.php";
+
+echo "<h2>DEBUG: Listado de Usuarios en BD</h2>";
+
+try {
+    $conexion = Conexion::conectar();
+    $stmt = $conexion->prepare("SELECT id, usuario, perfil FROM usuarios ORDER BY id DESC LIMIT 10");
+    $stmt->execute();
+    $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo "<table border='1' cellpadding='10'>";
+    echo "<tr><th>ID</th><th>Usuario</th><th>Perfil</th></tr>";
+    
+    foreach ($usuarios as $user) {
+        echo "<tr>";
+        echo "<td>" . $user['id'] . "</td>";
+        echo "<td>" . $user['usuario'] . "</td>";
+        echo "<td>" . $user['perfil'] . "</td>";
+        echo "</tr>";
+    }
+    
+    echo "</table>";
+    
+    // También mostrar info de la sesión actual
+    session_start();
+    
+    echo "<h2>DEBUG: Información de Sesión Actual</h2>";
+    echo "<pre>";
+    echo "Session ID: " . session_id() . "\n";
+    echo "SESSION Variables:\n";
+    var_dump($_SESSION);
+    echo "</pre>";
+    
+    // Si hay usuario en sesión, cargar sus datos desde BD
+    if (isset($_SESSION["id"])) {
+        echo "<h2>DEBUG: Datos del Usuario Actual en BD</h2>";
+        $stmt2 = $conexion->prepare("SELECT * FROM usuarios WHERE id = ?");
+        $stmt2->execute([$_SESSION["id"]]);
+        $usuarioActual = $stmt2->fetch(PDO::FETCH_ASSOC);
+        
+        echo "<pre>";
+        var_dump($usuarioActual);
+        echo "</pre>";
+    }
+    
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>

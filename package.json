@@ -1,0 +1,20 @@
+{
+  "name": "proyecto-atlantis",
+  "version": "1.0.0",
+  "description": "CRM Proyecto Atlantis con Tailwind CSS",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tailwindcss -i ./input.css -o ./output.css --watch",
+    "build": "tailwindcss -i ./input.css -o ./output.css --minify"
+  },
+  "dependencies": {
+    "flowbite": "^2.3.0",
+    "chart.js": "^4.4.0",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}
