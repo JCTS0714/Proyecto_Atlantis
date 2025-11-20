@@ -184,13 +184,10 @@
         if(isset($_GET["ruta"])){
           if($_GET["ruta"]=="inicio"       ||
             $_GET["ruta"]=="usuarios"     ||
-            $_GET["ruta"]=="categorias"   ||
-            $_GET["ruta"]=="productos"    ||
             $_GET["ruta"]=="clientes"     ||
             $_GET["ruta"]=="ventas"       ||
             $_GET["ruta"]=="crear-venta"  ||
             $_GET["ruta"]=="reportes"     ||
-            $_GET["ruta"]=="proveedor"    ||
             $_GET["ruta"]=="prospectos"   ||
             $_GET["ruta"]=="calendario"   ||
             $_GET["ruta"]=="crm"          ||
@@ -229,11 +226,8 @@
 
   <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
-  <script src="<?php echo BASE_URL; ?>/vistas/js/categorias.js"></script>
-  <script src="<?php echo BASE_URL; ?>/vistas/js/productos.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js"></script>
-  <script src="<?php echo BASE_URL; ?>/vistas/js/proveedor.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/ventas.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/oportunidades.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/prospectos.js"></script>
