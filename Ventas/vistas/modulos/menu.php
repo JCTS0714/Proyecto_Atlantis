@@ -147,31 +147,7 @@
 
             <!-- Código comentado para futuras referencias -->
 
-            <!-- Categorías y Productos (comentados) -->
-            <!--
-            <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=categorias">
-                    <i class="fa fa-th"></i>
-                    <span>Categorías</span>
-                </a>
-            </li>
-            <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=productos">
-                    <i class="fa fa-product-hunt"></i>
-                    <span>Productos</span>
-                </a>
-            </li>
-            -->
-
-            <!-- Proveedor (comentado) -->
-            <!--
-            <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=proveedor">
-                    <i class="fa fa-child"></i>
-                    <span>Proovedor</span>
-                </a>
-            </li>
-            -->
+            <!-- Categorías, Productos y Proveedor eliminados del árbol -->
         </ul>
     </section>
 </aside>
