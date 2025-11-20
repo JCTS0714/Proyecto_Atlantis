@@ -1,0 +1,81 @@
+<?php
+// Script rápido para verificar el perfil del usuario carlos
+
+require_once "modelos/conexion.php";
+
+try {
+    $conexion = Conexion::conectar();
+    
+    // Buscar usuario carlos
+    $stmt = $conexion->prepare("SELECT id, usuario, perfil FROM usuarios WHERE usuario LIKE '%carlos%' OR usuario LIKE '%admin%'");
+    $stmt->execute();
+    $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo "<!DOCTYPE html>";
+    echo "<html><head><title>Debug Usuarios</title></head><body>";
+    echo "<h1>Búsqueda de Usuarios</h1>";
+    
+    if (empty($usuarios)) {
+        echo "<p>No se encontraron usuarios.</p>";
+    } else {
+        echo "<table border='1' cellpadding='10'>";
+        echo "<tr><th>ID</th><th>Usuario</th><th>Perfil</th></tr>";
+        
+        foreach ($usuarios as $user) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($user['id']) . "</td>";
+            echo "<td>" . htmlspecialchars($user['usuario']) . "</td>";
+            echo "<td><strong>" . htmlspecialchars($user['perfil']) . "</strong></td>";
+            echo "</tr>";
+        }
+        
+        echo "</table>";
+    }
+    
+    // Mostrar TODOS los usuarios
+    echo "<h2>Todos los Usuarios en BD</h2>";
+    $stmt2 = $conexion->prepare("SELECT id, usuario, perfil FROM usuarios ORDER BY id");
+    $stmt2->execute();
+    $todosUsuarios = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo "<table border='1' cellpadding='5'>";
+    echo "<tr><th>ID</th><th>Usuario</th><th>Perfil</th></tr>";
+    foreach ($todosUsuarios as $user) {
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($user['id']) . "</td>";
+        echo "<td>" . htmlspecialchars($user['usuario']) . "</td>";
+        echo "<td>" . htmlspecialchars($user['perfil']) . "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+    
+    // Mostrar sesión actual
+    session_start();
+    echo "<h2>Sesión Actual</h2>";
+    echo "<pre>";
+    echo "Usuario ID: " . (isset($_SESSION["id"]) ? $_SESSION["id"] : "NO") . "\n";
+    echo "Usuario Nombre: " . (isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : "NO") . "\n";
+    echo "Perfil: " . (isset($_SESSION["perfil"]) ? $_SESSION["perfil"] : "NO SETEADO") . "\n";
+    echo "</pre>";
+    
+    // Si hay sesión, cargar del usuario desde BD
+    if (isset($_SESSION["id"])) {
+        $stmt3 = $conexion->prepare("SELECT * FROM usuarios WHERE id = ?");
+        $stmt3->execute([$_SESSION["id"]]);
+        $usuarioSesion = $stmt3->fetch(PDO::FETCH_ASSOC);
+        
+        if ($usuarioSesion) {
+            echo "<h2>Usuario de BD (ID: " . $_SESSION["id"] . ")</h2>";
+            echo "<pre>";
+            print_r($usuarioSesion);
+            echo "</pre>";
+        }
+    }
+    
+    echo "</body></html>";
+    
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+    echo "<br>Trace: " . $e->getTraceAsString();
+}
+?>

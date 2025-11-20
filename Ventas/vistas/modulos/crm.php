@@ -71,6 +71,18 @@
       font-weight: bold;
       text-transform: uppercase;
     }
+    /* Botón derecho del toolbar: empuja a la derecha con un pequeño margen */
+    #filtros-inline { flex: 1 1 auto; min-width: 0; }
+    .toolbar-right-button {
+      margin-left: auto;
+      margin-right: 8px; /* pequeño espacio desde el borde derecho */
+    }
+
+    /* Ajuste responsive: en pantallas pequeñas los elementos se apilan y el botón ocupa su propio renglón */
+    @media (max-width: 768px) {
+      #filtros-inline { flex: 1 1 100%; }
+      .toolbar-right-button { margin-left: 0; margin-right: 0; }
+    }
   </style>
 </head>
 <body>
@@ -80,13 +92,52 @@
     </section>
 
     <section class="content">
-      <div style="margin-bottom: 15px;">
+      <div style="margin-bottom: 15px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <button class="btn btn-success" data-toggle="modal" data-target="#modalAgregarProspecto" style="margin-right: 10px; width: 100%; max-width: 230px;">+ Nuevo Prospecto</button>
-        <button class="btn btn-info" data-toggle="modal" data-target="#modal-filtros" style="width: 100%; max-width: 230px;">
-          <i class="fa fa-filter mr-2"></i>Filtros
-        </button>
-      </div>
-      <div class="row">
+
+          <!-- Filtros inline encima del kanban (posición restaurada) -->
+          <div id="filtros-inline" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div class="form-group" style="margin:0;">
+              <label for="filtro-estado" style="display:block; font-weight:600; margin-bottom:4px;">Estado</label>
+              <select class="form-control" id="filtro-estado" name="filtroEstado" style="min-width:160px;">
+                  <option value="">Todos los estados</option>
+                  <option value="1">Seguimiento</option>
+                  <option value="2">Calificado</option>
+                  <option value="3">Propuesto</option>
+                  <option value="4">Ganado</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin:0;">
+              <label for="filtro-periodo" style="display:block; font-weight:600; margin-bottom:4px;">Periodo</label>
+              <select class="form-control" id="filtro-periodo" name="filtroPeriodo" style="min-width:140px;">
+                  <option value="diario">Diario</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensual">Mensual</option>
+                  <option value="personalizado">Personalizado</option>
+              </select>
+            </div>
+
+            <div id="filtro-fechas-personalizado" style="display: none; margin:0;">
+                <div class="form-group" style="margin:0 8px 0 0;">
+                    <label for="fecha-inicio" style="display:block; font-weight:600; margin-bottom:4px;">Fecha Inicio</label>
+                    <input type="date" class="form-control" id="fecha-inicio" name="fechaInicio">
+                </div>
+                <div class="form-group" style="margin:0 8px 0 0;">
+                    <label for="fecha-fin" style="display:block; font-weight:600; margin-bottom:4px;">Fecha Fin</label>
+                    <input type="date" class="form-control" id="fecha-fin" name="fechaFin">
+                </div>
+              </div>
+
+            <div style="display:flex; gap:6px; align-items:flex-end;">
+              <button type="button" class="btn btn-default" id="btn-limpiar-filtros-inline">Limpiar</button>
+              <button type="button" class="btn btn-primary" id="btn-aplicar-filtros-inline">Aplicar</button>
+            </div>
+          </div>
+        <!-- Botón para crear oportunidad desde prospecto (ubicado a la derecha del toolbar) -->
+        <button id="btn-nueva-oportunidad-prospecto" class="btn btn-info toolbar-right-button" style="width: 100%; max-width: 230px;">+ Nueva Oportunidad (Prospecto)</button>
+        </div>
+        <div class="row">
         <?php
     $estados = [
         "1" => "Seguimiento",
@@ -110,6 +161,86 @@
     </section>
   </div>
 
+      <style>
+        /* Estilos específicos para los filtros inline */
+        #filtros-inline .form-group { display:inline-block; }
+        @media (max-width: 768px) {
+        #filtros-inline { flex-direction: column; align-items: stretch; }
+        #filtros-inline .form-group { width: 100%; }
+        #filtro-fechas-personalizado { display:flex; flex-direction:column; }
+        }
+      </style>
+
+      <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar periodo por defecto a 'mensual'
+        var filtroPeriodo = document.getElementById('filtro-periodo');
+        if (filtroPeriodo) {
+          filtroPeriodo.value = 'mensual';
+        }
+
+        function showHidePersonalizado() {
+          var el = document.getElementById('filtro-fechas-personalizado');
+          if (!el) return;
+          if (filtroPeriodo.value === 'personalizado') {
+            el.style.display = 'flex';
+          } else {
+            el.style.display = 'none';
+          }
+        }
+
+        if (filtroPeriodo) {
+          filtroPeriodo.addEventListener('change', function() {
+            showHidePersonalizado();
+          });
+        }
+
+        // Limpiar filtros
+        document.getElementById('btn-limpiar-filtros-inline').addEventListener('click', function() {
+          document.getElementById('filtro-estado').value = '';
+          document.getElementById('filtro-periodo').value = 'mensual';
+          document.getElementById('fecha-inicio').value = '';
+          document.getElementById('fecha-fin').value = '';
+          showHidePersonalizado();
+          if (typeof filtrarOportunidades === 'function') {
+            filtrarOportunidades('', '', '', '');
+          }
+        });
+
+        // Aplicar filtros con validación para personalizado
+        document.getElementById('btn-aplicar-filtros-inline').addEventListener('click', function() {
+          var estado = document.getElementById('filtro-estado').value;
+          var periodo = document.getElementById('filtro-periodo').value;
+          var inicio = document.getElementById('fecha-inicio').value;
+          var fin = document.getElementById('fecha-fin').value;
+
+          if (periodo === 'personalizado') {
+            if (!inicio || !fin) {
+              alert('Para el periodo personalizado debe seleccionar Fecha Inicio y Fecha Fin.');
+              return;
+            }
+            var dInicio = new Date(inicio);
+            var dFin = new Date(fin);
+            if (isNaN(dInicio.getTime()) || isNaN(dFin.getTime())) {
+              alert('Fechas inválidas.');
+              return;
+            }
+            if (dInicio > dFin) {
+              alert('Fecha Inicio no puede ser mayor que Fecha Fin.');
+              return;
+            }
+          }
+
+          if (typeof filtrarOportunidades === 'function') {
+            filtrarOportunidades(estado || '', periodo || '', inicio || '', fin || '');
+          }
+        });
+
+        // Mostrar/ocultar personalizado según valor inicial
+        showHidePersonalizado();
+      });
+      </script>
+
 
 <!-- Modal para crear nueva oportunidad -->
 <div class="modal fade" id="modal-nueva-oportunidad" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -123,26 +254,20 @@
         <div class="modal-body">
           <!-- Usuario logueado -->
           <input type="hidden" id="usuario_id" name="idUsuario" value="<?php echo $_SESSION['id']; ?>">
+
+          <!-- 1: Título (único campo editable) -->
           <div class="form-group">
             <label for="titulo">Título <span style="color:red">*</span></label>
             <input type="text" class="form-control" id="titulo" name="nuevoTitulo" required>
           </div>
+
+          <!-- Información adicional (editable) -->
           <div class="form-group">
             <label for="descripcion">Información adicional</label>
-            <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+            <textarea class="form-control" id="descripcion" name="nuevaDescripcion" placeholder="Información adicional"></textarea>
           </div>
-          <div class="form-group">
-            <label for="valor_estimado">Valor Estimado <span style="color:red">*</span></label>
-            <input type="number" class="form-control" id="valor_estimado" name="nuevoValorEstimado" required>
-          </div>
-          <div class="form-group">
-            <label for="probabilidad">Probabilidad (%) <span style="color:red">*</span></label>
-            <input type="number" class="form-control" id="probabilidad" name="nuevaProbabilidad" required>
-          </div>
-          <div class="form-group">
-            <label for="fecha_cierre">Fecha de Cierre Estimado (Estimado) <span style="color:red">*</span></label>
-            <input type="date" class="form-control" id="fecha_cierre" name="nuevaFechaCierre" required>
-          </div>
+
+          <!-- 2: Cliente (select2) -->
           <div class="form-group">
             <label for="cliente_id">Cliente <span style="color:red">*</span></label>
             <div class="input-group">
@@ -152,6 +277,26 @@
               </select>
             </div>
           </div>
+
+          <!-- 3: Empresa (solo lectura, autocompletado desde prospectos) -->
+          <div class="form-group">
+            <label for="empresa">Empresa</label>
+            <input type="text" class="form-control" id="empresa" name="empresa" readonly>
+          </div>
+
+          <!-- 4: Teléfono (solo lectura, autocompletado desde prospectos) -->
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" name="telefono" readonly>
+          </div>
+          <!-- Campos antiguos ocultos para compatibilidad con CRUD existente -->
+          <input type="hidden" id="valor_estimado" name="nuevoValorEstimado" value="50">
+          <input type="hidden" id="probabilidad" name="nuevaProbabilidad" value="50">
+          <!-- Indicador si el modal fue abierto para crear desde prospecto (solo prospectos) -->
+          <input type="hidden" id="prospect_only" name="prospect_only" value="">
+          <!-- Fecha de cierre por defecto: hoy (formato YYYY-MM-DD) -->
+          <?php $hoy = date('Y-m-d'); ?>
+          <input type="hidden" id="fecha_cierre" name="nuevaFechaCierre" value="<?php echo $hoy; ?>">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
@@ -208,7 +353,7 @@
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo">
+                  <input type="text" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar Observacion">
                 </div>
               </div>
               <div class="form-group">
@@ -291,31 +436,49 @@
 
   <script>
 $(document).ready(function () {
-  $('#cliente_id').select2({
-    placeholder: 'Buscar cliente',
-    minimumInputLength: 1,
-    dropdownParent: $('#modal-nueva-oportunidad'),
-    ajax: {
-      url: 'ajax/clientes_oportunidades.ajax.php',
-      dataType: 'json',
-      delay: 250,
-      data: function (params) {
-        console.log("Search term:", params.term);
-        return {
-          q: params.term // término de búsqueda
-        };
-      },
-      processResults: function (data) {
-        return {
-          results: data.map(function(cliente) {
-            return { id: cliente.id, text: cliente.nombre };
-          })
-        };
-      },
-      cache: true
+  function initClienteSelect2() {
+    var $el = $('#cliente_id');
+    // Si ya existe una instancia, destrúyela antes de re-inicializar
+    if ($el.data('select2')) {
+      try { $el.select2('destroy'); } catch(e) { /* ignore */ }
     }
+
+    $el.select2({
+      placeholder: 'Buscar cliente',
+      minimumInputLength: 1,
+      dropdownParent: $('#modal-nueva-oportunidad'),
+      ajax: {
+        url: 'ajax/clientes_oportunidades.ajax.php',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          // Pasar posible filtro de estado (e.g., prospectos)
+          return {
+            q: params.term,
+            estado: window.selectClientesEstado || ''
+          };
+        },
+        processResults: function (data) {
+          if (!Array.isArray(data)) return { results: [] };
+          return {
+            results: data.map(function(cliente) {
+              return { id: cliente.id, text: cliente.nombre };
+            })
+          };
+        },
+        cache: true
+      }
+    });
+  }
+
+  // Inicializar al cargar el documento y también cuando el modal se muestre (por si hay conflictos)
+  initClienteSelect2();
+  $('#modal-nueva-oportunidad').on('shown.bs.modal', function() {
+    initClienteSelect2();
   });
   // Ya no se usa loadClientes porque select2 carga dinámicamente
+  // Aplicar filtro por defecto: periodo mensual
+  window.filtrosActivos = { estado: '', periodo: 'mensual', fechaInicio: '', fechaFin: '' };
   loadOportunidades();
 
   // Nueva funcionalidad: abrir modal con cliente preseleccionado y bloqueado si cliente_id está en URL
@@ -365,6 +528,9 @@ $(document).ready(function () {
     $('#cliente_id').prop('disabled', false);
     // Resetear todos los campos del formulario
     $('#form-nueva-oportunidad')[0].reset();
+    // reset prospect_only flag and global filter
+    window.selectClientesEstado = null;
+    $('#prospect_only').val('');
 
     // Limpiar parámetros de la URL para evitar reapertura del modal con datos previos
     if (window.history.replaceState) {
@@ -389,7 +555,60 @@ $(document).ready(function () {
       }
     });
   });
+
+  // Handler para botón "Nueva Oportunidad (Prospecto)"
+  $('#btn-nueva-oportunidad-prospecto').on('click', function() {
+    // Forzar que select2 devuelva solo prospectos (estado = 0)
+    window.selectClientesEstado = '0';
+    // Marcar el modal como creado desde prospectos
+    $('#prospect_only').val('1');
+    // Limpiar select y abrir modal
+    $('#cliente_id').val(null).trigger('change');
+    $('#modal-nueva-oportunidad').modal('show');
+  });
 });
+  </script>
+
+  <script>
+  // Autocompletar empresa y teléfono al seleccionar cliente en el modal
+  (function() {
+    // Cuando select2 cambia, solicitar datos del cliente
+    $(document).on('change', '#cliente_id', function() {
+      var clienteId = $(this).val();
+      if (!clienteId) {
+        $('#empresa').val('');
+        $('#telefono').val('');
+        return;
+      }
+
+      $.ajax({
+        type: 'GET',
+        url: 'ajax/clientes_oportunidades.ajax.php',
+        data: { id: clienteId },
+        dataType: 'json'
+      }).then(function(data) {
+        if (data && data.length > 0) {
+          var c = data[0];
+          $('#empresa').val(c.empresa || '');
+          $('#telefono').val(c.telefono || '');
+        } else if (data && data.empresa) {
+          // en caso de que el endpoint devuelva un objeto en vez de array
+          $('#empresa').val(data.empresa || '');
+          $('#telefono').val(data.telefono || '');
+        } else {
+          $('#empresa').val('');
+          $('#telefono').val('');
+        }
+      }).fail(function() {
+        $('#empresa').val('');
+        $('#telefono').val('');
+      });
+    });
+
+    // Si el modal se abre con cliente_id en la URL, ya existe código que coloca la opción
+    // Extendemos para rellenar empresa/telefono y bloquearlos
+    // (El código que detecta cliente_id y hace la petición mantiene su lógica arriba)
+  })();
   </script>
 
   <script>

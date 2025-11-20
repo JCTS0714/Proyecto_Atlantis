@@ -67,7 +67,7 @@ $(document).ready(function() {
 
             var item = '<li><a href="#" class="notificacion-item" data-html="' + encodeURIComponent(contenidoCompleto) + '">' +
                 '<i class="fa fa-bell ' + colorCampana + '"></i><br>' + contenidoCompleto + '</a></li>';
-            console.log("Notificación generada para dropdown:", item);
+            // console.log("Notificación generada para dropdown:", item);
             lista.append(item);
         });
 
@@ -95,9 +95,9 @@ $(document).ready(function() {
             data: { accion: 'obtener_para_notificar', usuario_id: usuarioId },
             dataType: 'json',
             success: function(response) {
-                console.log("Respuesta AJAX obtener_para_notificar:", response);
+                // console.log("Respuesta AJAX obtener_para_notificar:", response);
                 if (response && Array.isArray(response.eventos)) {
-                    console.log("Array eventos recibido para notificaciones:", response.eventos);
+                    // console.log("Array eventos recibido para notificaciones:", response.eventos);
                     actualizarDropdownNotificaciones(response.eventos);
                     var hoy = new Date().toISOString().split('T')[0];
                     response.eventos.forEach(function(reunion) {

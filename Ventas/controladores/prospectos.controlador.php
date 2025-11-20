@@ -35,7 +35,7 @@ class ControladorProspectos {
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoNombre"]) &&
                 in_array($tipo, ["DNI", "RUC", "otros"]) &&
                 $documentoValido &&
-                (empty($_POST["nuevoCorreo"]) || filter_var($_POST["nuevoCorreo"], FILTER_VALIDATE_EMAIL)) &&
+                isset($_POST["nuevoCorreo"]) &&
                 preg_match('/^\d{1,11}$/', $telefonoLimpio) &&
                 (empty($_POST["nuevoCiudad"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoCiudad"])) &&
                 (empty($_POST["nuevoMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoMigracion"])) &&

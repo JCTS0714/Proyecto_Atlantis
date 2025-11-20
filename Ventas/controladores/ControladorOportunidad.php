@@ -70,6 +70,21 @@ class ControladorOportunidad {
             }
 
             try {
+                // Si la creación viene marcada como "prospect-only", verificar que el cliente exista y sea prospecto (estado = 0)
+                if (isset($_POST['prospect_only']) && $_POST['prospect_only'] == '1') {
+                    $clienteIdCheck = $_POST['idCliente'] ?? null;
+                    if (!$clienteIdCheck) {
+                        header('Content-Type: application/json');
+                        echo json_encode(["status" => "error", "message" => "Cliente prospecto no proporcionado."]);
+                        return;
+                    }
+                    $clienteData = ModeloCliente::MdlMostrarCliente('clientes', 'id', $clienteIdCheck);
+                    if (empty($clienteData) || !isset($clienteData[0]['estado']) || (int)$clienteData[0]['estado'] !== 0) {
+                        header('Content-Type: application/json');
+                        echo json_encode(["status" => "error", "message" => "El cliente seleccionado no es un prospecto válido."]);
+                        return;
+                    }
+                }
                 $tabla = self::TABLA_OPORTUNIDADES;
 
                 $datos = array(

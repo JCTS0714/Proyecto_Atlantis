@@ -37,8 +37,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="filtro-correo"><i class="fa fa-envelope mr-2"></i>Correo</label>
-                        <input type="email" class="form-control" id="filtro-correo" name="correo" placeholder="Buscar por correo">
+                        <label for="filtro-correo"><i class="fa fa-envelope mr-2"></i>Observacion</label>
+                        <input type="text" class="form-control" id="filtro-correo" name="correo" placeholder="Buscar por Observacion">
                     </div>
 
                     <div class="form-group">

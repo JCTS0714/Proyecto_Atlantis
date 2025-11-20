@@ -114,14 +114,11 @@ $(function () {
           data: { accion: 'mostrar' },
           dataType: 'json',
           success: function (response) {
-            console.log("Reuniones recibidas del servidor:", response);
             var events = [];
           // Función para formatear hora con "a.m." y "p.m." sin etiquetas HTML
           function formatAmPm(time) {
-            console.log("formatAmPm - time:", time);
             var hour = moment(time).format('h:mm');
             var ampm = moment(time).format('a');
-            console.log("formatAmPm - ampm:", ampm);
             if (ampm === 'am') return hour + ' a.m.';
             if (ampm === 'pm') return hour + ' p.m.';
             return hour;
@@ -475,7 +472,7 @@ formEditar.off('submit').on('submit', function (e) {
     var titulo = getUrlParameter('titulo');
     var fecha = getUrlParameter('fecha');
 
-    console.log("Verificando parámetros de URL:", {clienteId, titulo, fecha});
+   // console.log("Verificando parámetros de URL:", {clienteId, titulo, fecha});
 
     if (clienteId && titulo && fecha) {
       console.log("Abriendo modal con parámetros de URL:", {clienteId, titulo, fecha});
@@ -524,7 +521,7 @@ formEditar.off('submit').on('submit', function (e) {
         }
       });
     } else {
-      console.log("No hay parámetros suficientes en la URL para abrir modal");
+      //console.log("No hay parámetros suficientes en la URL para abrir modal");
     }
   }
 

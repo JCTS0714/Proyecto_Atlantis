@@ -10,6 +10,10 @@
      */
 
     // Validación de sesión existente
+    // Fallback seguro: si BASE_URL no está definida en producción, definirla vacía
+    if (!defined('BASE_URL')) {
+      define('BASE_URL', '');
+    }
     if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
       $tabla = "usuarios";
       $item = "id";
@@ -22,7 +26,7 @@
       if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
         session_destroy();
         echo '<script>
-          window.location.href = "/login";
+          window.location.href = "'.BASE_URL.'/index.php?ruta=login";
         </script>';
         exit;
       }
@@ -30,7 +34,7 @@
       // Si hay sesión pero no hay ruta específica, redirigir a inicio
       if (!isset($_GET["ruta"])) {
         echo '<script>
-          window.location.href = "/inicio";
+          window.location.href = "'.BASE_URL.'/index.php?ruta=inicio";
         </script>';
         exit;
       }
@@ -48,40 +52,40 @@
     PLUGINS DE CSS
   =====================================-->
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="/vistas/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/font-awesome/css/font-awesome.min.css">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="/vistas/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/Ionicons/css/ionicons.min.css">
 
     <!-- fullCalendar -->
-    <link rel="stylesheet" href="/vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
-    <link rel="stylesheet" href="/vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
     <!-- jQuery UI -->
-    <link rel="stylesheet" href="/vistas/bower_components/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/jquery-ui/jquery-ui.min.css">
     <!-- Select2 CSS -->
-    <link rel="stylesheet" href="/vistas/bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/select2/dist/css/select2.min.css">
     
     <!-- Column Toggle CSS - Sistema mostrar/ocultar columnas -->
-    <link rel="stylesheet" href="/css/column-toggle.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/column-toggle.css">
     
     <!-- Estilos personalizados para Kanban -->
-    <link rel="stylesheet" href="/css/estilos_kanban.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/estilos_kanban.css">
     
     <!-- Responsive Tables CSS -->
-    <link rel="stylesheet" href="/css/responsive-tables.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/responsive-tables.css">
 
-    <link rel="stylesheet" href="/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
-    <link rel="stylesheet" href="/vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
 
     <!--=================================
     CAMBIAMOS LA HOJA DE ESTILO DE AdminLTE a solo.cc
   =====================================-->
-    <link rel="stylesheet" href="/vistas/dist/css/AdminLTE.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
         folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="/vistas/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/skins/_all-skins.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -116,42 +120,42 @@
     ==========PLUGINS DE JAVASCRIP
     =====================================-->
   <!-- jQuery 3 -->
-  <script src="/vistas/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"></script>
 
   <!-- jQuery UI -->
-  <script src="/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
   <!-- fullCalendar -->
-  <script src="/vistas/bower_components/moment/moment.js"></script>
-  <script src="/vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/moment/moment.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
   <!-- Select2 JS -->
-  <script src="/vistas/bower_components/select2/dist/js/select2.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/select2/dist/js/select2.min.js"></script>
   <!-- Calendario JS -->
-  <script src="/vistas/js/calendario.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
     <!-- Chart.js para gráficos del dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- Bootstrap 3.3.7 -->
-  <script src="/vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <!-- SlimScroll -->
-  <script src="/vistas/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
   <!-- FastClick -->
-  <script src="/vistas/bower_components/fastclick/lib/fastclick.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/fastclick/lib/fastclick.js"></script>
   <!-- AdminLTE App -->
-  <script src="/vistas/dist/js/adminlte.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"></script>
   <!-- AdminLTE for demo purposes -->
-  <script src="/vistas/dist/js/demo.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/dist/js/demo.js"></script>
 
-  <script src="/vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-  <script src="/vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
-  <script src="/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- Sistema de Mostrar/Ocultar Columnas v2 -->
-  <script src="/vistas/js/column-toggle-v2.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/column-toggle-v2.js"></script>
   
   <!-- Responsive Tables Script -->
-  <script src="/vistas/js/responsive-tables.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/responsive-tables.js"></script>
 
   </head>
   <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
@@ -223,21 +227,22 @@
       ?>
   <!-- ./wrapper -->
 
-  <script src="/vistas/js/plantilla.js"></script>
-  <script src="/vistas/js/usuarios.js"></script>
-  <script src="/vistas/js/categorias.js"></script>
-  <script src="/vistas/js/productos.js"></script>
-  <script src="/vistas/js/clientes.js"></script>
-  <script src="/vistas/js/incidencias.js"></script>
-  <script src="/vistas/js/proveedor.js"></script>
-  <script src="/vistas/js/ventas.js"></script>
-  <script src="/vistas/js/oportunidades.js"></script>
-  <script src="/vistas/js/prospectos.js"></script>
-  <script src="/vistas/js/calendario.js"></script>
-  <script src="/vistas/js/evento.js"></script>
-  <script src="/vistas/js/dashboard.js"></script>
-  <script src="/vistas/js/notificaciones.js"></script>
-  <script src="/vistas/js/alarma.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/categorias.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/productos.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/proveedor.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/ventas.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/oportunidades.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/prospectos.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/evento.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/dashboard.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/alarma.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>
 
   </body>
   </html>

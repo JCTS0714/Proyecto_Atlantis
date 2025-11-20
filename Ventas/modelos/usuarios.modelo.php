@@ -37,8 +37,11 @@ class ModeloUsuarios {
     $stmt->bindParam(":foto", $datos["foto"], PDO::PARAM_STR);
 
     if ($stmt->execute()) {
+      error_log("mdlRegistrarUsuario: execute OK for usuario=" . $datos["usuario"] . " | hash_prefix=" . substr($datos["password"],0,10) . " | hash_len=" . strlen($datos["password"]));
       return "ok";
     } else {
+      $err = $stmt->errorInfo();
+      error_log("mdlRegistrarUsuario: execute ERROR for usuario=" . $datos["usuario"] . " | SQLSTATE=" . $err[0] . " | code=" . $err[1] . " | message=" . $err[2]);
       return "error";
     }
   }

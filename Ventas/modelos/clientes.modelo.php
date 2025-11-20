@@ -59,12 +59,14 @@ class ModeloCliente{
 
   /* Nuevo método para obtener clientes para oportunidades */
   static public function mdlMostrarClientesParaOportunidad($searchTerm = null) {
+    // Limitar resultados para Select2 y evitar cargas masivas
     if ($searchTerm) {
-      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes WHERE nombre LIKE :nombre ORDER BY nombre ASC");
+      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes WHERE nombre LIKE :nombre ORDER BY nombre ASC LIMIT 10");
       $likeTerm = "%".$searchTerm."%";
       $stmt->bindParam(":nombre", $likeTerm, PDO::PARAM_STR);
     } else {
-      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes ORDER BY nombre ASC");
+      // Cuando no hay término de búsqueda, devolver un conjunto limitado para evitar sobrecarga
+      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes ORDER BY nombre ASC LIMIT 50");
     }
     $stmt->execute();
     return $stmt->fetchAll();
@@ -213,7 +215,8 @@ class ModeloCliente{
       $params[':fechaContactoHasta'] = $filtros['fechaContactoHasta'];
     }
 
-    if (!empty($filtros['estado'])) {
+    // Estado puede ser '0' (prospecto), por lo que no usamos empty() aquí
+    if (isset($filtros['estado']) && $filtros['estado'] !== '') {
       $where[] = "c.estado = :estado";
       $params[':estado'] = $filtros['estado'];
     }

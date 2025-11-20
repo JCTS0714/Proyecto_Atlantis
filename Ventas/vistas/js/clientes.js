@@ -1,21 +1,17 @@
-console.log('Archivo clientes.js cargado correctamente');
+// ========================================
+// ARCHIVO CLIENTES.JS
+// ========================================
 
-// Verificar que jQuery esté disponible
-if (typeof $ === 'undefined') {
-    console.error('jQuery no está disponible');
-} else {
-    console.log('jQuery está disponible, versión:', $.fn.jquery);
-}
+// console.log('Archivo clientes.js cargado correctamente');
+// console.log('jQuery está disponible, versión:', $.fn.jquery);
 
 $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", function(event) {
   event.preventDefault();
-  console.log("Click en botón estado cliente/prospecto");
   var $btn = $(this);
   var idCliente = $btn.attr("idCliente");
   var estadoCliente = parseInt($btn.attr("estadoCliente"));
 
   if (!idCliente || isNaN(estadoCliente)) {
-    console.error("Atributos idCliente o estadoCliente inválidos en el botón.");
     return;
   }
 
@@ -32,7 +28,6 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
     confirmButtonText: 'Sí, cambiar',
     cancelButtonText: 'No, cancelar'
   }).then((result) => {
-    console.log("Resultado SweetAlert:", result);
     if (result.isConfirmed) {
       // Envía el nuevo estado al backend
       var datos = new FormData();
@@ -47,7 +42,6 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
         contentType: false,
         processData: false,
         success: function(respuesta) {
-          console.log("Respuesta ajax:", respuesta);
           if (respuesta == "ok" || respuesta == 1) {
             // Actualiza el botón y el atributo para reflejar el nuevo estado
             if (nuevoEstado === 2) {
@@ -70,9 +64,7 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
 });
 
 $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", function() {
-  console.log("Click en botón editar cliente detectado"); // Log para verificar evento
   var idCliente = $(this).attr("idCliente");
-  console.log("ID Cliente obtenido:", idCliente);
   var datos = new FormData();
   datos.append("idCliente", idCliente);
 
@@ -85,25 +77,14 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
     processData: false,
     dataType: "json",
     success: function(respuesta) {
-      console.log("Respuesta ajax editar cliente:", respuesta); // Log para diagnóstico
-      console.log("Intentando llenar campo id:", respuesta["id"]);
-      
       if (!respuesta || !respuesta["id"]) {
-        console.error("La respuesta no contiene datos válidos");
         alert("Error: No se pudieron cargar los datos del cliente");
         return;
       }
 
       $("#idCliente").val(respuesta["id"]);
       $("#editarNombre").val(respuesta["nombre"]);
-
-      // Asignar valor al select tipo, permitiendo cualquier valor que venga
-      if (respuesta["tipo"]) {
-        $("#editarTipo").val(respuesta["tipo"]);
-      } else {
-        $("#editarTipo").val("");
-      }
-
+      $("#editarTipo").val(respuesta["tipo"] || "");
       $("#editarDocumento").val(respuesta["documento"]);
       $("#editarTelefono").val(respuesta["telefono"]);
       $("#editarCorreo").val(respuesta["correo"]);
@@ -119,7 +100,7 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarTipo").attr("placeholder", "Seleccionar tipo");
       $("#editarDocumento").attr("placeholder", "Ingresar documento");
       $("#editarTelefono").attr("placeholder", "Ingresar teléfono");
-      $("#editarCorreo").attr("placeholder", "Ingresar correo");
+      $("#editarCorreo").attr("placeholder", "Ingresar Observacion");
       $("#editarCiudad").attr("placeholder", "Ingresar ciudad");
       $("#editarMigracion").attr("placeholder", "Ingresar migración");
       $("#editarReferencia").attr("placeholder", "Ingresar referencia");
@@ -380,17 +361,9 @@ function validarTelefonoProspecto(telefonoSelector) {
   return true;
 }
 
-// Validar correo: puede estar vacío o ser un email válido
+// Validar Observacion: permitir cualquier texto (no se valida formato de email)
 function validarCorreo(correoSelector) {
-  var correo = $(correoSelector).val();
-  if (correo === "") {
-    return true;
-  }
-  var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(correo)) {
-    alert("El correo electrónico no es válido.");
-    return false;
-  }
+  // Aceptar vacío o cualquier tipo de texto — validación superficial por diseño
   return true;
 }
 
@@ -485,30 +458,56 @@ $(document).off("click", ".btnRegistrarIncidencia").on("click", ".btnRegistrarIn
   window.location.href = "index.php?ruta=incidencias&idCliente=" + idCliente + "&nombreCliente=" + encodeURIComponent(nombreCliente);
 });
 
-// Inicializar DataTable para la tabla de clientes
-$('#tablaClientes').DataTable({
-    "language": {
-        "sProcessing":     "Procesando...",
-        "sLengthMenu":     "Mostrar _MENU_ registros",
-        "sZeroRecords":    "No se encontraron resultados",
-        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-        "sInfoPostFix":    "",
-        "sSearch":         "Buscar:",
-        "sUrl":            "",
-        "sInfoThousands":  ",",
-        "sLoadingRecords": "Cargando...",
-        "oPaginate": {
-            "sFirst":    "Primero",
-            "sLast":     "Último",
-            "sNext":     "Siguiente",
-            "sPrevious": "Anterior"
-        },
-        "oAria": {
-            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-        }
+// DataTable initialization moved to plantilla.js (centralized)
+
+// Manejador para selects de cambio de estado en la tabla de clientes (similar a prospectos)
+$(document).off('change', '.select-estado-cliente').on('change', '.select-estado-cliente', function() {
+  var idCliente = $(this).data('id');
+  var nuevoEstado = $(this).val();
+
+  console.log('select-estado-cliente changed', { idCliente: idCliente, nuevoEstado: nuevoEstado });
+
+  if (!idCliente || nuevoEstado === undefined) {
+    console.error('select-estado-cliente: parámetros inválidos', {idCliente: idCliente, nuevoEstado: nuevoEstado});
+    return;
+  }
+
+  // Usar $.post para enviar datos URL-encoded y evitar problemas con FormData en algunos entornos
+  $.post('ajax/clientes.ajax.php', { activarId: idCliente, activarEstado: nuevoEstado }, function(respuesta, textStatus, xhr) {
+    console.log('Respuesta POST cambiar estado:', { respuesta: respuesta, textStatus: textStatus });
+
+    var res = respuesta;
+    if (typeof respuesta === 'string') {
+      var trimmed = respuesta.trim();
+      if (trimmed === 'ok') {
+        res = { status: 'ok' };
+      } else {
+        try { res = JSON.parse(respuesta); } catch (e) { res = { status: 'error', message: 'Respuesta no válida' }; }
+      }
     }
+
+    if (res && res.status && res.status === 'ok') {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Actualizado', 'Estado actualizado correctamente', 'success').then(function() { location.reload(); });
+      } else {
+        alert('Estado actualizado correctamente');
+        location.reload();
+      }
+    } else {
+      var msg = (res && res.message) ? res.message : 'Error al actualizar estado';
+      console.warn('Fallo al actualizar estado:', msg, respuesta);
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Error', msg, 'error');
+      } else {
+        alert(msg);
+      }
+    }
+  }).fail(function(xhr, status, err) {
+    console.error('POST falló cambiar estado', { status: status, err: err, response: xhr.responseText });
+    if (typeof Swal !== 'undefined') {
+      Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
+    } else {
+      alert('No se pudo actualizar el estado (request failed)');
+    }
+  });
 });

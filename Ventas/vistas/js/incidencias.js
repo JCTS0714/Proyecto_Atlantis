@@ -1,8 +1,6 @@
 // Archivo JavaScript para manejar funcionalidades de incidencias
 
 $(document).ready(function() {
-    console.log('Archivo incidencias.js cargado correctamente');
-
     // Verificar si hay parámetros en la URL para preseleccionar cliente
     var urlParams = new URLSearchParams(window.location.search);
     var idCliente = urlParams.get('idCliente');
@@ -35,12 +33,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     $('#nuevoCorrelativo').val(response.correlativo);
-                } else {
-                    console.error('Error al generar correlativo:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX generar correlativo:', error);
             }
         });
     }
@@ -58,9 +51,6 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     response(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX buscar clientes:', error);
                 }
             });
         },
@@ -78,9 +68,7 @@ $(document).ready(function() {
 
     // Limpiar campo oculto cuando se cambia el texto manualmente
     $('#nuevoNombreCliente').on('input', function() {
-        if ($(this).val() !== $(this).data('selected-label')) {
-            $('#idClienteSeleccionado').val('');
-        }
+        $('#idClienteSeleccionado').val('');
     });
 
     // Validación y envío AJAX del formulario de crear incidencia
@@ -252,9 +240,6 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     response(data);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX buscar clientes para editar:', error);
                 }
             });
         },

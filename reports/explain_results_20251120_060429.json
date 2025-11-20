@@ -1,0 +1,149 @@
+[
+    {
+        "query_index": 1,
+        "query": "-- 2) Indicadores clave - clientes ganados este mes\r\nSELECT COUNT(*) as total FROM clientes WHERE estado = 2 AND fecha_creacion BETWEEN :inicioMes AND :finMes",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "clientes",
+                "type": "ALL",
+                "possible_keys": null,
+                "key": null,
+                "key_len": null,
+                "ref": null,
+                "rows": "12",
+                "Extra": "Using where"
+            }
+        ]
+    },
+    {
+        "query_index": 2,
+        "query": "-- 3) Prospectos nuevos vs mes anterior (subconsultas)\r\nSELECT (SELECT COUNT(*) FROM clientes WHERE fecha_creacion BETWEEN :inicioMes AND :finMes) as actual,\r\n       (SELECT COUNT(*) FROM clientes WHERE fecha_creacion BETWEEN :inicioMesAnterior AND :finMesAnterior) as anterior",
+        "error": "SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'Anterior AND '2025-11-30'Anterior) as anterior' at line 3"
+    },
+    {
+        "query_index": 3,
+        "query": "-- 4) Oportunidades (kanban) - carga masiva\r\nSELECT o.*, c.nombre AS nombre_cliente FROM oportunidades o LEFT JOIN clientes c ON o.cliente_id = c.id ORDER BY o.fecha_modificacion DESC LIMIT 1000",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "o",
+                "type": "ALL",
+                "possible_keys": null,
+                "key": null,
+                "key_len": null,
+                "ref": null,
+                "rows": "5",
+                "Extra": "Using filesort"
+            },
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "c",
+                "type": "eq_ref",
+                "possible_keys": "PRIMARY",
+                "key": "PRIMARY",
+                "key_len": "4",
+                "ref": "atlantisbd.o.cliente_id",
+                "rows": "1",
+                "Extra": ""
+            }
+        ]
+    },
+    {
+        "query_index": 4,
+        "query": "-- 5) Mostrar clientes filtrados con joins (ejemplo con estado prospecto)\r\nSELECT DISTINCT c.* FROM clientes c LEFT JOIN oportunidades o ON c.id = o.cliente_id WHERE c.estado = :estado ORDER BY c.fecha_creacion DESC LIMIT 200",
+        "error": "SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ':estado ORDER BY c.fecha_creacion DESC LIMIT 200' at line 2"
+    },
+    {
+        "query_index": 5,
+        "query": "-- 6) Buscar clientes para Select2\r\nSELECT id, nombre FROM clientes WHERE nombre LIKE :nombre ORDER BY nombre ASC LIMIT 10",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "clientes",
+                "type": "ALL",
+                "possible_keys": null,
+                "key": null,
+                "key_len": null,
+                "ref": null,
+                "rows": "12",
+                "Extra": "Using where; Using filesort"
+            }
+        ]
+    },
+    {
+        "query_index": 6,
+        "query": "-- 7) Reuniones de la semana\r\nSELECT r.id, r.titulo, r.fecha, r.hora_inicio, r.hora_fin, r.estado, c.nombre as cliente_nombre\r\nFROM reuniones r\r\nLEFT JOIN clientes c ON r.cliente_id = c.id\r\nWHERE r.fecha BETWEEN :inicioSemana AND :finSemana\r\nORDER BY r.fecha, r.hora_inicio",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "r",
+                "type": "ALL",
+                "possible_keys": null,
+                "key": null,
+                "key_len": null,
+                "ref": null,
+                "rows": "1",
+                "Extra": "Using where; Using filesort"
+            },
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "c",
+                "type": "eq_ref",
+                "possible_keys": "PRIMARY",
+                "key": "PRIMARY",
+                "key_len": "4",
+                "ref": "atlantisbd.r.cliente_id",
+                "rows": "1",
+                "Extra": ""
+            }
+        ]
+    },
+    {
+        "query_index": 7,
+        "query": "-- 8) Incidencias con join de cliente y usuario\r\nSELECT i.*, i.columna_backlog, c.nombre as nombre_cliente, u.nombre as nombre_usuario\r\nFROM incidencias i\r\nLEFT JOIN clientes c ON i.cliente_id = c.id\r\nLEFT JOIN usuarios u ON i.usuario_id = u.id\r\nORDER BY i.fecha_creacion DESC LIMIT 200",
+        "error": "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'i.columna_backlog' in 'field list'"
+    },
+    {
+        "query_index": 8,
+        "query": "-- 9) Consultas de verificación de estructura (limitar)\r\nSELECT id, nombre, usuario, perfil, foto, estado, ultimo_login FROM usuarios LIMIT 10",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "usuarios",
+                "type": "ALL",
+                "possible_keys": null,
+                "key": null,
+                "key_len": null,
+                "ref": null,
+                "rows": "10",
+                "Extra": ""
+            }
+        ]
+    },
+    {
+        "query_index": 9,
+        "query": "-- 10) Conteo de oportunidades por cliente (puede canalizarse a contador materializado)\r\nSELECT cliente_id, COUNT(*) as total FROM oportunidades GROUP BY cliente_id HAVING total > 0 LIMIT 100",
+        "explain": [
+            {
+                "id": 1,
+                "select_type": "SIMPLE",
+                "table": "oportunidades",
+                "type": "index",
+                "possible_keys": null,
+                "key": "cliente_id",
+                "key_len": "4",
+                "ref": null,
+                "rows": "5",
+                "Extra": "Using index"
+            }
+        ]
+    }
+]

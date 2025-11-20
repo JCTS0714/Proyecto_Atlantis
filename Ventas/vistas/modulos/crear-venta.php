@@ -300,12 +300,12 @@
               </div>
             </div>
 
-            <!-- Email -->
+            <!-- Observacion (antes Email) -->
             <div class="form-group">
-              <label for="nuevoEmail">Email <span style="color:red">*</span></label>
+              <label for="nuevoEmail">Observacion <span style="color:red">*</span></label>
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" class="form-control input-lg" name="nuevoEmail" placeholder="Ingresar email" required>
+                <input type="text" class="form-control input-lg" name="nuevoEmail" placeholder="Ingresar Observacion" required>
               </div>
             </div>
 

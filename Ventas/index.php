@@ -9,6 +9,8 @@ if (session_status() == PHP_SESSION_NONE) {
 
 /**REQUERIMOS CONFIGURACIÓN */
 require_once "config/estados.php";
+// Rutas base (detecta entorno y arma BASE_URL)
+require_once "config/paths.php";
 
 /**REQUERIMOS DE CONTROLADOR */
 require_once "controladores/plantilla.controlador.php";

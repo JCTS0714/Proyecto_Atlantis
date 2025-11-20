@@ -37,7 +37,7 @@ function loadOportunidades() {
 function agregarTarjeta(oportunidad) {
     var estadoClase = "estado-" + oportunidad.estado; // Clase para el cuadro de estado
     var tarjeta = 
-        '<div class="kanban-card panel-kanban" id="oportunidad-' + oportunidad.id + '" data-fecha-cierre="' + oportunidad.fecha_cierre_estimada + '" onclick="mostrarDetalles(' + oportunidad.id + ')" draggable="true" ondragstart="drag(event)">' +
+        '<div class="kanban-card panel-kanban" id="oportunidad-' + oportunidad.id + '" data-fecha-cierre="' + (oportunidad.fecha_cierre_estimada || '') + '" data-fecha-apertura="' + (oportunidad.fecha_apertura || oportunidad.fecha_creacion || oportunidad.fechaCreacion || '') + '" onclick="mostrarDetalles(' + oportunidad.id + ')" draggable="true" ondragstart="drag(event)">' +
             '<h5>' + oportunidad.titulo + '</h5>' + // Título de la oportunidad
             '<p>' + oportunidad.nombre_cliente + '</p>' + // Nombre del prospecto
         '</div>';
@@ -46,15 +46,35 @@ function agregarTarjeta(oportunidad) {
 
 function crearOportunidad() {
     return new Promise(function(resolve, reject) {
+        // Solo enviar los campos necesarios: título (rellenado por usuario) y cliente (seleccionado).
+        // Empresa y teléfono se obtienen del cliente/prospecto y no son necesarios para la creación
+        // Validaciones cliente-lado
+        var tituloVal = $('#titulo').val().trim();
+        if (!tituloVal) {
+            alert('El título es obligatorio.');
+            reject(new Error('Título vacío'));
+            return;
+        }
+
+        var clienteIdVal = $('#cliente_id').val();
+        var prospectFlag = $('#prospect_only').val() || '';
+        // Si el modal fue abierto como "prospecto-only", exigir selección de cliente
+        if (prospectFlag === '1' && (!clienteIdVal || clienteIdVal === '')) {
+            alert('Debes seleccionar un cliente prospecto antes de crear la oportunidad.');
+            reject(new Error('Cliente prospecto no seleccionado'));
+            return;
+        }
+
         var nuevaOportunidad = {
-            nuevoTitulo: $('#titulo').val(),
-            nuevaDescripcion: $('#descripcion').val(),
-            nuevoValorEstimado: $('#valor_estimado').val(),
-            nuevaProbabilidad: $('#probabilidad').val(),
-            idCliente: $('#cliente_id').val(),
+            nuevoTitulo: tituloVal,
+            nuevaDescripcion: $('#descripcion').val() || '',
+            nuevoValorEstimado: $('#valor_estimado').val() || 50,
+            nuevaProbabilidad: $('#probabilidad').val() || 50,
+            idCliente: clienteIdVal,
             idUsuario: $('#usuario_id').val(),
             nuevoEstado: '1', // Estado 1: seguimiento
-            nuevaFechaCierre: $('#fecha_cierre').val()
+            nuevaFechaCierre: $('#fecha_cierre').val() || '',
+            prospect_only: prospectFlag
         };
 
         $.ajax({
@@ -63,7 +83,6 @@ function crearOportunidad() {
             data: Object.assign({ action: 'crearOportunidad' }, nuevaOportunidad),
             dataType: 'json',
             success: function(response) {
-                // console.log("AJAX success response:", response);
                 if (response.status === "success") {
                     $('#modal-nueva-oportunidad').modal('hide');
                     loadOportunidades();
@@ -82,8 +101,6 @@ function crearOportunidad() {
 }
 
 function cambiarEstado(id, nuevoEstado) {
-    console.log("cambiarEstado llamado - ID:", id, "Nuevo Estado:", nuevoEstado, "Tipo:", typeof nuevoEstado);
-
     $.ajax({
         url: 'ajax/oportunidades.ajax.php',
         method: 'POST',
@@ -94,20 +111,16 @@ function cambiarEstado(id, nuevoEstado) {
         },
         dataType: 'json',
         success: function(respuesta) {
-            console.log("cambiarEstado success - Respuesta:", respuesta);
             if (respuesta && respuesta.status === "success") {
                 // Si el nuevo estado es 5 (Perdido) o 6 (Zona de Espera), remover la tarjeta del kanban
                 if (nuevoEstado == "5" || nuevoEstado == "6") {
-                    console.log("Removiendo tarjeta para estado", nuevoEstado);
                     $('#oportunidad-' + id).remove();
 
                     // Si estamos en la página de No Clientes, recargar la página completa
                     if (window.location.pathname.includes('NoClientes')) {
-                        console.log("Recargando página de No Clientes...");
                         location.reload();
                     }
                 } else {
-                    console.log("Moviendo tarjeta a estado", nuevoEstado);
                     // Mover la tarjeta al nuevo estado solo si la base de datos respondió OK
                     var tarjeta = $('#oportunidad-' + id);
                     if (tarjeta.length) {
@@ -128,8 +141,6 @@ function cambiarEstado(id, nuevoEstado) {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            console.log("Error AJAX en cambiarEstado:", textStatus, errorThrown);
-
             // Intentar parsear la respuesta como JSON si está disponible
             let errorMessage = "No se pudo actualizar el estado.";
 
@@ -162,11 +173,8 @@ $(document).on('click', '.btn-cambiar-estado', function() {
     var estado = $(this).data('estado');
     var estadoTexto = obtenerTextoEstado(estado);
 
-    console.log("Botón cambiar estado clickeado - ID:", id, "Estado:", estado, "Tipo:", typeof estado);
-
     // Confirmación especial para estado "Perdido"
     if (estado == "5") {
-        console.log("Mostrando confirmación para Perdido");
         Swal.fire({
             title: "¿Marcar como Perdido?",
             text: "¿Estás seguro de marcar esta oportunidad como Perdida? Esta acción no se puede deshacer.",
@@ -178,16 +186,12 @@ $(document).on('click', '.btn-cambiar-estado', function() {
             cancelButtonText: "Cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log("Confirmado Perdido, cambiando estado");
                 cambiarEstado(id, estado);
                 // Cerrar el modal después de confirmar
                 $('#modal-detalles-oportunidad').modal('hide');
-            } else {
-                console.log("Cancelado Perdido");
             }
         });
     } else {
-        console.log("Cambiando estado sin confirmación especial");
         cambiarEstado(id, estado);
         // Cerrar el modal para otros estados
         $('#modal-detalles-oportunidad').modal('hide');
@@ -358,39 +362,66 @@ window.filtrarOportunidades = function(filtroEstado, filtroPeriodo, fechaInicio,
         var fechaCierre = $(this).data('fecha-cierre');
         var mostrar = true;
 
-        if (filtroPeriodo && filtroPeriodo !== '') {
-            if (!fechaCierre) {
-                mostrar = false;
-            } else {
-                var fecha = new Date(fechaCierre);
+            if (filtroPeriodo && filtroPeriodo !== '') {
+                // Normalizar fechas (ignorar horas)
+                function parseDateYMD(d) {
+                    if (!d) return null;
+                    // d expected format YYYY-MM-DD
+                    var parts = String(d).split('-');
+                    if (parts.length !== 3) return new Date(d);
+                    return new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+                }
+
+                // Priorizar fecha_apertura (creación) sobre fecha_cierre_estimada
+                var fechaAperturaAttr = $(this).data('fecha-apertura');
+                var fechaCierreAttr = $(this).data('fecha-cierre');
+                var fechaAperturaParsed = parseDateYMD(fechaAperturaAttr);
+                var fechaCierreParsed = parseDateYMD(fechaCierreAttr);
+                var fecha = fechaAperturaParsed || fechaCierreParsed; // el día que representa la tarjeta
+
                 var hoy = new Date();
+                var hoyCero = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
 
                 switch (filtroPeriodo) {
                     case 'diario':
-                        mostrar = fecha.toDateString() === hoy.toDateString();
+                        if (!fecha) { mostrar = false; }
+                        else { mostrar = fecha.getTime() === hoyCero.getTime(); }
                         break;
+
                     case 'semanal':
-                        var primerDiaSemana = new Date(hoy);
-                        primerDiaSemana.setDate(hoy.getDate() - hoy.getDay());
-                        var ultimoDiaSemana = new Date(primerDiaSemana);
-                        ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
-                        mostrar = fecha >= primerDiaSemana && fecha <= ultimoDiaSemana;
-                        break;
-                    case 'mensual':
-                        mostrar = fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear();
-                        break;
-                    case 'personalizado':
-                        if (fechaInicio && fechaFin) {
-                            var inicio = new Date(fechaInicio);
-                            var fin = new Date(fechaFin);
-                            mostrar = fecha >= inicio && fecha <= fin;
+                        if (!fecha) { mostrar = false; }
+                        else {
+                            // Rango desde hoy (inclusive) hasta 7 días hacia adelante
+                            var finSemana = new Date(hoyCero);
+                            finSemana.setDate(hoyCero.getDate() + 7);
+                            mostrar = fecha.getTime() >= hoyCero.getTime() && fecha.getTime() <= finSemana.getTime();
                         }
                         break;
+
+                    case 'mensual':
+                        if (!fecha) { mostrar = false; }
+                        else { mostrar = fecha.getMonth() === hoyCero.getMonth() && fecha.getFullYear() === hoyCero.getFullYear(); }
+                        break;
+
+                    case 'personalizado':
+                        if (fechaInicio && fechaFin) {
+                            var inicio = parseDateYMD(fechaInicio);
+                            var fin = parseDateYMD(fechaFin);
+                            if (inicio && fin && fecha) {
+                                // incluir límites
+                                mostrar = fecha.getTime() >= inicio.getTime() && fecha.getTime() <= fin.getTime();
+                            } else {
+                                mostrar = false;
+                            }
+                        } else {
+                            mostrar = false;
+                        }
+                        break;
+
                     default:
                         mostrar = true;
                 }
             }
-        }
 
         if (mostrar) {
             $(this).show();
@@ -499,6 +530,80 @@ function mostrarDetalles(id) {
             if (data && Array.isArray(data) && data.length > 0) {
                 var oportunidad = data[0];
 
+                // Determinar en qué columna está la tarjeta para pasar el nombre de columna al modal
+                try {
+                    var tarjeta = $('#oportunidad-' + oportunidad.id);
+                    var parentId = tarjeta.parent().attr('id') || '';
+                    var estadoMap = {
+                        '1': 'seguimiento',
+                        '2': 'calificado',
+                        '3': 'propuesto',
+                        '4': 'ganado',
+                        '5': 'perdido',
+                        '6': 'zona de espera'
+                    };
+                    var columnaNombre = estadoMap[parentId] || parentId || '';
+                    // Guardar tanto data-attribute como propiedad jQuery para compatibilidad
+                    if (columnaNombre) {
+                        $('#modal-detalles-oportunidad').attr('data-column', columnaNombre).data('column', columnaNombre);
+                        // También dejar en el contenedor de contenido por si otro flujo lo lee
+                        $('#detalles-oportunidad-contenido').attr('data-column-name', columnaNombre).data('column-name', columnaNombre);
+                    } else {
+                        $('#modal-detalles-oportunidad').removeAttr('data-column').removeData('column');
+                        $('#detalles-oportunidad-contenido').removeAttr('data-column-name').removeData('column-name');
+                    }
+                } catch (e) {
+                    console.log('No se pudo determinar la columna de la tarjeta:', e);
+                }
+
+                // Si la plantilla del modal contiene elementos estáticos (los añadidos en PHP),
+                // rellenarlos en lugar de sobrescribir el HTML completo.
+                if ($('#det-titulo').length && $('#det-cliente').length) {
+                    $('#det-titulo').text(oportunidad.titulo || '-');
+                    $('#det-cliente').text(oportunidad.nombre_cliente || '-');
+                    $('#det-descripcion').text(oportunidad.descripcion || '-');
+                    $('#det-fecha').text(oportunidad.fecha_cierre_estimada || '-');
+
+                    // Intentar obtener teléfono/empresa desde la respuesta de oportunidad
+                    var telefono = oportunidad.telefono || oportunidad.telefono_cliente || oportunidad.cliente_telefono || '';
+                    var empresa = oportunidad.empresa || oportunidad.empresa_cliente || '';
+
+                    // Si no hay teléfono o empresa en la respuesta, pedirlos al endpoint de clientes
+                    if ((!telefono || !empresa) && oportunidad.cliente_id) {
+                        $.ajax({
+                            url: 'ajax/clientes.ajax.php',
+                            method: 'POST',
+                            data: { idCliente: oportunidad.cliente_id },
+                            dataType: 'json',
+                            success: function(clienteData) {
+                                if (clienteData) {
+                                    var tel = clienteData.telefono || clienteData['telefono'] || telefono || '-';
+                                    var emp = clienteData.empresa || clienteData['empresa'] || empresa || '-';
+                                    $('#det-telefono').text(tel || '-');
+                                    $('#det-empresa').text(emp || '-');
+                                } else {
+                                    $('#det-telefono').text(telefono || '-');
+                                    $('#det-empresa').text(empresa || '-');
+                                }
+                            },
+                            error: function() {
+                                $('#det-telefono').text(telefono || '-');
+                                $('#det-empresa').text(empresa || '-');
+                            }
+                        });
+                    } else {
+                        $('#det-telefono').text(telefono || '-');
+                        $('#det-empresa').text(empresa || '-');
+                    }
+
+                    // Mostrar modal (sin formulario editable)
+                    $('#modal-detalles-oportunidad').modal('show');
+
+                    // Deshabilitar guardado desde este modal ya que ahora es de sólo lectura
+                    return;
+                }
+
+                // Comportamiento previo: si no existen los elementos estáticos, inyectar el formulario editable
                 var contenido =
                     '<form id="form-detalles-oportunidad">' +
                     '<div class="row">' +
@@ -518,14 +623,16 @@ function mostrarDetalles(id) {
                             '<textarea class="form-control" id="modal-descripcion" name="descripcion">' + (oportunidad.descripcion || '') + '</textarea>' +
                         '</div>' +
                         '<div class="col-md-6">' +
-                            '<h6>Valor Estimado:</h6>' +
-                            '<input type="number" step="0.01" class="form-control" id="modal-valor_estimado" name="valor_estimado" value="' + (oportunidad.valor_estimado || '') + '" />' +
+                            '<h6>Teléfono:</h6>' +
+                            '<p id="display-telefono">' + (oportunidad.telefono || '') + '</p>' +
+                            '<input type="hidden" id="modal-valor_estimado" name="valor_estimado" value="' + (oportunidad.valor_estimado || '') + '" />' +
                         '</div>' +
                     '</div>' +
                     '<div class="row">' +
                         '<div class="col-md-6">' +
-                            '<h6>Probabilidad (%): <span style="color: red;">*</span></h6>' +
-                            '<input type="number" min="0" max="100" class="form-control" id="modal-probabilidad" name="probabilidad" value="' + (oportunidad.probabilidad || '') + '" />' +
+                            '<h6>Empresa:</h6>' +
+                            '<p id="display-empresa">' + (oportunidad.empresa || '') + '</p>' +
+                            '<input type="hidden" id="modal-probabilidad" name="probabilidad" value="' + (oportunidad.probabilidad || '') + '" />' +
                         '</div>' +
                         '<div class="col-md-6">' +
                             '<h6>Fecha de Cierre Estimada (Estimado): <span style="color: red;">*</span></h6>' +
@@ -568,6 +675,38 @@ function mostrarDetalles(id) {
                     '</form>';
 
                 $('#detalles-oportunidad-contenido').html(contenido);
+
+                // Obtener datos de teléfono/empresa a partir de la respuesta de oportunidad
+                var telefono = oportunidad.telefono || oportunidad.telefono_cliente || oportunidad.cliente_telefono || '';
+                var empresa = oportunidad.empresa || oportunidad.empresa_cliente || '';
+
+                // Si no hay teléfono/empresa en la respuesta, pedirlos al endpoint de clientes
+                if ((!telefono || !empresa) && oportunidad.cliente_id) {
+                    $.ajax({
+                        url: 'ajax/clientes.ajax.php',
+                        method: 'POST',
+                        data: { idCliente: oportunidad.cliente_id },
+                        dataType: 'json',
+                        success: function(clienteData) {
+                            var tel = clienteData && (clienteData.telefono || clienteData['telefono'] || clienteData.celular) ? (clienteData.telefono || clienteData['telefono'] || clienteData.celular) : telefono || '';
+                            var emp = clienteData && (clienteData.empresa || clienteData['empresa'] || clienteData.empresa_nombre) ? (clienteData.empresa || clienteData['empresa'] || clienteData.empresa_nombre) : empresa || '';
+                            // Poner en los <p> visibles solamente (no sobrescribir los inputs editables)
+                            $('#display-telefono').text(tel || '');
+                            $('#display-empresa').text(emp || '');
+                        },
+                        error: function() {
+                            // Rellenar con lo que tengamos (posiblemente vacío)
+                            $('#display-telefono').text(telefono || '');
+                            $('#display-empresa').text(empresa || '');
+                        }
+                    });
+                } else {
+                    // Si ya tenemos los datos, colocarlos directamente
+                    $('#display-telefono').text(telefono || '');
+                    $('#modal-valor_estimado').val(telefono || '');
+                    $('#display-empresa').text(empresa || '');
+                    $('#modal-probabilidad').val(empresa || '');
+                }
 
                 $('#modal-detalles-oportunidad').modal('show');
 
@@ -615,16 +754,13 @@ function actualizarOportunidad() {
             usuario_id: $('#modal-detalles-oportunidad').data('usuario-id')
         };
 
-        // console.log("Datos a enviar en actualizarOportunidad:", datos);
-        // console.log("Actividad seleccionada:", actividadVal, "Tipo:", typeof actividadVal);
-        // console.log("Fecha actividad:", fechaActividadVal, "Tipo:", typeof fechaActividadVal);
-
         // Validar campos obligatorios antes de enviar
         if (!tituloVal || tituloVal.trim() === "") {
             alert("El campo Título es obligatorio.");
             return;
         }
-        if (!datos.probabilidad || isNaN(datos.probabilidad) || datos.probabilidad < 0 || datos.probabilidad > 100) {
+        // Validación numérica para 'probabilidad' (porcentaje 0-100)
+        if (datos.probabilidad === '' || isNaN(datos.probabilidad) || Number(datos.probabilidad) < 0 || Number(datos.probabilidad) > 100) {
             alert("El campo Probabilidad debe ser un número entre 0 y 100.");
             return;
         }
@@ -684,7 +820,6 @@ function actualizarOportunidad() {
                                         var url = 'calendario?cliente_id=' + encodeURIComponent(datos.cliente_id) +
                                                   '&titulo=' + encodeURIComponent(datos.actividad) +
                                                   '&fecha=' + encodeURIComponent(datos.fecha_actividad);
-                                        console.log("Redirigiendo a URL:", url);
                                         window.location.href = url;
                                     }
                                 });
@@ -745,22 +880,17 @@ function verificarBotonCalendario() {
     var fechaActividad = $('#modal-fecha_actividad').val();
     var btnCalendario = $('#btn-ir-calendario');
 
-    console.log("Verificando botón calendario - Actividad:", actividad, "Fecha:", fechaActividad);
-
     if (actividad && fechaActividad) {
         btnCalendario.prop('disabled', false);
         btnCalendario.removeClass('btn-secondary').addClass('btn-info');
-        console.log("Botón calendario ACTIVADO");
     } else {
         btnCalendario.prop('disabled', true);
         btnCalendario.removeClass('btn-info').addClass('btn-secondary');
-        console.log("Botón calendario DESACTIVADO");
     }
 }
 
 // Event listeners para los campos de actividad y fecha
 $(document).on('change', '#modal-actividad, #modal-fecha_actividad', function() {
-    console.log("Cambio detectado en campo:", $(this).attr('id'), "Valor:", $(this).val());
     verificarBotonCalendario();
 });
 
@@ -770,12 +900,9 @@ $(document).on('click', '#btn-ir-calendario', function() {
     var fechaActividad = $('#modal-fecha_actividad').val();
     var clienteId = $('#modal-cliente-id').val();
 
-    console.log("Botón calendario clickeado - Actividad:", actividad, "Fecha:", fechaActividad, "Cliente ID:", clienteId);
-
     if (actividad && fechaActividad) {
         // Mapear la actividad al título de reunión
         var tituloMapeado = mapearActividadATitulo(actividad);
-        console.log("Título mapeado:", tituloMapeado);
 
         // Construir URL para el calendario con parámetros
         var url = 'calendario?cliente_id=' + encodeURIComponent(clienteId) +
@@ -783,15 +910,12 @@ $(document).on('click', '#btn-ir-calendario', function() {
                   '&fecha=' + encodeURIComponent(fechaActividad) +
                   '&actividad_origen=' + encodeURIComponent(actividad);
 
-        console.log("Redirigiendo a calendario con URL:", url);
-
         // Cerrar el modal antes de redirigir
         $('#modal-detalles-oportunidad').modal('hide');
 
         // Redirigir al calendario
         window.location.href = url;
     } else {
-        console.warn("Intento de redirección sin actividad o fecha completa");
         Swal.fire({
             icon: 'warning',
             title: 'Datos incompletos',
@@ -818,6 +942,5 @@ function mapearActividadATitulo(actividad) {
 
 // Inicializar el botón calendario cuando se muestra el modal
 $(document).on('shown.bs.modal', '#modal-detalles-oportunidad', function() {
-    console.log("Modal de detalles mostrado - inicializando botón calendario");
     verificarBotonCalendario();
 });

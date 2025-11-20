@@ -37,7 +37,7 @@ try {
     // Si hay usuario en sesión, cargar sus datos desde BD
     if (isset($_SESSION["id"])) {
         echo "<h2>DEBUG: Datos del Usuario Actual en BD</h2>";
-        $stmt2 = $conexion->prepare("SELECT * FROM usuarios WHERE id = ?");
+        $stmt2 = $conexion->prepare("SELECT id, usuario, perfil, foto, estado, ultimo_login FROM usuarios WHERE id = ?");
         $stmt2->execute([$_SESSION["id"]]);
         $usuarioActual = $stmt2->fetch(PDO::FETCH_ASSOC);
         

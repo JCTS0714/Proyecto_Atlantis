@@ -1,0 +1,128 @@
+Análisis general del proyecto "Proyecto_Atlantis" (estado actual)
+
+Fecha: 16-11-2025
+Autor: Informe automático (resumen y recomendaciones)
+
+Objetivo del informe
+- Estandarizar el código.
+- Limpiar código (eliminar duplicados, comentarios/dead code, scripts de debug expuestos).
+- Eliminar/centralizar valores hardcodeados (credenciales, rutas, salts, URLs).
+- Optimizar rendimiento y lógica de negocio donde sea necesario.
+
+Resumen del estado actual (hallazgos importantes)
+- Estructura: aplicación PHP organizada por `controladores/`, `modelos/`, `vistas/`, `ajax/`, `config/` y `scripts/`. Buena separación básica de capas.
+- Conexión a BD: `modelos/conexion.php` contiene credenciales DNS y usuario (PDO con "localhost", "root", contraseña vacía). Hardcode evidente.
+- Configuración: `config/paths.php` y `config/estados.php` contienen constantes úteis. `paths.php` calcula `BASE_URL` dinámicamente (positivo).
+- Hardcode y secretos:
+  - Credenciales DB hardcodeadas en `modelos/conexion.php` (host, dbname, user, password).
+  - Salts/pepper hardcodeado en `controladores/usuarios.controlador.php` usado con `crypt()` (cadena fija `$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$`).
+  - Muchas cadenas literales en vistas (texto, placeholders, mensajes), scripts, y algunos mensajes JSON.
+  - Uso extensivo de CDNs externos referenciados directamente en `vistas/plantilla.php` y módulos (ej. jQuery, Chart.js, SweetAlert, Select2). Esto no es necesariamente malo, pero requiere consideración (offline, SRI, versiones).
+- Seguridad y buenas prácticas:
+  - La mayoría de queries en modelos usan PDO y `prepare()` / `bindParam()`: buen patrón para evitar inyección SQL.
+  - Sin embargo hay evidencia de código duplicado y en algunos controladores lógica de validación mezclada con presentación.
+  - Passwords se encriptan con `crypt()` + salt fijo; mejor usar `password_hash()` y `password_verify()`.
+  - No hay evidencia clara de CSRF tokens en formularios (revisar vistas que envían POST via AJAX y formularios HTML).
+  - Hay scripts de diagnóstico y debug expuestos (`debug_usuarios.php`, `verificar_usuario_carlos.php`, `crear_reunion_prueba.php`) que no deberían estar accesibles en producción.
+- Calidad de código y duplicación:
+  - Comentarios y líneas duplicadas detectadas en outputs (múltiples llamadas a `bindParam()` repetidas). Revisar para simplificar.
+  - Mezcla de lógica de negocio en vistas (porciones de PHP en archivos de vista). Considerar mover lógica a controladores.
+- Rendimiento y consultas:
+  - No se han inspeccionado todas las consultas, pero recomendaciones generales: evitar N+1, usar índices en columnas de búsqueda/joins, revisar consultas en `modelos/*` para optimizar.
+- Logging y manejo de errores:
+  - No se encontraron mecanismos robustos de logging centralizado; se sugiere agregar logger y manejo de excepciones PDO con try/catch y reporting controlado.
+
+Prioridad de acciones (alto/medio/bajo) y pasos recomendados
+
+Prioridad Alta (seguridad y estabilidad)
+- 1) Extraer credenciales y parámetros de entorno: mover host/usuario/password/dbname/charset a un `.env` o archivo de configuración fuera del control de versiones. Reemplazar `modelos/conexion.php` por una versión que lea variables de entorno (ej. usar `vlucas/phpdotenv`).
+  - Ejemplo .env: `DB_HOST=localhost`, `DB_NAME=atlantisbd`, `DB_USER=root`, `DB_PASS=...`
+- 2) Migrar manejo de contraseñas a `password_hash()` y `password_verify()`; eliminar uso de `crypt()` con salt fija.
+- 3) Retirar o proteger scripts de debug y creación de datos de prueba. Moverlos fuera o condicionarlos a entorno `development`.
+- 4) Habilitar manejo de errores y excepciones en PDO: usar PDO::ERRMODE_EXCEPTION y capturar errores para logging, no exponer información al usuario.
+
+Prioridad Media (calidad de código y estandarización)
+- 5) Adoptar un estándar de estilo (PSR-12 para PHP) y ejecutar un formateador/linters (PHP-CS-Fixer, PHPCS). Reglas mínimas: nombres de clases CamelCase, métodos camelCase o PSR consistente, espacios, etc.
+- 6) Centralizar constantes y strings configurables: mover textos repetidos, rutas y códigos a `config/*` o archivos de idioma si se planea internacionalizar.
+- 7) Revisar controladores y mover la lógica de negocio a modelos/servicios: vistas sólo para presentación.
+- 8) Eliminar código duplicado encontrado en `modelos/*` y `controladores/*`; buscar funciones utilitarias comunes.
+- 9) Introducir autoloading con Composer y considerar namespaces para modernizar estructura.
+
+Prioridad Media/Baja (rendimiento y mantenimiento)
+- 10) Revisar consultas SQL en `modelos/*`: agregar índices donde aplique, evitar SELECT * en tablas grandes, limitar resultados y usar paginación.
+- 11) Cache para consultas costosas (APCu, Redis, o cache por archivo) según la infraestructura.
+- 12) Optimizar recursos front-end: combinar y minificar CSS/JS, servir recursos locales en producción o usar SRI y versiones fijas para CDNs.
+
+Recomendaciones concretas y técnicos
+- Reemplazos inmediatos y prácticas seguras:
+  - `modelos/conexion.php`: leer desde variables de entorno y lanzar excepción si falta configuración.
+  - `controladores/usuarios.controlador.php`: reemplazar `crypt()` por `password_hash()` cuando se registra, y `password_verify()` al loguear.
+  - Validaciones de entrada: estandarizar funciones de sanitización/validación en una clase `Validator` y usar siempre en controllers.
+  - Escapar salidas en vistas con `htmlspecialchars()` o template engine (Twig/Blade) para prevenir XSS.
+  - Añadir tokens CSRF en todos los formularios POST y verificar en endpoints AJAX.
+- Organización y estandarización:
+  - Crear `config/config.php` que incluya/importe `paths.php` y `estados.php`, y que lea `.env`.
+  - Añadir `README.md` con instrucciones para desarrollo y despliegue: cómo crear `.env`, migraciones SQL, permisos de carpetas.
+  - Mover assets (JS/CSS) comunes a `public/assets/*` y referenciarlos desde `BASE_URL`.
+- Pruebas y CI/CD:
+  - Añadir una suite básica de pruebas unitarias para la lógica crítica (por ejemplo PHPUnit para controladores/modelos).
+  - Añadir CI (GitHub Actions) que corra linting y tests.
+- Documentación y checklist para deploy a producción:
+  - Asegurarse de que `.env` no esté en git; añadir a `.gitignore`.
+  - Configurar PHPMailer o similar con credenciales extraídas de entorno para notificaciones.
+  - Revisar permisos de carpetas (uploads), evitar que `scripts/` y `debug_*.php` sean accesibles públicamente.
+
+Lista de archivos y áreas a revisar (acción recomendada)
+- `modelos/conexion.php` — mover credenciales a `.env`, usar PDO con excepciones.
+- `controladores/usuarios.controlador.php` — migrar hashing, revisar validaciones, revisar duplicados.
+- `config/paths.php`, `config/estados.php` — mantener, pero centralizar en `config/config.php` y documentar.
+- `vistas/plantilla.php` y `vistas/modulos/*` — extraer scripts CSS/JS, revisar placeholders, agregar escaping.
+- `ajax/*.ajax.php` — asegurar métodos permitidos y validar entradas/CSRF.
+- `modelos/*.modelo.php` — revisar consultas para índices y evitar N+1; unificar patrones de retorno y manejo de errores.
+- `scripts/` — mover fuera o proteger.
+- `utils/verificar_token_db.php` — validar seguridad y flujo de tokens.
+
+Plan de trabajo sugerido y estimación (ejemplo)
+- Fase 1 (2–4 días): Extraer configuración a `.env`, actualizar `conexion.php`, reemplazar crypt->password_hash en usuarios, proteger scripts debug.
+- Fase 2 (3–6 días): Estandarizar código (PSR-12), configurar Composer/autoload, reorganizar assets, añadir logging básico.
+- Fase 3 (4–8 días): Revisar y optimizar consultas, añadir caching, introducción de testing básico y CI.
+Tiempo estimado total: 1–3 semanas según tamaño del equipo y pruebas necesarias.
+
+Checklist mínimo para el primer commit de refactor (orden recomendado)
+- [ ] Crear `.env.example` con variables requeridas.
+- [ ] Implementar carga de `.env` (recomendar `vlucas/phpdotenv`).
+- [ ] Actualizar `modelos/conexion.php` para leer `.env`.
+- [ ] Reemplazar `crypt()` por `password_hash()` / `password_verify()`.
+- [ ] Añadir verificación CSRF básica y protección en formularios.
+- [ ] Mover scripts de debugging fuera de `public` o restringir por entorno.
+- [ ] Ejecutar linter (PHPCS/PHP-CS-Fixer) y aplicar reglas básicas.
+
+Conclusión
+Este proyecto ya tiene una separación de capas y uso de PDO en muchos modelos, lo cual facilita la mejora. Los cambios prioritarios son de seguridad (extracción de credenciales y migración del hashing de contraseñas), seguidos por estandarización del código y optimizaciones de consultas/recursos. Si quieres, puedo: (A) generar los parches iniciales para extraer la configuración y actualizar `conexion.php`, (B) convertir los endpoints de usuarios para `password_hash()` y `password_verify()`, o (C) preparar un plan de commits detallado y los cambios automáticos (con diffs) para cada paso.
+
+Archivos clave revisados para este informe:
+- `modelos/conexion.php`
+- `config/paths.php`
+- `config/estados.php`
+- varios archivos en `modelos/`, `controladores/`, `vistas/` y `ajax/` (lista disponible si se requiere examen más detallado)
+
+Fin del informe.
+
+---
+Registro de cambios automatizado
+Fecha: 2025-11-20
+Acción: Eliminación de scripts de prueba y herramientas de desarrollo del árbol de producción. Se conservaron copias de seguridad en los mismos directorios con extensión `.bak`.
+Archivos respaldados y eliminados:
+- `Ventas/debug_usuarios.php` -> `Ventas/debug_usuarios.php.bak`
+- `Ventas/crear_datos_prueba_incidencias.php` -> `Ventas/crear_datos_prueba_incidencias.php.bak`
+- `Ventas/crear_datos_prueba_zona_espera.php` -> `Ventas/crear_datos_prueba_zona_espera.php.bak`
+- `Ventas/crear_tabla_incidencias.php` -> `Ventas/crear_tabla_incidencias.php.bak`
+- `Ventas/verificar_usuario_carlos.php` -> `Ventas/verificar_usuario_carlos.php.bak`
+- `tools/run_explain.php` -> `tools/run_explain.php.bak`
+- `tools/queries_to_explain.sql` -> `tools/queries_to_explain.sql.bak`
+- `Documentacion/index_suggestions.sql` -> `Documentacion/index_suggestions.sql.bak`
+- `Documentacion/index_suggestions_README.md` -> `Documentacion/index_suggestions_README.md.bak`
+
+Motivo: estos archivos son utilidades de desarrollo, scripts de creación de datos de prueba o documentación de sugerencias de índices que no deben permanecer accesibles en un despliegue de producción. Se conservan copias `.bak` para reversión o revisión posterior.
+
+Nota: Recomiendo revisar `scripts/` y `Documentacion/` antes de despliegue final; algunos archivos de `scripts/` pueden ser necesarios para migraciones y deben conservarse fuera del acceso público.

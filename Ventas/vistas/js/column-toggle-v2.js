@@ -5,39 +5,26 @@
 
 // Ejecutar inmediatamente y también en DOMContentLoaded
 function startColumnToggle() {
-  console.log('[ColumnToggle-v2] Inicializando sistema...');
-  
   const checkboxes = document.querySelectorAll('.column-toggle-checkbox');
-  console.log('[ColumnToggle-v2] Checkboxes encontrados:', checkboxes.length);
-  
+
   if (checkboxes.length === 0) {
-    console.warn('[ColumnToggle-v2] No hay checkboxes! El DOM aún no está listo.');
     return false;
   }
-  
-  checkboxes.forEach((checkbox, idx) => {
-    console.log(`[ColumnToggle-v2] Checkbox ${idx}: column="${checkbox.dataset.column}"`);
-    
-    checkbox.addEventListener('change', function(e) {
+
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener('change', function() {
       const columnName = this.dataset.column;
       const tableId = this.dataset.table;
       const isVisible = this.checked;
-      
-      console.log('[ColumnToggle-v2] >>> CAMBIO DETECTADO:', columnName, '-> Visible:', isVisible);
-      console.log('[ColumnToggle-v2] Event details:', e);
-      console.log('[ColumnToggle-v2] this.checked actual:', this.checked);
-      
+
       const table = document.getElementById(tableId);
       if (table) {
-        console.log('[ColumnToggle-v2] Tabla encontrada, toggling...');
         toggleColumnByName(table, columnName, isVisible);
         saveColumnPreference(tableId, columnName, isVisible);
-      } else {
-        console.warn('[ColumnToggle-v2] Tabla NO encontrada:', tableId);
       }
     });
   });
-  
+
   loadColumnPreferences();
   return true;
 }
@@ -52,19 +39,15 @@ if (document.readyState === 'loading') {
 // Intento alternativo después de un delay
 setTimeout(function() {
   if (document.querySelectorAll('.column-toggle-checkbox').length === 0) {
-    console.log('[ColumnToggle-v2] Reintentando inicialización...');
     startColumnToggle();
   }
 }, 500);
 
 function toggleColumnByName(table, columnName, isVisible) {
-  console.log('[ColumnToggle-v2] toggleColumnByName:', columnName, '->', isVisible);
-  
   if (!table) {
-    console.warn('[ColumnToggle-v2] Tabla inválida');
     return;
   }
-  
+
   // Si esta tabla tiene DataTables inicializado, usarlo
   const dataTableInstance = $.fn.DataTable.fnTables(true);
   let tableData = null;
@@ -76,10 +59,9 @@ function toggleColumnByName(table, columnName, isVisible) {
       }
     }
   }
-  
+
   const cellsToToggle = table.querySelectorAll(`[data-column="${columnName}"]`);
-  console.log('[ColumnToggle-v2] Celdas encontradas para', columnName, ':', cellsToToggle.length);
-  
+
   if (cellsToToggle.length === 0) {
     console.warn('[ColumnToggle-v2] NO se encontraron celdas con data-column=', columnName);
     console.log('[ColumnToggle-v2] Buscando todas las celdas con data-column...');
@@ -89,7 +71,7 @@ function toggleColumnByName(table, columnName, isVisible) {
       console.log('[ColumnToggle-v2]   - data-column:', cell.dataset.column, '| content:', cell.textContent.substring(0, 20));
     });
   }
-  
+
   cellsToToggle.forEach(cell => {
     if (isVisible) {
       cell.style.display = '';
@@ -114,15 +96,13 @@ function saveColumnPreference(tableId, columnName, isVisible) {
 }
 
 function loadColumnPreferences() {
-  console.log('[ColumnToggle-v2] Cargando preferencias...');
-  
   const checkboxes = document.querySelectorAll('.column-toggle-checkbox');
-  
+
   checkboxes.forEach(checkbox => {
     const tableId = checkbox.dataset.table;
     const columnName = checkbox.dataset.column;
     const table = document.getElementById(tableId);
-    
+
     if (table) {
       const prefsStr = localStorage.getItem('columnPrefs_' + tableId);
       if (prefsStr) {
@@ -139,13 +119,11 @@ function loadColumnPreferences() {
 window.toggleColumnPanel = function(event) {
   event.preventDefault();
   event.stopPropagation();
-  
+
   const btn = event.currentTarget;
   const container = btn.closest('.column-toggle-container');
   const panel = container.querySelector('.column-toggle-panel');
-  
-  console.log('[ColumnToggle-v2] Panel toggle clicked');
-  
+
   if (panel) {
     panel.classList.toggle('hidden');
     panel.classList.toggle('visible');

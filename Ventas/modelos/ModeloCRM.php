@@ -16,7 +16,8 @@ class ModeloCRM {
                     $stmt->bindParam(":fechaLimite", $fechaLimite, PDO::PARAM_STR);
                 }
             } else {
-                $stmt = Conexion::conectar()->prepare("SELECT o.*, c.nombre AS nombre_cliente FROM $tabla o LEFT JOIN clientes c ON o.cliente_id = c.id WHERE o.fecha_modificacion >= :fechaLimite");
+                // Limitar resultados y ordenar por fecha de modificación para evitar cargas masivas
+                $stmt = Conexion::conectar()->prepare("SELECT o.*, c.nombre AS nombre_cliente FROM $tabla o LEFT JOIN clientes c ON o.cliente_id = c.id WHERE o.fecha_modificacion >= :fechaLimite ORDER BY o.fecha_modificacion DESC LIMIT 200");
                 $stmt->bindParam(":fechaLimite", $fechaLimite, PDO::PARAM_STR);
             }
             $stmt->execute();
@@ -34,7 +35,8 @@ class ModeloCRM {
                 $stmt->execute();
                 $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } else {
-                $stmt = Conexion::conectar()->prepare("SELECT o.*, c.nombre AS nombre_cliente FROM $tabla o LEFT JOIN clientes c ON o.cliente_id = c.id");
+                // Cuando se solicitan todas las oportunidades, limitar para evitar sobrecarga
+                $stmt = Conexion::conectar()->prepare("SELECT o.*, c.nombre AS nombre_cliente FROM $tabla o LEFT JOIN clientes c ON o.cliente_id = c.id ORDER BY o.fecha_modificacion DESC LIMIT 200");
                 $stmt->execute();
                 $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
@@ -87,12 +89,12 @@ class ModeloCRM {
 
     static public function mdlMostrarClientes($tabla, $item = null, $valor = null) {
         if ($item != null) {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item ORDER BY fecha_creacion DESC");
             $stmt->bindParam(":".$item, $valor, PDO::PARAM_STR);
             $stmt->execute();
             $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
-            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla ORDER BY fecha_creacion DESC");
             $stmt->execute();
             $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }

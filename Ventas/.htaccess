@@ -2,7 +2,10 @@ Options All -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    # Ajustar RewriteBase según ruta local. Si tu URL local es:
+    # http://localhost/Proyecto_Atlantis/Ventas/  -> usa RewriteBase /Proyecto_Atlantis/Ventas/
+    # Si accedes desde otra ruta local, reemplaza la línea por la correspondiente.
+    RewriteBase /Proyecto_Atlantis/Ventas/
     
     # No reescribir si es un archivo real
     RewriteCond %{REQUEST_FILENAME} !-f

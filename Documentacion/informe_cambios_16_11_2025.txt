@@ -1,0 +1,32 @@
+# Informe de Cambios - 16 de Noviembre de 2025
+
+## Archivos Modificados
+
+1. **Ventas/controladores/usuarios.controlador.php**
+   - **Mejoras realizadas:**
+     - Se corrigieron problemas de validación en el login (`ctrIngresoUsuario`) para manejar contraseñas modernas y compatibilidad con hashes antiguos (`crypt`, `MD5`).
+     - Se agregó rehash automático a contraseñas modernas (`password_hash`) al iniciar sesión con contraseñas antiguas.
+     - Se mejoró la validación de entradas (`trim`, expresiones regulares) en las funciones de creación y edición de usuarios.
+     - Se añadieron logs (`error_log`) para depuración en las funciones de login y registro.
+     - Se aseguró que los usuarios nuevos se registren con `estado = 1` por defecto.
+
+## Tareas Pendientes
+
+1. **Sugerencias de optimización y buenas prácticas**
+   - Proponer cambios para mejorar el rendimiento y la seguridad:
+     - Uso de consultas preparadas para evitar inyecciones SQL.
+     - Implementar caching para minimizar consultas repetitivas.
+     - Reducir el uso de `include` redundantes.
+
+2. **Revisión de otros módulos**
+   - Analizar y optimizar otros controladores y modelos para estandarizar la lógica y mejorar la seguridad.
+
+3. **Centralización de configuraciones**
+   - Extraer configuraciones hardcodeadas (rutas, credenciales, constantes) a un archivo centralizado.
+
+4. **Informe final**
+   - Generar un informe detallado con todas las optimizaciones realizadas y pendientes, priorizando tareas críticas.
+
+---
+
+**Nota:** Este archivo resume los cambios realizados y las tareas pendientes para continuar con la optimización del proyecto.

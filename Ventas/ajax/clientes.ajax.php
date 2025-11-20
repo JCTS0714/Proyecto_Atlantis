@@ -122,3 +122,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
     echo json_encode($clientes);
     exit;
 }
+
+// Nuevo endpoint para actualizar estado de cliente desde select en prospectos
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "actualizarEstadoCliente") {
+    // Validar parámetros
+    $idCliente = isset($_POST['idCliente']) ? intval($_POST['idCliente']) : 0;
+    $nuevoEstado = isset($_POST['nuevoEstado']) ? intval($_POST['nuevoEstado']) : null;
+
+    header('Content-Type: application/json');
+
+    if ($idCliente <= 0 || $nuevoEstado === null) {
+        echo json_encode(['status' => 'error', 'message' => 'Parámetros inválidos']);
+        exit;
+    }
+
+    // Verificar permisos básicos (opcional): permitir a Vendedor cambiar estado puede estar restringido
+    if (isset($_SESSION['perfil']) && $_SESSION['perfil'] === 'Vendedor') {
+        // Permitimos que Vendedor actualice a ciertos estados si es necesario, de lo contrario bloquear
+        // Aquí se permite la acción; ajustar según políticas
+    }
+
+    // Actualizar en la base de datos
+    $tabla = 'clientes';
+    $item1 = 'estado';
+    $valor1 = $nuevoEstado;
+    $item2 = 'id';
+    $valor2 = $idCliente;
+
+    $respuesta = ModeloCliente::mdlActualizarCliente($tabla, $item1, $valor1, $item2, $valor2);
+
+    if ($respuesta === 'ok') {
+        echo json_encode(['status' => 'ok']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'No se pudo actualizar']);
+    }
+    exit;
+}

@@ -48,7 +48,7 @@
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-correo" checked>
-                <label>Correo</label>
+                <label>Observacion</label>
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-ciudad" checked>
@@ -75,8 +75,8 @@
                 <label>Fecha Creación</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-estado" checked>
-                <label>Estado</label>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-cambiar-estado" checked>
+                <label>Cambiar Estado</label>
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-acciones" checked>
@@ -96,14 +96,14 @@
               <th data-column="col-tipo">Tipo</th>
               <th data-column="col-documento">Documento</th>
               <th data-column="col-telefono">Teléfono</th>
-              <th data-column="col-correo">Correo</th>
+              <th data-column="col-correo">Observacion</th>
               <th data-column="col-ciudad">Ciudad</th>
               <th data-column="col-migracion">Migración</th>
               <th data-column="col-referencia">Referencia</th>
               <th data-column="col-fecha-contacto">Fecha Contacto</th>
               <th data-column="col-empresa">Empresa</th>
               <th data-column="col-fecha-creacion">Fecha Creación</th>
-              <th data-column="col-estado">Estado</th>
+              <th data-column="col-cambiar-estado">Cambiar Estado</th>
               <th data-column="col-acciones">Acciones</th>
             </tr>
           </thead>
@@ -131,7 +131,15 @@
                     <td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>
                     <td data-column="col-empresa">'.$value["empresa"].'</td>
                     <td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>
-                    <td data-column="col-estado"><button class="btn '.$btnClass.' btn-xs btnEstadoCliente" idCliente="'.$value["id"].'" estadoCliente="'.$value["estado"].'">'.$estadoTexto.'</button></td>
+                    <td data-column="col-cambiar-estado">
+                      <select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">
+                        <option value="0"'.($value["estado"] == 0 ? ' selected' : '').'>Prospecto</option>
+                        <option value="1"'.($value["estado"] == 1 ? ' selected' : '').'>Seguimiento</option>
+                        <option value="2"'.($value["estado"] == 2 ? ' selected' : '').'>Cliente</option>
+                        <option value="3"'.($value["estado"] == 3 ? ' selected' : '').'>No Cliente</option>
+                        <option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>
+                      </select>
+                    </td>
                     <td data-column="col-acciones">
                       <div class="btn-group">
                         <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
@@ -197,9 +205,9 @@
               </div>
             </div>
             <div class="form-group">
-              <div class="input-group">
+                <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                  <input type="email" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar correo">
+                  <input type="text" class="form-control input-lg" name="nuevoCorreo" placeholder="Ingresar Observacion">
               </div>
             </div>
             <div class="form-group">
@@ -317,7 +325,7 @@
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                  <input type="email" class="form-control input-lg" id="editarCorreo" name="editarCorreo">
+                  <input type="text" class="form-control input-lg" id="editarCorreo" name="editarCorreo" placeholder="Ingresar Observacion">
               </div>
             </div>
             <div class="form-group">
@@ -395,6 +403,54 @@ $(document).ready(function() {
   $('#modalAgregarProspecto').on('show.bs.modal', function() {
     $('#nuevoTipo').val('otros');
     $('#nuevoDocumento').val('55555555');
+  });
+
+  // Cambiar estado vía select: envía AJAX para actualizar el estado del cliente
+  $(document).on('change', '.select-estado-cliente', function() {
+    var idCliente = $(this).data('id');
+    var nuevoEstado = $(this).val();
+
+    // Usar el endpoint ya existente que espera 'activarId' y 'activarEstado'
+    $.post('ajax/clientes.ajax.php', { activarId: idCliente, activarEstado: nuevoEstado }, function(response) {
+      var res = response;
+      // Si el servidor devuelve la cadena literal "ok" (comportamiento actual), tratar como éxito
+      if (typeof response === 'string') {
+        var trimmed = response.trim();
+        if (trimmed === 'ok') {
+          res = { status: 'ok' };
+        } else {
+          try {
+            res = JSON.parse(response);
+          } catch (e) {
+            res = { status: 'error', message: 'Respuesta no válida del servidor' };
+          }
+        }
+      }
+
+      if (res && res.status && res.status === 'ok') {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire('Actualizado', 'Estado actualizado correctamente', 'success').then(function() {
+            location.reload();
+          });
+        } else {
+          alert('Estado actualizado correctamente');
+          location.reload();
+        }
+      } else {
+        var msg = (res && res.message) ? res.message : 'No se pudo actualizar el estado';
+        if (typeof Swal !== 'undefined') {
+          Swal.fire('Error', msg, 'error');
+        } else {
+          alert(msg);
+        }
+      }
+    }).fail(function() {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
+      } else {
+        alert('No se pudo actualizar el estado (request failed)');
+      }
+    });
   });
 });
 </script>

@@ -33,7 +33,7 @@ class ControladorCliente {
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoNombre"]) &&
                 in_array($tipo, ["DNI", "RUC"]) &&
                 $documentoValido &&
-                (empty($_POST["nuevoCorreo"]) || filter_var($_POST["nuevoCorreo"], FILTER_VALIDATE_EMAIL)) &&
+                isset($_POST["nuevoCorreo"]) &&
                 preg_match('/^[0-9]{9}$/', $_POST["nuevoTelefono"]) &&
                 (empty($_POST["nuevoCiudad"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoCiudad"])) &&
                 (empty($_POST["nuevoMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoMigracion"])) &&
@@ -146,7 +146,7 @@ class ControladorCliente {
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"]) &&
                 in_array($tipo, ["DNI", "RUC"]) &&
                 $documentoValido &&
-                (empty($_POST["editarCorreo"]) || filter_var($_POST["editarCorreo"], FILTER_VALIDATE_EMAIL)) &&
+                isset($_POST["editarCorreo"]) &&
                 preg_match('/^[0-9]{9}$/', $_POST["editarTelefono"]) &&
                 (empty($_POST["editarCiudad"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarCiudad"])) &&
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&

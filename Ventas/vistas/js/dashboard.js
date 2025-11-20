@@ -34,12 +34,7 @@ $(document).ready(function() {
                     $('#resumen-prospectos').text(response.data.total_prospectos);
                     $('#resumen-clientes').text(response.data.total_clientes);
                     $('#resumen-reuniones').text(response.data.total_reuniones);
-                } else {
-                    console.error('Error al cargar totales:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX al cargar totales:', error);
             }
         });
     }
@@ -54,13 +49,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     actualizarIndicadores(response.data);
-                } else {
-                    console.error('Error al cargar indicadores:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX:', error);
-                console.error('Respuesta completa:', xhr.responseText);
             }
         });
     }
@@ -106,12 +95,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     crearGraficoClientes(response.data);
-                } else {
-                    console.error('Error al cargar métricas:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX:', error);
             }
         });
     }
@@ -214,12 +198,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     actualizarReuniones(response.data);
-                } else {
-                    console.error('Error al cargar reuniones:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX:', error);
             }
         });
     }
@@ -277,12 +256,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     crearGraficoEvolucion(response.data);
-                } else {
-                    console.error('Error al cargar evolución:', response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error AJAX:', error);
             }
         });
     }
