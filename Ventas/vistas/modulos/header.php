@@ -60,7 +60,7 @@
                     <ul class="dropdown-menu">
                         <li class="user-body">
                             <div class="pull-right">
-                                <a href="<?php echo BASE_URL; ?>/index.php?ruta=salir" class="btn btn-default btn-flat">Salir</a>
+                                <a href="<?php echo BASE_URL; ?>/salir" class="btn btn-default btn-flat">Salir</a>
                             </div>
                         </li>
                     </ul>

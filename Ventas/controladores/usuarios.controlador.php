@@ -74,7 +74,7 @@ class ControladorUsuarios {
 
                 session_set_cookie_params(30 * 24 * 60 * 60);
                 error_log("Login success: usuario=" . $ingUsuario . " | id=" . $respuesta["id"]);
-                echo '<script>window.location = "inicio";</script>';
+                    echo '<script>window.location = "'.BASE_URL.'/inicio";</script>';
 
             } else {
                 echo '<br><div class="alert alert-danger">El usuario está inactivo</div>';
@@ -96,7 +96,7 @@ class ControladorUsuarios {
         if (!preg_match('/^[\\p{L}\\p{N}\\p{P}\\p{M}\\s]+$/u', $nuevoNombre) ||
             !preg_match('/^[\\p{L}\\p{N}._\\-\\s]+$/u', $nuevoUsuario) ||
             strlen($nuevoPassword) == 0) {
-            echo '<script>swal.fire({icon: "error", title: "¡El campo usuario no puede estar vacio o con caracteres inválidos!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "usuarios"; });</script>';
+                echo '<script>swal.fire({icon: "error", title: "¡El campo usuario no puede estar vacio o con caracteres inválidos!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -135,7 +135,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlRegistrarUsuario($tabla, $datos);
         if ($respuesta === "ok") {
-            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "usuarios"; });</script>';
+              echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
         } else {
             error_log("mdlRegistrarUsuario: ERROR para usuario=" . $nuevoUsuario . " | respuesta=" . json_encode($respuesta));
         }
@@ -153,7 +153,7 @@ class ControladorUsuarios {
         if (!isset($_POST["editarUsuario"])) return;
 
         if (!preg_match('/^[\\p{L}\\p{N}\\p{P}\\p{M}\\s]+$/u', $_POST["editarNombre"])) {
-            echo '<script>swal.fire({icon: "error", title: "¡El nombre no puede ir vacío o llevar caracteres especiales!"}).then(()=>{ window.location = "usuarios"; });</script>';
+              echo '<script>swal.fire({icon: "error", title: "¡El nombre no puede ir vacío o llevar caracteres especiales!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -202,7 +202,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);
         if ($respuesta == "ok") {
-            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido Editado correctamente!"}).then(()=>{ window.location = "usuarios"; });</script>';
+              echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido Editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
         }
     }
 
@@ -211,7 +211,7 @@ class ControladorUsuarios {
         if (!isset($_GET["idUsuario"])) return;
 
         if ($_SESSION["perfil"] == "Vendedor") {
-            echo '<script>swal.fire({icon: "error", title: "¡No tienes permisos para eliminar usuarios!"}).then(()=>{ window.location = "usuarios"; });</script>';
+              echo '<script>swal.fire({icon: "error", title: "¡No tienes permisos para eliminar usuarios!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -224,7 +224,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $datos);
         if ($respuesta == "ok") {
-            echo '<script>swal.fire({icon: "success", title: "¡El usuario se ha borrado correctamente!"}).then(()=>{ window.location = "usuarios"; });</script>';
+              echo '<script>swal.fire({icon: "success", title: "¡El usuario se ha borrado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
         }
     }
 

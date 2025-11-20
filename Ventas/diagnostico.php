@@ -60,5 +60,5 @@ echo "</pre>";
 
 echo "<hr>";
 echo "<h3>Si ves este mensaje, PHP está funcionando correctamente.</h3>";
-echo "<p><a href='index.php?ruta=inicio'>Ir a Inicio</a></p>";
+echo "<p><a href='./inicio'>Ir a Inicio</a></p>";
 ?>

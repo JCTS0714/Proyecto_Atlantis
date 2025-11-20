@@ -6,7 +6,7 @@
   <section class="content-header">
     <h1>Zona de Espera</h1>
     <ol class="breadcrumb">
-      <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
+      <li><a href="<?php echo BASE_URL; ?>/inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
       <li class="active">Zona de Espera</li>
     </ol>
   </section>

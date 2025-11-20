@@ -3,7 +3,7 @@
         <ul class="sidebar-menu">
             <!-- Inicio -->
             <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=inicio">
+                <a href="<?php echo BASE_URL; ?>/inicio">
                     <i class="fa fa-home "></i>
                     <span>Inicio</span>
                 </a>
@@ -12,7 +12,7 @@
             <!-- Usuarios -->
             <?php if($_SESSION["perfil"] !== "Vendedor"): ?>
             <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=usuarios">
+                <a href="<?php echo BASE_URL; ?>/usuarios">
                     <i class="fa fa-user "></i>
                     <span>Usuarios</span>
                 </a>
@@ -27,7 +27,7 @@
             <?php endif; ?>
 
             <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=calendario">
+                <a href="<?php echo BASE_URL; ?>/calendario">
                     <i class="fa fa-calendar "></i>
                     <span>calendario</span>
                 </a>
@@ -43,31 +43,31 @@
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=prospectos">
+                        <a href="<?php echo BASE_URL; ?>/prospectos">
                             <i class="fa fa-circle-o"></i>
                             <span>Prospectos</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=seguimiento">
+                        <a href="<?php echo BASE_URL; ?>/seguimiento">
                             <i class="fa fa-circle-o"></i>
                             <span>Seguimientos</span>
                         </a>
                     </li>
                     <li >
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=clientes">
+                        <a href="<?php echo BASE_URL; ?>/clientes">
                             <i class="fa fa-circle-o"></i>
                             <span>Clientes</span>
                         </a>
                     </li>
                     <li >
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=no-clientes">
+                        <a href="<?php echo BASE_URL; ?>/no-clientes">
                             <i class="fa fa-circle-o"></i>
                             <span>No Clientes</span>
                         </a>
                     </li>
                     <li >
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=zona-espera">
+                        <a href="<?php echo BASE_URL; ?>/zona-espera">
                             <i class="fa fa-circle-o"></i>
                             <span>Zona de Espera</span>
                         </a>
@@ -77,7 +77,7 @@
 
             <!-- CRM -->
             <li class="active">
-                <a href="<?php echo BASE_URL; ?>/index.php?ruta=crm">
+                <a href="<?php echo BASE_URL; ?>/crm">
                     <i class="fa fa-handshake-o "></i>
                     <span>CRM</span>
                 </a>
@@ -94,19 +94,19 @@
                 </a>
                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=incidencias">
+                        <a href="<?php echo BASE_URL; ?>/incidencias">
                             <i class="fa fa-circle-o"></i>
                             <span>Incidencias</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=backlog">
+                        <a href="<?php echo BASE_URL; ?>/backlog">
                             <i class="fa fa-circle-o"></i>
                             <span>Backlog</span>
                         </a>
                     </li>
-                     <li >
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=clientes">
+                    <li >
+                        <a href="<?php echo BASE_URL; ?>/clientes">
                             <i class="fa fa-circle-o"></i>
                             <span>Clientes</span>
                         </a>
@@ -125,19 +125,19 @@
                 </a> -->
 <!--                 <ul class="treeview-menu">
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=ventas">
+                        <a href="<?php echo BASE_URL; ?>/ventas">
                             <i class="fa fa-circle-o"></i>
                             <span>Administrar ventas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=crear-venta">
+                        <a href="<?php echo BASE_URL; ?>/crear-venta">
                             <i class="fa fa-circle-o"></i>
                             <span>Crear venta</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=reportes">
+                        <a href="<?php echo BASE_URL; ?>/reportes">
                             <i class="fa fa-circle-o"></i>
                             <span>Reporte de ventas</span>
                         </a>

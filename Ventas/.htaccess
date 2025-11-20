@@ -1,4 +1,22 @@
-Options All -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Sitio desplegado en la raíz pública: ajuste RewriteBase = /
+  # Si su despliegue está en un subdirectorio, reemplace '/' por '/ruta/subcarpeta/'
+  RewriteBase /
+
+  # No reescribir archivos o carpetas existentes
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Redirigir todo lo demás al front controller index.php?ruta=...
+  RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
+</IfModule>
+
+# Nota: Si tras subir esto obtiene 500 o el archivo no parece aplicarse,
+# - Verifique que Apache tenga mod_rewrite habilitado.
+# - Asegúrese de que el VirtualHost permita .htaccess con `AllowOverride All`.Options All -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On

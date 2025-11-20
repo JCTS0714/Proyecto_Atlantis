@@ -454,8 +454,13 @@ $(document).off("click", ".btnRegistrarIncidencia").on("click", ".btnRegistrarIn
   var idCliente = $(this).attr("idCliente");
   var nombreCliente = $(this).attr("nombreCliente");
 
-  // Redirigir a la página de incidencias con parámetros
-  window.location.href = "index.php?ruta=incidencias&idCliente=" + idCliente + "&nombreCliente=" + encodeURIComponent(nombreCliente);
+  // Redirigir a la página de incidencias con parámetros (usar BASE_URL + ruta limpia)
+  if (typeof window.BASE_URL !== 'undefined') {
+    window.location.href = window.BASE_URL + '/incidencias?idCliente=' + encodeURIComponent(idCliente) + '&nombreCliente=' + encodeURIComponent(nombreCliente);
+  } else {
+    // Fallback relativo
+    window.location.href = 'incidencias?idCliente=' + encodeURIComponent(idCliente) + '&nombreCliente=' + encodeURIComponent(nombreCliente);
+  }
 });
 
 // DataTable initialization moved to plantilla.js (centralized)

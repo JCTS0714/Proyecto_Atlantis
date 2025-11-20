@@ -6,7 +6,7 @@
   <section class="content-header">
     <h1>Administrar Prospectos</h1>
     <ol class="breadcrumb">
-      <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
+      <li><a href="<?php echo BASE_URL; ?>/inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
       <li class="active">Administrar Prospectos</li>
     </ol>
   </section>
@@ -146,7 +146,7 @@
                         <?php if($_SESSION["perfil"] !== "Vendedor"): ?>
                         <button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="prospectos"><i class="fa fa-times"></i></button>
                         <?php endif; ?>
-                        <a href="index.php?ruta=crm&cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
+                        <a href="'.BASE_URL.'/crm?cliente_id='.$value["id"].'" class="btn btn-info" title="Nueva Oportunidad"><i class="fa fa-plus"></i></a>
                       </div>
                     </td>
                   </tr>';

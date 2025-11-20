@@ -147,7 +147,8 @@ $(document).on("click",".btnEliminarUsuario",function(){
 
 
 
-      window.location = "index.php?ruta=usuarios&idUsuario="+idUsuario+"&usuario="+usuario+"&fotoUsuario="+fotoUsuario;
+      // Redirect to usuarios page using injected BASE_URL
+      window.location = window.BASE_URL + '/usuarios?idUsuario=' + encodeURIComponent(idUsuario) + '&usuario=' + encodeURIComponent(usuario) + '&fotoUsuario=' + encodeURIComponent(fotoUsuario);
 
 
 

@@ -9,7 +9,7 @@
         
       </h1>
       <ol class="breadcrumb">
-        <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
+        <li><a href="<?php echo BASE_URL; ?>/inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
         <li class="active"> Reporte de ventas</li>
       </ol>
     </section>

@@ -25,16 +25,16 @@
       // Validar token de sesión único (protección contra acceso múltiple)
       if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
         session_destroy();
-        echo '<script>
-          window.location.href = "'.BASE_URL.'/index.php?ruta=login";
-        </script>';
+          echo '<script>
+            window.location.href = "'.BASE_URL.'/login";
+          </script>';
         exit;
       }
 
       // Si hay sesión pero no hay ruta específica, redirigir a inicio
       if (!isset($_GET["ruta"])) {
         echo '<script>
-          window.location.href = "'.BASE_URL.'/index.php?ruta=inicio";
+            window.location.href = "'.BASE_URL.'/inicio";
         </script>';
         exit;
       }
@@ -160,6 +160,10 @@
   </head>
   <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
   <!-- Site wrapper -->
+
+  <script>
+    window.BASE_URL = '<?php echo BASE_URL; ?>';
+  </script>
 
 
       <?php
