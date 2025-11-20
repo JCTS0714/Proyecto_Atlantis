@@ -11,3 +11,4 @@ vendor/
 # Ignore tools/reports used for local analysis
 reports/
 tools/
+backups/
