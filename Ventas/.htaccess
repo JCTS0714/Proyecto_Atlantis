@@ -1,8 +1,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Sitio desplegado en la raíz pública: ajuste RewriteBase = /
-  # Si su despliegue está en un subdirectorio, reemplace '/' por '/ruta/subcarpeta/'
+  # --- Ajusta RewriteBase según despliegue ---
+  # Si el sitio está desplegado en la raíz pública (ej. https://example.com/) usar:
+  #   RewriteBase /
+  # Si el sitio está en un subdirectorio (ej. XAMPP local):
+  #   RewriteBase /Proyecto_Atlantis/Ventas/
+  # Descomenta la línea que corresponda y deja la otra comentada.
   RewriteBase /
 
   # No reescribir archivos o carpetas existentes
@@ -10,26 +14,14 @@
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Redirigir todo lo demás al front controller index.php?ruta=...
+  # Redirigir todo lo demás al front controller `index.php?ruta=...`
   RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
 </IfModule>
 
-# Nota: Si tras subir esto obtiene 500 o el archivo no parece aplicarse,
-# - Verifique que Apache tenga mod_rewrite habilitado.
-# - Asegúrese de que el VirtualHost permita .htaccess con `AllowOverride All`.Options All -Indexes
-
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    # Ajustar RewriteBase según ruta local. Si tu URL local es:
-    # http://localhost/Proyecto_Atlantis/Ventas/  -> usa RewriteBase /Proyecto_Atlantis/Ventas/
-    # Si accedes desde otra ruta local, reemplaza la línea por la correspondiente.
-    RewriteBase /Proyecto_Atlantis/Ventas/
-    
-    # No reescribir si es un archivo real
-    RewriteCond %{REQUEST_FILENAME} !-f
-    # No reescribir si es una carpeta real
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Reescribir todas las rutas a index.php?ruta=
-    RewriteRule ^(.+)$ index.php?ruta=$1 [QSA,L]
-</IfModule>
+# Notas de despliegue:
+# - Asegúrate de que Apache tenga `mod_rewrite` habilitado (LoadModule rewrite_module ...).
+# - Si las reglas no se aplican, configura `AllowOverride All` para el directorio público en httpd.conf o el VirtualHost:
+#     <Directory "C:/xampp/htdocs">
+#         AllowOverride All
+#     </Directory>
+# - Reinicia Apache tras cualquier cambio.
