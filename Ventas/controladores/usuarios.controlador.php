@@ -77,7 +77,8 @@ class ControladorUsuarios {
                     echo '<script>window.location = "'.BASE_URL.'/inicio";</script>';
 
             } else {
-                echo '<br><div class="alert alert-danger">El usuario está inactivo</div>';
+                // Mostrar mensaje claro cuando la cuenta está desactivada
+                echo '<br><div class="alert alert-danger">El usuario está inactivo. Esta cuenta esta descativada</div>';
             }
         } else {
             error_log("Login error: Contraseña incorrecta para usuario=" . $ingUsuario);
@@ -135,7 +136,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlRegistrarUsuario($tabla, $datos);
         if ($respuesta === "ok") {
-              echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios" });</script>';
         } else {
             error_log("mdlRegistrarUsuario: ERROR para usuario=" . $nuevoUsuario . " | respuesta=" . json_encode($respuesta));
         }
@@ -202,7 +203,15 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);
         if ($respuesta == "ok") {
-              echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido Editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            // Si el usuario editado es el que está en sesión, actualizar la sesión
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+            if (isset($_SESSION["usuario"]) && $_SESSION["usuario"] == $_POST["editarUsuario"]) {
+                $_SESSION["foto"] = $ruta;
+                $_SESSION["nombre"] = $_POST["editarNombre"];
+            }
+            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido Editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios" });</script>';
         }
     }
 
