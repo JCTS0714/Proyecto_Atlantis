@@ -4,3 +4,10 @@ Ventas/.env
 
 # Composer vendor
 vendor/
+
+# Ignore backup files created during cleanup
+*.bak
+
+# Ignore tools/reports used for local analysis
+reports/
+tools/
