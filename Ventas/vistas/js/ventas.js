@@ -107,6 +107,18 @@ $(".tablaVentas tbody").on("click","button.btnAgregarProductos",function(){
                       '</div>'+
 					  '</div>')
     }
+		},
+		error: function(xhr, status, error) {
+			// Productos endpoint removed — show message and restore button
+			swal.fire({
+				icon: "warning",
+				title: "Funcionalidad de productos deshabilitada",
+				text: "El módulo de productos fue eliminado. No es posible agregar productos.",
+				showConfirmButton: true,
+				confirmButtonText: "Cerrar",
+			});
+			$("button[idProducto='"+idProducto+"']").removeClass("btn-default").addClass("btn-primary btnAgregarProductos");
+		}
   });
 });
 
