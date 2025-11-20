@@ -20,7 +20,7 @@
           <h3><i class="fa fa-warning text-yellow"></i> Oops! Página no encontrada.</h3>
 
           <p>
-            Ingrese a las opciones del menu <a href="../../index.html">Retornar a Inicio</a>
+            Ingrese a las opciones del menu <a href="<?php echo BASE_URL; ?>/index.php?ruta=inicio">Retornar a Inicio</a>
           </p>
         </div>
         <!-- /.error-content -->

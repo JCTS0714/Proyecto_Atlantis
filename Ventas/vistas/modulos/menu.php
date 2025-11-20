@@ -106,7 +106,7 @@
                         </a>
                     </li>
                      <li >
-                        <a href="clientes">
+                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=clientes">
                             <i class="fa fa-circle-o"></i>
                             <span>Clientes</span>
                         </a>
@@ -125,19 +125,19 @@
                 </a> -->
 <!--                 <ul class="treeview-menu">
                     <li>
-                        <a href="ventas">
+                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=ventas">
                             <i class="fa fa-circle-o"></i>
                             <span>Administrar ventas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="crear-venta">
+                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=crear-venta">
                             <i class="fa fa-circle-o"></i>
                             <span>Crear venta</span>
                         </a>
                     </li>
                     <li>
-                        <a href="reportes">
+                        <a href="<?php echo BASE_URL; ?>/index.php?ruta=reportes">
                             <i class="fa fa-circle-o"></i>
                             <span>Reporte de ventas</span>
                         </a>
@@ -150,13 +150,13 @@
             <!-- Categorías y Productos (comentados) -->
             <!--
             <li class="active">
-                <a href="categorias">
+                <a href="<?php echo BASE_URL; ?>/index.php?ruta=categorias">
                     <i class="fa fa-th"></i>
                     <span>Categorías</span>
                 </a>
             </li>
             <li class="active">
-                <a href="productos">
+                <a href="<?php echo BASE_URL; ?>/index.php?ruta=productos">
                     <i class="fa fa-product-hunt"></i>
                     <span>Productos</span>
                 </a>
@@ -166,7 +166,7 @@
             <!-- Proveedor (comentado) -->
             <!--
             <li class="active">
-                <a href="proveedor">
+                <a href="<?php echo BASE_URL; ?>/index.php?ruta=proveedor">
                     <i class="fa fa-child"></i>
                     <span>Proovedor</span>
                 </a>

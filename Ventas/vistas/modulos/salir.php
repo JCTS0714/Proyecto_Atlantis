@@ -15,5 +15,5 @@ if (isset($_SESSION["id"])) {
 session_destroy();
 
 echo '<script>
-      window.location = "login";
+    window.location = "'.BASE_URL.'/index.php?ruta=login";
  </script>';
