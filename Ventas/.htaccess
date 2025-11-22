@@ -1,9 +1,8 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Production: use root as RewriteBase. If deploying to a subdirectory,
-  # change this to the proper path (e.g. /Proyecto_Atlantis/Ventas/).
-  RewriteBase /
+  # Local development: use subdirectory RewriteBase. Change to '/' in production.
+  RewriteBase /Proyecto_Atlantis/Ventas/
 
   # Bypass existing files and directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]

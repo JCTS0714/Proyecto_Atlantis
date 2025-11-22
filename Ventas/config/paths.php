@@ -6,13 +6,21 @@
 // Determinar si estamos en un entorno local según variables de entorno
 // Prefer explicit config file if present (not committed to repo). This allows
 // deploying teams to set production parameters in `config/production.php`.
-$productionConfig = null;
+$productionConfig = [];
+// Load production config if present (not committed)
 if (file_exists(__DIR__ . '/production.php')) {
 	$productionConfig = include __DIR__ . '/production.php';
 }
+// Load local config for testing if present (safe to commit)
+$localConfig = [];
+if (file_exists(__DIR__ . '/local.php')) {
+	$localConfig = include __DIR__ . '/local.php';
+}
+// Merge: local overrides production for local testing
+$config = array_merge($productionConfig ?? [], $localConfig ?? []);
 
-$appEnv = $productionConfig['APP_ENV'] ?? getenv('APP_ENV') ?: null;
-$forceHttp = $productionConfig['FORCE_HTTP'] ?? getenv('FORCE_HTTP');
+$appEnv = $config['APP_ENV'] ?? getenv('APP_ENV') ?: null;
+$forceHttp = $config['FORCE_HTTP'] ?? getenv('FORCE_HTTP');
 
 // Forzar protocolo HTTP en desarrollo/local si se solicita
 if ($appEnv === 'local' || $forceHttp == '1') {
