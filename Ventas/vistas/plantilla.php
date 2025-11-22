@@ -130,7 +130,7 @@
   <!-- Select2 JS -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/select2/dist/js/select2.min.js"></script>
   <!-- Calendario JS -->
-  <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
+  <!-- moved to end of body to avoid duplicate execution -->
     <!-- Chart.js para gráficos del dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- Bootstrap 3.3.7 -->
@@ -189,6 +189,7 @@
           if($_GET["ruta"]=="inicio"       ||
             $_GET["ruta"]=="usuarios"     ||
             $_GET["ruta"]=="clientes"     ||
+            $_GET["ruta"]=="reuniones-archivadas" ||
             $_GET["ruta"]=="ventas"       ||
             $_GET["ruta"]=="crear-venta"  ||
             $_GET["ruta"]=="reportes"     ||
@@ -238,6 +239,7 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/evento.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/dashboard.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.module.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/alarma.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>

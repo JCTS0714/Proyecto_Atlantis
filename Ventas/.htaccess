@@ -1,27 +1,21 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # --- Ajusta RewriteBase según despliegue ---
-  # Si el sitio está desplegado en la raíz pública (ej. https://example.com/) usar:
-  #   RewriteBase /
-  # Si el sitio está en un subdirectorio (ej. XAMPP local):
-  #   RewriteBase /Proyecto_Atlantis/Ventas/
-  # Descomenta la línea que corresponda y deja la otra comentada.
-  RewriteBase /
+  # TEMPORAL: Ajuste para desarrollo local en XAMPP
+  # Esta configuración fuerza la base de reescritura al subdirectorio
+  # donde está el proyecto en tu máquina local. Revertir cuando pases a staging/prod.
+  RewriteBase /Proyecto_Atlantis/Ventas/
 
   # No reescribir archivos o carpetas existentes
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Redirigir todo lo demás al front controller `index.php?ruta=...`
+  # Redirigir todo lo demás al front controller `index.php?ruta=`
   RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
 </IfModule>
 
-# Notas de despliegue:
-# - Asegúrate de que Apache tenga `mod_rewrite` habilitado (LoadModule rewrite_module ...).
-# - Si las reglas no se aplican, configura `AllowOverride All` para el directorio público en httpd.conf o el VirtualHost:
-#     <Directory "C:/xampp/htdocs">
-#         AllowOverride All
-#     </Directory>
-# - Reinicia Apache tras cualquier cambio.
+# Notas temporales:
+# - Este archivo fue modificado para desarrollo local. Revertir a `RewriteBase /` en producción.
+# - Backup creado en `Ventas/.htaccess.bak`.
+# - Si usas VirtualHost preferible configurar `DocumentRoot` y `RewriteBase` acorde y usar AllowOverride.

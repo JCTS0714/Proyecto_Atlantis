@@ -13,19 +13,7 @@ $(document).ready(function() {
             return fechaHoraFin >= ahora;
         });
 
-        var contador = notificaciones.length;
-        $('#contador-notificaciones').text(contador);
-        $('#header-notificaciones').text(contador > 0 ? 'Tienes ' + contador + ' notificación' + (contador > 1 ? 'es' : '') : 'No tienes notificaciones');
-
         var lista = $('#lista-notificaciones');
-        // Eliminar solo los elementos "No hay notificaciones" para evitar duplicados
-        lista.find('li:contains("No hay notificaciones")').remove();
-
-        if (contador === 0) {
-            lista.append('<li><a href="#">No hay notificaciones</a></li>');
-            return;
-        }
-
         // Limpiar todas las notificaciones previas para evitar duplicados por cambio de fecha
         lista.empty();
 
@@ -34,13 +22,23 @@ $(document).ready(function() {
             var ahora = new Date();
             var fechaHoraFin = new Date(notificacion.fecha + ' ' + notificacion.hora_fin);
             var fechaNotificacion = new Date(notificacion.fecha);
-            var diffDias = Math.floor((fechaNotificacion - ahora) / (1000 * 60 * 60 * 24));
-            // Ajuste para incluir reuniones del día actual y días anteriores (para cubrir casos de horas posteriores)
-            // Se corrige cálculo de diffDias para incluir reuniones del día actual correctamente
-            var diffDias = Math.floor((fechaNotificacion.setHours(0,0,0,0) - ahora.setHours(0,0,0,0)) / (1000 * 60 * 60 * 24));
+            // Calcular diffDays sin mutar 'ahora' ni 'fechaNotificacion'
+            var inicioDiaAhora = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+            var inicioDiaNotificacion = new Date(fechaNotificacion.getFullYear(), fechaNotificacion.getMonth(), fechaNotificacion.getDate());
+            var diffDias = Math.floor((inicioDiaNotificacion - inicioDiaAhora) / (1000 * 60 * 60 * 24));
             var mostrar = fechaHoraFin >= ahora && diffDias <= 3;
             return mostrar;
         });
+
+        // Después de aplicar el filtrado final, actualizar contador y cabecera
+        var contador = notificaciones.length;
+        $('#contador-notificaciones').text(contador);
+        $('#header-notificaciones').text(contador > 0 ? 'Tienes ' + contador + ' notificación' + (contador > 1 ? 'es' : '') : 'No tienes notificaciones');
+
+        if (contador === 0) {
+            lista.append('<li><a href="#">No hay notificaciones</a></li>');
+            return;
+        }
 
         notificaciones.forEach(function(notificacion) {
             var contenidoCompleto = '';
@@ -86,34 +84,50 @@ $(document).ready(function() {
         });
     }
 
-    // Función para consultar reuniones próximas a notificar
-    function consultarReunionesParaNotificar() {
-        var usuarioId = $('#usuario_id').val();
-        $.ajax({
-            url: 'ajax/calendario.ajax.php',
-            type: 'POST',
-            data: { accion: 'obtener_para_notificar', usuario_id: usuarioId },
-            dataType: 'json',
-            success: function(response) {
-                // console.log("Respuesta AJAX obtener_para_notificar:", response);
-                if (response && Array.isArray(response.eventos)) {
-                    // console.log("Array eventos recibido para notificaciones:", response.eventos);
-                    actualizarDropdownNotificaciones(response.eventos);
-                    var hoy = new Date().toISOString().split('T')[0];
-                    response.eventos.forEach(function(reunion) {
-                        $.ajax({
-                            url: 'ajax/calendario.ajax.php',
-                            type: 'POST',
-                            data: { accion: 'actualizar_ultima_notificacion', id: reunion.id, fecha: hoy }
-                        });
-                    });
-                }
+    // Si existe el módulo de notificaciones, registrar renderer y arrancarlo
+    if (window.NotificationsModule && typeof window.NotificationsModule.registerRenderer === 'function') {
+        try {
+            // Registrar la función que actualiza el dropdown
+            window.NotificationsModule.registerRenderer(actualizarDropdownNotificaciones);
+            // Opcional: ajustar intervalo (en ms)
+            if (window.NotificationsModule.init) {
+                // Pasar también el parámetro de cooldown para evitar notificaciones repetidas
+                window.NotificationsModule.init({ pollInterval: 30 * 1000, cooldownMinutes: 30 });
             }
-        });
+            // Arrancar
+            window.NotificationsModule.start();
+        } catch (e) {
+            console.error('Error inicializando NotificationsModule', e);
+        }
+    } else {
+        // Fallback: iniciar polling local (si no está el módulo)
+        var POLL_INTERVAL = 30 * 1000; // 30 segundos
+        var pollTimer = null;
+        function consultarReunionesParaNotificarFallback() {
+            var usuarioId = $('#usuario_id').val();
+            $.ajax({
+                url: 'ajax/calendario.ajax.php',
+                type: 'POST',
+                data: { accion: 'obtener_para_notificar', usuario_id: usuarioId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response && Array.isArray(response.eventos)) {
+                        actualizarDropdownNotificaciones(response.eventos);
+                    }
+                }
+            });
+        }
+        function startPollingFallback() {
+            if (pollTimer) return;
+            consultarReunionesParaNotificarFallback();
+            pollTimer = setInterval(consultarReunionesParaNotificarFallback, POLL_INTERVAL);
+        }
+        function stopPollingFallback() {
+            if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        }
+        document.addEventListener('visibilitychange', function() { if (document.hidden) stopPollingFallback(); else startPollingFallback(); });
+        startPollingFallback();
     }
-
-    consultarReunionesParaNotificar();
-    setInterval(consultarReunionesParaNotificar, 5000);
 });
 
     // Función para consultar reuniones próximas a notificar

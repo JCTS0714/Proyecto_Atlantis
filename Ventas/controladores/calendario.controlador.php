@@ -102,6 +102,34 @@ class ControladorCalendario {
         $respuesta = ModeloCalendario::mdlActualizarUltimaNotificacion($tabla, $id, $fecha);
         return $respuesta;
     }
+
+    // Método para actualizar última notificación en lote
+    public static function ctrActualizarUltimaNotificacionLote($ids, $fecha) {
+      $tabla = "reuniones";
+      $respuesta = ModeloCalendario::mdlActualizarUltimaNotificacionLote($tabla, $ids, $fecha);
+      return $respuesta;
+    }
+
+    // Listar reuniones pasadas (no archivadas)
+    public static function ctrListarReunionesPasadas($limit = 100) {
+      $tabla = "reuniones";
+      $respuesta = ModeloCalendario::mdlListarReunionesPasadas($tabla, $limit);
+      return $respuesta;
+    }
+
+    // Archivar / marcar concretado una reunión
+    public static function ctrArchivarReunion($id, $estado = null, $usuario_id = null) {
+      $tabla = "reuniones";
+      $respuesta = ModeloCalendario::mdlArchivarReunion($tabla, $id, $estado, $usuario_id);
+      return $respuesta;
+    }
+
+    // Obtener reuniones archivadas
+    public static function ctrObtenerReunionesArchivadas($limit = 500) {
+      $tabla = "reuniones";
+      $respuesta = ModeloCalendario::mdlObtenerReunionesArchivadas($tabla, $limit);
+      return $respuesta;
+    }
 }
 ?>
              

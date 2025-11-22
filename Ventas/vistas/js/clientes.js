@@ -2,8 +2,7 @@
 // ARCHIVO CLIENTES.JS
 // ========================================
 
-// console.log('Archivo clientes.js cargado correctamente');
-// console.log('jQuery está disponible, versión:', $.fn.jquery);
+// Archivo clientes.js — manejadores de clientes/prospectos
 
 $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", function(event) {
   event.preventDefault();
@@ -107,7 +106,6 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarFechaContacto").attr("placeholder", "Ingresar fecha de contacto");
       $("#editarEmpresa").attr("placeholder", "Ingresar empresa");
 
-      console.log("Mostrando modal");
       $("#modalActualizarClientes").modal("show");
     },
     error: function(xhr, status, error) {
@@ -123,7 +121,6 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
 // ========================================
 $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente", function(e) {
   e.preventDefault();
-  console.log("Click en botón eliminar cliente detectado");
   var idCliente = $(this).attr("idCliente");
   var dataRuta = $(this).attr("data-ruta");
   
@@ -133,7 +130,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
     return;
   }
 
-  console.log("ID Cliente:", idCliente, "Ruta:", dataRuta);
+  // ID y ruta leídos correctamente
 
   // Confirmación con SweetAlert
   if (typeof Swal === 'undefined') {
@@ -153,7 +150,6 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
       contentType: false,
       processData: false,
       success: function(respuesta) {
-        console.log("Respuesta eliminar cliente:", respuesta);
         if (respuesta == "ok" || respuesta == 1) {
           alert('El cliente ha sido eliminado correctamente.');
           location.reload();
@@ -191,7 +187,6 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
           contentType: false,
           processData: false,
           success: function(respuesta) {
-            console.log("Respuesta eliminar cliente:", respuesta);
             if (respuesta == "ok" || respuesta == 1) {
               Swal.fire({
                 title: 'Eliminado',
@@ -225,23 +220,19 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
 
 // Manejador para botón Reactivar en zona de espera
 $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarCliente', function() {
-  console.log('Click detectado en botón Reactivar');
+  // Click Reactivar detectado
   var idCliente = $(this).attr('idCliente');
-  console.log('ID Cliente obtenido:', idCliente);
 
   if (!idCliente) {
-    console.error('ID de cliente no encontrado en el botón');
     alert('ID de cliente no encontrado');
     return;
   }
-
-  console.log('Mostrando confirmación al usuario');
   if (!confirm('¿Está seguro que desea reactivar este cliente y pasarlo a seguimiento?')) {
     console.log('Usuario canceló la confirmación');
     return;
   }
 
-  console.log('Buscando oportunidad para cliente ID:', idCliente);
+  // Buscar oportunidad para cliente
 
   // Primero buscar la oportunidad del cliente
   $.ajax({
@@ -252,16 +243,8 @@ $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarClien
     },
     dataType: 'json',
     success: function(oportunidadResponse) {
-      console.log('Respuesta búsqueda oportunidad:', oportunidadResponse);
-
       if (oportunidadResponse && oportunidadResponse.length > 0) {
         var idOportunidad = oportunidadResponse[0].id;
-        console.log('ID Oportunidad encontrado:', idOportunidad);
-
-        console.log('Enviando petición AJAX para cambiar estado con datos:', {
-          idOportunidad: idOportunidad,
-          nuevoEstado: 1
-        });
 
         // Ahora cambiar el estado de la oportunidad
         $.ajax({
@@ -273,39 +256,22 @@ $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarClien
           },
           dataType: 'json',
           success: function(response) {
-            console.log('Respuesta AJAX cambio estado exitosa:', response);
             if (response.status === 'success') {
-              console.log('Estado actualizado correctamente, recargando página');
               alert('Cliente reactivado correctamente');
-              // Recargar la página o tabla para reflejar cambios
               location.reload();
             } else {
-              console.error('Error en respuesta:', response.message);
               alert('Error al reactivar cliente: ' + response.message);
             }
           },
           error: function(xhr, status, error) {
-            console.error('Error AJAX cambio estado:', {
-              xhr: xhr,
-              status: status,
-              error: error,
-              responseText: xhr.responseText
-            });
             alert('Error en la petición AJAX: ' + error);
           }
         });
       } else {
-        console.error('No se encontró oportunidad para el cliente');
         alert('No se encontró la oportunidad asociada al cliente');
       }
     },
     error: function(xhr, status, error) {
-      console.error('Error AJAX búsqueda oportunidad:', {
-        xhr: xhr,
-        status: status,
-        error: error,
-        responseText: xhr.responseText
-      });
       alert('Error al buscar la oportunidad del cliente: ' + error);
     }
   });
@@ -469,8 +435,6 @@ $(document).off("click", ".btnRegistrarIncidencia").on("click", ".btnRegistrarIn
 $(document).off('change', '.select-estado-cliente').on('change', '.select-estado-cliente', function() {
   var idCliente = $(this).data('id');
   var nuevoEstado = $(this).val();
-
-  console.log('select-estado-cliente changed', { idCliente: idCliente, nuevoEstado: nuevoEstado });
 
   if (!idCliente || nuevoEstado === undefined) {
     console.error('select-estado-cliente: parámetros inválidos', {idCliente: idCliente, nuevoEstado: nuevoEstado});

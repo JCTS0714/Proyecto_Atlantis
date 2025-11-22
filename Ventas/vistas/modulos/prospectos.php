@@ -405,52 +405,7 @@ $(document).ready(function() {
     $('#nuevoDocumento').val('55555555');
   });
 
-  // Cambiar estado vía select: envía AJAX para actualizar el estado del cliente
-  $(document).on('change', '.select-estado-cliente', function() {
-    var idCliente = $(this).data('id');
-    var nuevoEstado = $(this).val();
-
-    // Usar el endpoint ya existente que espera 'activarId' y 'activarEstado'
-    $.post('ajax/clientes.ajax.php', { activarId: idCliente, activarEstado: nuevoEstado }, function(response) {
-      var res = response;
-      // Si el servidor devuelve la cadena literal "ok" (comportamiento actual), tratar como éxito
-      if (typeof response === 'string') {
-        var trimmed = response.trim();
-        if (trimmed === 'ok') {
-          res = { status: 'ok' };
-        } else {
-          try {
-            res = JSON.parse(response);
-          } catch (e) {
-            res = { status: 'error', message: 'Respuesta no válida del servidor' };
-          }
-        }
-      }
-
-      if (res && res.status && res.status === 'ok') {
-        if (typeof Swal !== 'undefined') {
-          Swal.fire('Actualizado', 'Estado actualizado correctamente', 'success').then(function() {
-            location.reload();
-          });
-        } else {
-          alert('Estado actualizado correctamente');
-          location.reload();
-        }
-      } else {
-        var msg = (res && res.message) ? res.message : 'No se pudo actualizar el estado';
-        if (typeof Swal !== 'undefined') {
-          Swal.fire('Error', msg, 'error');
-        } else {
-          alert(msg);
-        }
-      }
-    }).fail(function() {
-      if (typeof Swal !== 'undefined') {
-        Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
-      } else {
-        alert('No se pudo actualizar el estado (request failed)');
-      }
-    });
-  });
+  // El manejo de cambio de estado de clientes se realiza de forma centralizada en `vistas/js/clientes.js`.
+  // Este archivo debe incluirse antes de este script para que el comportamiento sea consistente.
 });
 </script>

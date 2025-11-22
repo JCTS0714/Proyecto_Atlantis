@@ -97,6 +97,34 @@ class ModeloCliente{
     return $result;
   }
 
+    /* MÉTODO PARA BUSCAR CLIENTE POR TELÉFONO (normalizando caracteres comunes) */
+    static public function mdlBuscarPorTelefono($telefono) {
+      // Normalizar: eliminar todo lo que no sea dígito
+      $telefonoNormalizado = preg_replace('/[^0-9]/', '', $telefono);
+      $stmt = Conexion::conectar()->prepare("SELECT * FROM clientes WHERE REPLACE(REPLACE(REPLACE(telefono, ' ', ''), '-', ''), '+', '') = :telefono LIMIT 1");
+      $stmt->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
+      try {
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      } catch (PDOException $e) {
+        error_log("mdlBuscarPorTelefono ERROR: " . $e->getMessage());
+        return [];
+      }
+    }
+
+    /* MÉTODO PARA BUSCAR CLIENTE POR DOCUMENTO */
+    static public function mdlBuscarPorDocumento($documento) {
+      $stmt = Conexion::conectar()->prepare("SELECT * FROM clientes WHERE documento = :documento LIMIT 1");
+      $stmt->bindParam(':documento', $documento, PDO::PARAM_STR);
+      try {
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      } catch (PDOException $e) {
+        error_log("mdlBuscarPorDocumento ERROR: " . $e->getMessage());
+        return [];
+      }
+    }
+
   /* MÉTODO PARA REGISTRAR CLIENTE */
   static public function mdlRegistrarCliente($tabla,$datos){
     $stmt = Conexion::conectar()->prepare("INSERT INTO clientes(nombre, tipo, documento, telefono, correo, ciudad, migracion, referencia, fecha_contacto, empresa, estado) VALUES(:nombre, :tipo, :documento, :telefono, :correo, :ciudad, :migracion, :referencia, :fecha_contacto, :empresa, :estado)");

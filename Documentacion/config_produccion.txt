@@ -1,0 +1,122 @@
+1) `vistas/plantilla.php` - Resumen
+- Qué es: archivo de plantilla principal (layout) que carga cabeceras, pies, estilos y scripts.
+- Impacto en producción: controla los headers HTTP, inclusión de assets y salida HTML global.
+- Checklist de producción:
+  - Desactivar cualquier debug/display de variables (eliminar `var_dump`, `print_r` y dumps de debug`).
+  - Usar versiones minificadas de CSS/JS; reemplazar rutas a `bower_components` por `/dist` o assets compilados.
+  - Establecer cabeceras de seguridad (Content-Security-Policy, X-Frame-Options, X-Content-Type-Options).
+  - Forzar cookies seguras: `session_set_cookie_params(['secure'=>true,'httponly'=>true,'samesite'=>'Lax'])` o equivalente.
+  - Eliminar código que muestre rutas absolutas o credenciales en HTML.
+
+2) `Ventas/index.php` (u otro `index.php`) - Resumen
+- Qué es: punto de entrada público al módulo/área (router front controller si aplica).
+- Impacto en producción: controla enrutamiento, carga inicial y configuración de entorno.
+- Checklist de producción:
+  - Desactivar `display_errors` y cualquier `error_reporting(E_ALL)` que muestre errores públicamente.
+  - Detectar entorno por variable de entorno (ENV) o archivo fuera del webroot; no usar valores por defecto de desarrollo.
+  - Implementar redirección a HTTPS (o dejarlo en `.htaccess`/config del servidor).
+  - Restringir acceso a archivos sensibles con reglas de servidor.
+
+3) `/.htaccess` (archivo en la raíz del proyecto o en la carpeta pública) - Resumen
+- Qué es: reglas de Apache para reescrituras, redirecciones, cabeceras y protección de archivos.
+- Impacto en producción: determina seguridad (bloqueo de accesos), rendimiento (compresión, caché) y envío a index.
+- Checklist de producción (ejemplos a aplicar):
+  - Forzar HTTPS: `RewriteCond %{HTTPS} off` + `RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]`.
+  - Bloquear acceso a archivos de configuración: `RewriteRule ^(config|modelos|Documentacion)/ - [F]` (mejor mover fuera del webroot).
+  - Habilitar compresión y expirations (mod_deflate, mod_expires) o hacerlo en host.
+  - Deshabilitar listado de directorios: `Options -Indexes`.
+  - Evitar exposición de `.git`, `.env`, `.bak` y backups.
+
+4) `modelos/conexion.php` - Resumen
+- Qué es: responsable de la conexión a la base de datos.
+- Impacto en producción: seguridad y estabilidad de DB (credenciales, manejo de errores).
+- Checklist de producción:
+  - No versionar credenciales en texto (mover a variables de entorno o archivo fuera del webroot).
+  - Usar PDO con prepared statements y manejo de excepciones (`PDO::ERRMODE_EXCEPTION`).
+  - Establecer charset (`utf8mb4`) y modos estrictos si aplica.
+  - Limitar permisos del usuario de BD (no `root`, solo los privilegios necesarios).
+
+5) `config/paths.php` - Resumen
+- Qué es: definiciones de rutas/constantes y paths usados por la app.
+- Impacto en producción: rutas mal definidas pueden romper inclusión y exponer archivos.
+- Checklist de producción:
+  - Usar rutas dinámicas basadas en `__DIR__` o constantes calculadas, no rutas absolutas de desarrollo.
+  - Asegurar que rutas a logs y caches apunten fuera del webroot o en carpetas con permisos controlados.
+
+6) `config/estados.php` - Resumen
+- Qué es: archivo de constantes/estados usados por la app (posiblemente enums, estados de pedidos, etc.).
+- Impacto en producción: contenido seguro pero cuidado con datos de prueba.
+- Checklist de producción:
+  - Eliminar o desactivar datos de prueba o fixtures incluidos en archivos de configuración.
+  - Mantener solo constantes, sin información sensible.
+
+7) `controladores/plantilla.controlador.php` y controladores en general - Resumen
+- Qué es: lógica que prepara datos para las vistas.
+- Impacto en producción: fugas de información, rendimiento y validación.
+- Checklist de producción:
+  - Quitar logs y `echo`/`print` de depuración.
+  - Validar y sanitizar todas las entradas (POST/GET/FILES).
+  - Centralizar manejo de errores y registrar en logs seguros en lugar de mostrar.
+
+8) `Ventas/bd.txt` y otros archivos con credenciales (ej.: `bd.txt`, `*.sql`, backups) - Resumen
+- Qué es: archivos que a veces contienen credenciales o dumps.
+- Impacto en producción: exposición directa de credenciales/estructura.
+- Checklist de producción:
+  - NO subir estos archivos al servidor público; moverlos fuera del webroot o eliminarlos.
+  - Añadir a `.gitignore` y eliminar del repo si contienen secretos (rotar credenciales si ya se expusieron).
+
+9) `tests/`, `tools/`, `scripts/` (p. ej. `run_explain.php`, `consultar_reuniones_para_notificar.php`) - Resumen
+- Qué es: utilidades, pruebas y scripts de diagnóstico.
+- Impacto en producción: pueden dar acceso o información sensible y no deben estar expuestos.
+- Checklist de producción:
+  - No desplegar tests ni herramientas de diagnóstico en el servidor público.
+  - Si se requieren scripts, protegerlos por IP o autenticación y ubicarlos fuera del webroot.
+
+10) `vistas/bower_components/`, `vistas/js/`, `vistas/css/` - Resumen
+- Qué es: librerías y assets front-end.
+- Impacto en producción: rendimiento y seguridad (mapas de fuente, versiones, libs con vulnerabilidades).
+- Checklist de producción:
+  - Servir archivos minificados y concatenados (`app.min.js`, `app.min.css`).
+  - Remover source maps (`*.map`) de producción si exponen código o rutas.
+  - Mantener actualizadas las dependencias (auditoría de vulnerabilidades) y usar CDNs seguros si procede.
+
+11) `utils/verificar_token_db.php` y manejo de tokens/keys - Resumen
+- Qué es: validación y verificación de tokens para autenticación/servicios.
+- Impacto en producción: seguridad de autenticación.
+- Checklist de producción:
+  - Guardar secretos en variables de entorno o en un secret manager.
+  - Usar hashing/firmas seguras y tiempo de expiración.
+
+12) `Documentacion/` y archivos `.bak` - Resumen
+- Qué es: documentación y copias de seguridad (.bak).
+- Impacto en producción: suelen contener datos sensibles o pistas de la estructura.
+- Checklist de producción:
+  - No exponer documentación interna en el servidor público; mantenerla fuera del webroot o restringida.
+  - Eliminar o mover `.bak` y archivos de respaldo para evitar exposiciones.
+
+13) Permisos y propietarios (general)
+- Qué revisar:
+  - Archivos: permisos `644` (lectura para el servidor, escritura solo para el propietario).
+  - Directorios: permisos `755`.
+  - Carpetas que requieren escritura (logs, cache, uploads) deben tener permisos restringidos y ser propiedad del usuario del servidor web.
+
+14) Configuración de PHP / servidor (no siempre en repo)
+- Qué revisar:
+  - `display_errors = Off`, `log_errors = On` y `error_log` apuntando a una ubicación segura.
+  - `session.cookie_secure = 1`, `session.cookie_httponly = 1`.
+  - Limites de `upload_max_filesize`, `post_max_size`, `max_execution_time` adecuados para producción.
+
+15) Checklist final antes del deploy
+- Pasos prácticos:
+  - Ejecutar build assets (`npm run build` / `gulp --production`) y comprobar que `plantilla` carga `/dist`.
+  - Verificar que no hay archivos con credenciales en el repo (`grep -R "password\\|DB_PASS\\|DB_USER"`).
+  - Asegurar HTTPS, HSTS y reescrituras en `.htaccess` o configuración del host.
+  - Hacer backup completo (DB + archivos) y probar restore en entorno staging.
+  - Habilitar logging/monitoring (error logs, uptime, alertas) y plan de rollback.
+
+Resumen:
+Este archivo enumera los puntos de mayor impacto al pasar el proyecto a producción: plantillas y puntos de entrada (index), reglas del servidor (`.htaccess`), conexiones a BD, archivos de configuración y utilidades de diagnóstico. Antes de subir, mover credenciales fuera del webroot, desactivar la salida de errores, usar assets compilados/minificados y proteger o eliminar scripts/tests que no deban estar en producción.
+
+Notas adicionales:
+- Recomendación de almacenar variables sensibles en variables de entorno (`.env` fuera del webroot o configuración del host).
+- Considerar usar un sistema de despliegue automatizado (CI/CD) que ejecute tests, builds y despliegue solo artefactos listos para producción.

@@ -77,7 +77,14 @@ class AjaxCalendario {
         }
 
         $respuesta = ControladorCalendario::ctrEditarReunion($this->datos);
-        echo json_encode('ok');
+            // Devolver la respuesta real del controlador/modelo (generalmente JSON con success)
+            if (is_string($respuesta)) {
+                // respuesta ya viene serializada (json_encode en el modelo)
+                header('Content-Type: application/json');
+                echo $respuesta;
+            } else {
+                echo json_encode($respuesta);
+            }
     }
 
     // Actualizar solo fecha de reunión
@@ -225,6 +232,33 @@ if(isset($_POST["accion"]) && $_POST["accion"] == "actualizar_ultima_notificacio
     echo json_encode(['success' => $respuesta]);
 }
 
+// Marcar varias notificaciones vistas en lote
+if(isset($_POST["accion"]) && $_POST["accion"] == "marcar_notificaciones_vistas") {
+    $idsRaw = isset($_POST['ids']) ? $_POST['ids'] : null;
+    $fecha = isset($_POST['fecha']) ? $_POST['fecha'] : null;
+
+    // Aceptar JSON string o array
+    $ids = [];
+    if (is_string($idsRaw)) {
+        $decoded = json_decode($idsRaw, true);
+        if (is_array($decoded)) $ids = $decoded;
+    } elseif (is_array($idsRaw)) {
+        $ids = $idsRaw;
+    }
+
+    // Sanitizar a enteros
+    $ids = array_map('intval', $ids);
+    $ids = array_filter($ids, function($v) { return $v > 0; });
+
+    if (empty($ids) || !$fecha) {
+        echo json_encode(['success' => false, 'error' => 'Faltan parámetros (ids/fecha)']);
+        exit;
+    }
+
+    $respuesta = ControladorCalendario::ctrActualizarUltimaNotificacionLote($ids, $fecha);
+    echo json_encode(['success' => (bool)$respuesta, 'updated_count' => $respuesta ? count($ids) : 0]);
+}
+
 // Verificar actividades duplicadas para un cliente
 if(isset($_POST["accion"]) && $_POST["accion"] == "verificar_duplicados") {
     $clienteId = intval($_POST['cliente_id']);
@@ -233,4 +267,38 @@ if(isset($_POST["accion"]) && $_POST["accion"] == "verificar_duplicados") {
     $stmt->execute();
     $actividades = $stmt->fetchAll(PDO::FETCH_COLUMN);
     echo json_encode(['duplicados' => $actividades]);
+}
+
+// Listar reuniones pasadas no archivadas
+if(isset($_POST["accion"]) && $_POST["accion"] == "listar_pasadas") {
+    $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 100;
+    $reuniones = ControladorCalendario::ctrListarReunionesPasadas($limit);
+    echo json_encode(['eventos' => $reuniones]);
+}
+
+// Archivar o marcar como concretado
+if(isset($_POST["accion"]) && ($_POST["accion"] == "archivar_reunion" || $_POST["accion"] == "marcar_concretado")) {
+    $id = intval($_POST['id']);
+    $usuario_id = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : null;
+    $estado = null;
+    if ($_POST["accion"] == "marcar_concretado") $estado = 'concretado';
+    if ($_POST["accion"] == "archivar_reunion") $estado = 'archivado';
+    $ok = ControladorCalendario::ctrArchivarReunion($id, $estado, $usuario_id);
+    echo json_encode(['success' => (bool)$ok]);
+}
+
+// Marcar reunión como no concretada (nueva acción)
+if(isset($_POST["accion"]) && $_POST["accion"] == "marcar_no_concretado") {
+    $id = intval($_POST['id']);
+    $usuario_id = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : null;
+    // Reutilizar la lógica de archivar pero marcar estado 'no_concretado'
+    $ok = ControladorCalendario::ctrArchivarReunion($id, 'no_concretado', $usuario_id);
+    echo json_encode(['success' => (bool)$ok]);
+}
+
+// Obtener reuniones archivadas (para interfaz completa)
+if(isset($_POST["accion"]) && $_POST["accion"] == "obtener_archivadas") {
+    $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 500;
+    $reuniones = ControladorCalendario::ctrObtenerReunionesArchivadas($limit);
+    echo json_encode(['eventos' => $reuniones]);
 }

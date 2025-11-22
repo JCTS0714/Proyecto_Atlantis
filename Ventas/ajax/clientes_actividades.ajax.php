@@ -6,19 +6,27 @@ require_once "../modelos/ModeloCRM.php";
 if(isset($_POST["accion"]) && $_POST["accion"] == "obtener_lista_clientes") {
     // Controlador ya incluido globalmente en index.php
     $clientes = ControladorOportunidad::ctrMostrarClientesOrdenados();
-    $clientesLimit = array_slice($clientes, 0, 5); // Mostrar solo los primeros 5
 
-    // Obtener ids de clientes para consultar reuniones
-    $clienteIds = array_column($clientesLimit, 'id');
-
-    // Obtener reuniones de estos clientes
-    $reuniones = ModeloCalendario::mdlMostrarReunionesPorClientes($clienteIds);
+    // Obtener ids de todos los clientes para consultar reuniones activas (archivado = 0)
+    $allClienteIds = array_column($clientes, 'id');
+    $reuniones = [];
+    if (!empty($allClienteIds)) {
+        $reuniones = ModeloCalendario::mdlMostrarReunionesPorClientes($allClienteIds);
+    }
 
     // Agrupar reuniones por cliente_id
     $reunionesPorCliente = [];
     foreach ($reuniones as $reunion) {
         $reunionesPorCliente[$reunion['cliente_id']][] = $reunion['titulo'];
     }
+
+    // Filtrar clientes para mostrar sólo aquellos que tengan reuniones activas
+    $clientesConReuniones = array_filter($clientes, function($c) use ($reunionesPorCliente) {
+        return isset($reunionesPorCliente[$c['id']]) && !empty($reunionesPorCliente[$c['id']]);
+    });
+
+    // Limitar a 5
+    $clientesLimit = array_slice(array_values($clientesConReuniones), 0, 5);
 
     $html = '';
     if (!empty($clientesLimit)) {
@@ -41,7 +49,7 @@ if(isset($_POST["accion"]) && $_POST["accion"] == "obtener_lista_clientes") {
             $html .= '</li>';
         }
     } else {
-        $html = '<li class="list-group-item">No hay clientes registrados.</li>';
+        $html = '<li class="list-group-item">No hay clientes con reuniones activas.</li>';
     }
 
     echo $html;
