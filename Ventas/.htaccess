@@ -1,21 +1,61 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # TEMPORAL: Ajuste para desarrollo local en XAMPP
-  # Esta configuración fuerza la base de reescritura al subdirectorio
-  # donde está el proyecto en tu máquina local. Revertir cuando pases a staging/prod.
-  RewriteBase /Proyecto_Atlantis/Ventas/
+  # Production: use root as RewriteBase. If deploying to a subdirectory,
+  # change this to the proper path (e.g. /Proyecto_Atlantis/Ventas/).
+  RewriteBase /
 
-  # No reescribir archivos o carpetas existentes
+  # Bypass existing files and directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Redirigir todo lo demás al front controller `index.php?ruta=`
+  # Front controller: route to index.php with `ruta` param
   RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
 </IfModule>
 
-# Notas temporales:
-# - Este archivo fue modificado para desarrollo local. Revertir a `RewriteBase /` en producción.
-# - Backup creado en `Ventas/.htaccess.bak`.
-# - Si usas VirtualHost preferible configurar `DocumentRoot` y `RewriteBase` acorde y usar AllowOverride.
+# Disable directory listing
+Options -Indexes
+
+# Deny access to sensitive files and backups
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(?:.*(\.bak|\.sql)$|\.env|bd\.txt)$">
+    Require all denied
+  </FilesMatch>
+  <FilesMatch "^(production\.php|config/.*)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  # Fallback for older Apache
+  <FilesMatch "^(?:.*(\.bak|\.sql)$|\.env|bd\.txt)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Deny access to VCS and archive folders
+RedirectMatch 403 \.git
+RedirectMatch 403 ^/archive_dev(/|$)
+RedirectMatch 403 ^/sql(/|$)
+RedirectMatch 403 ^/scripts(/|$)
+RedirectMatch 403 ^/Documentacion(/|$)
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "no-referrer-when-downgrade"
+</IfModule>
+
+# HTTPS redirect (uncomment to force HTTPS in production)
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# Notes:
+# - If you use a VirtualHost, prefer configuring redirects and rewrite base
+#   at the vhost level and keep AllowOverride minimal.
+# - Keep `archive_dev/`, `bd.txt`, `.env` and other sensitive files outside webroot
+#   or ensure they are denied as above.
