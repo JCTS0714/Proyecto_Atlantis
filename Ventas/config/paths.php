@@ -4,8 +4,15 @@
  * Define BASE_URL que apunta al esquema + host + carpeta del script.
  */
 // Determinar si estamos en un entorno local según variables de entorno
-$appEnv = getenv('APP_ENV') ?: null;
-$forceHttp = getenv('FORCE_HTTP');
+// Prefer explicit config file if present (not committed to repo). This allows
+// deploying teams to set production parameters in `config/production.php`.
+$productionConfig = null;
+if (file_exists(__DIR__ . '/production.php')) {
+	$productionConfig = include __DIR__ . '/production.php';
+}
+
+$appEnv = $productionConfig['APP_ENV'] ?? getenv('APP_ENV') ?: null;
+$forceHttp = $productionConfig['FORCE_HTTP'] ?? getenv('FORCE_HTTP');
 
 // Forzar protocolo HTTP en desarrollo/local si se solicita
 if ($appEnv === 'local' || $forceHttp == '1') {
@@ -27,5 +34,17 @@ define('BASE_URL', $protocol . '://' . $host . $scriptDir);
 
 // Opcional: ruta absoluta del filesystem a la raíz del proyecto
 define('BASE_PATH', rtrim(str_replace('\\', '/', dirname(__FILE__)), '/'));
+
+// Disable display errors by default in production if configured
+if (isset($productionConfig['display_errors'])) {
+	ini_set('display_errors', $productionConfig['display_errors'] ? '1' : '0');
+	error_reporting($productionConfig['error_reporting'] ?? E_ALL);
+}
+
+// Provide FORCE_RELOAD_ON_UPDATE global flag for frontend scripts
+if (!defined('FORCE_RELOAD_ON_UPDATE')) {
+	$forceReload = $productionConfig['FORCE_RELOAD_ON_UPDATE'] ?? (getenv('FORCE_RELOAD_ON_UPDATE') ?: false);
+	define('FORCE_RELOAD_ON_UPDATE', $forceReload);
+}
 
 ?>
