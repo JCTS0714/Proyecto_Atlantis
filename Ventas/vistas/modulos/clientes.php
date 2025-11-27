@@ -15,12 +15,8 @@
   <section class="content">
     <div class="box">
       <div class="box-header with-border">
-        <h3 class="box-title">Lista de Clientes (Oportunidades Ganadas)</h3>
-        <div class="box-tools pull-right">
-          <button class="btn btn-info" data-toggle="modal" data-target="#modal-filtros-clientes">
-            <i class="fa fa-filter"></i> Filtros
-          </button>
-        </div>
+        <h3 class="box-title">Lista de Clientes (Oportunidades)</h3>
+      </div>
         <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->
         <div class="column-toggle-container" style="margin-top:10px;">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
