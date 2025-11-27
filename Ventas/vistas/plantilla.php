@@ -181,6 +181,8 @@
          *  MENU LATERAL(ESTÁTICO)
          ==================== */
         include "modulos/menu.php";
+        // Incluir buscador avanzado (parcial global)
+        include "modulos/advanced_search.php";
   
         /**==================
          *  CONTENIDO PRINCIPAL
@@ -244,6 +246,7 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/alarma.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/advanced_search.js"></script>
 
   </body>
   </html>
