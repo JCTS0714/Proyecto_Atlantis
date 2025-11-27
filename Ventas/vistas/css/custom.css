@@ -7,3 +7,30 @@
   box-shadow: 0 0 8px 2px rgba(251, 192, 45, 0.7);
   z-index: 9999 !important;
 }
+
+/* Advanced Search and header controls alignment */
+/* Keep column toggle on the right and advanced search toggle on the left */
+.box .box-header .column-toggle-container {
+  float: right !important;
+  margin-top: 6px;
+}
+#advanced-search-bar {
+  float: left !important;
+  margin-right: 10px;
+  margin-top: 6px;
+}
+.box .box-header .box-title {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 12px;
+}
+.box .box-header::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+/* Make the inline advanced panel span full width below header */
+#advanced-search-panel-inline {
+  margin: 10px 15px 0 15px;
+}

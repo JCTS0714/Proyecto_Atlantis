@@ -181,8 +181,7 @@
          *  MENU LATERAL(ESTÁTICO)
          ==================== */
         include "modulos/menu.php";
-        // Incluir buscador avanzado (parcial global)
-        include "modulos/advanced_search.php";
+        // Búsqueda avanzada: ahora se incluye directamente en los módulos con tablas
   
         /**==================
          *  CONTENIDO PRINCIPAL

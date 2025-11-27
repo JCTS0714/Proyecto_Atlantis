@@ -16,7 +16,6 @@
     <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Clientes en Zona de Espera</h3>
-      </div>
       <!-- Botón Mostrar/Ocultar Columnas -->
       <div class="column-toggle-container" style="margin-top:10px;">
         <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -87,6 +86,9 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <?php include 'advanced_search.php'; ?>
 
             <script>
             // Abrir modal de edición y enfocar motivo si la URL contiene ?open_motivo_id=ID
@@ -128,7 +130,6 @@
               } catch(e) { console.error(e); }
             });
             </script>
-      </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaZonaEspera">
@@ -202,199 +203,5 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE EN ZONA DE ESPERA
 =========================================== -->
-<div id="modalActualizarClientes" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#3c8dbc; color:white;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Editar Cliente en Zona de Espera</h4>
-        </div>
-        <div class="modal-body">
-          <div class="box-body">
-            <input type="hidden" id="idCliente" name="idCliente">
-            <input type="hidden" name="ruta" value="zona-espera">
-
-            <!-- Campos editables -->
-            <div class="form-group">
-              <label for="editarNombre">Nombre <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control input-lg" id="editarNombre" name="editarNombre" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarTipo">Tipo <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-users"></i></span>
-                <select class="form-control input-lg" id="editarTipo" name="editarTipo" required>
-                  <option value="">Seleccionar tipo</option>
-                  <option value="DNI">DNI</option>
-                  <option value="RUC">RUC</option>
-                  <option value="otros">otros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarDocumento">Documento <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
-                <input type="text" class="form-control input-lg" id="editarDocumento" name="editarDocumento" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarTelefono">Teléfono <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" maxlength="15" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCorreo">Observacion</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCorreo" name="editarCorreo">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarMotivo">Motivo</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-sticky-note"></i></span>
-                <textarea class="form-control input-lg" id="editarMotivo" name="editarMotivo" rows="2" placeholder="Escribir motivo de zona de espera"></textarea>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCiudad">Ciudad</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCiudad" name="editarCiudad">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarMigracion">Migración</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                <input type="text" class="form-control input-lg" id="editarMigracion" name="editarMigracion">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarReferencia">Referencia</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                <select class="form-control input-lg" id="editarReferencia" name="editarReferencia">
-                  <option value="">Seleccionar referencia</option>
-                  <option value="TIK TOK">TIK TOK</option>
-                  <option value="FACEBOOK">FACEBOOK</option>
-                  <option value="INSTAGRAM">INSTAGRAM</option>
-                  <option value="whatsapp">whatsapp</option>
-                  <option value="otros">otros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarFechaContacto">Fecha de Contacto <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaContacto" name="editarFechaContacto" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarEmpresa">Empresa <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-building"></i></span>
-                <input type="text" class="form-control input-lg" id="editarEmpresa" name="editarEmpresa" required>
-              </div>
-            </div>
-            <div class="form-group" style="display:none;">
-              <label for="editarFechaCreacion">Fecha de Creación</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Editar Cliente</button>
-        </div>
-        <?php
-          ControladorCliente::ctrEditarCliente();
-        ?>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script src="vistas/js/clientes.js"></script>
-
-<!-- MODAL INFO CLIENTE (SOLO LECTURA) -->
-<div id="modalInfoCliente" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header" style="background:#00a65a; color:white;">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Información - Cliente / Oportunidad</h4>
-      </div>
-      <div class="modal-body">
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active"><a href="#tabProspecto" aria-controls="tabProspecto" role="tab" data-toggle="tab">Prospecto</a></li>
-          <li role="presentation"><a href="#tabOportunidad" aria-controls="tabOportunidad" role="tab" data-toggle="tab">Oportunidad</a></li>
-        </ul>
-
-        <div class="tab-content" style="margin-top:15px;">
-          <div role="tabpanel" class="tab-pane active" id="tabProspecto">
-            <div class="row">
-              <div class="col-md-6"><b>Nombre:</b> <span id="infoNombre"></span></div>
-              <div class="col-md-6"><b>Tipo:</b> <span id="infoTipo"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Documento:</b> <span id="infoDocumento"></span></div>
-              <div class="col-md-6"><b>Teléfono:</b> <span id="infoTelefono"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Observación:</b> <span id="infoCorreo"></span></div>
-              <div class="col-md-6"><b>Motivo:</b> <span id="infoMotivo"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Ciudad:</b> <span id="infoCiudad"></span></div>
-              <div class="col-md-6"><b>Migración:</b> <span id="infoMigracion"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Referencia:</b> <span id="infoReferencia"></span></div>
-              <div class="col-md-6"><b>Empresa:</b> <span id="infoEmpresa"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha de Contacto:</b> <span id="infoFechaContacto"></span></div>
-              <div class="col-md-6"><b>Fecha de Creación:</b> <span id="infoFechaCreacion"></span></div>
-            </div>
-          </div>
-
-          <div role="tabpanel" class="tab-pane" id="tabOportunidad">
-            <div class="row">
-              <div class="col-md-12"><b>Título:</b> <span id="infoOportTitulo"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-12"><b>Descripción:</b> <div id="infoOportDescripcion"></div></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-4"><b>Valor Estimado:</b> <span id="infoOportValor"></span></div>
-              <div class="col-md-4"><b>Probabilidad:</b> <span id="infoOportProbabilidad"></span></div>
-              <div class="col-md-4"><b>Estado:</b> <span id="infoOportEstado"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha Cierre Estimada:</b> <span id="infoOportFechaCierre"></span></div>
-              <div class="col-md-6"><b>Actividad:</b> <span id="infoOportActividad"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha Actividad:</b> <span id="infoOportFechaActividad"></span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>
+<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
+<?php include 'modulos/partials/modal_info_cliente.php'; ?>

@@ -11,6 +11,9 @@
       <div class="box-header">
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarContador">Agregar Contador</button>
       </div>
+
+      <?php include 'advanced_search.php'; ?>
+
       <div class="box-body">
         <table class="table table-bordered table-striped" id="tablaContadores">
           <thead>

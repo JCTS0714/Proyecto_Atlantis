@@ -1,0 +1,124 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');
+require_once "../modelos/conexion.php";
+require_once "../modelos/clientes.modelo.php";
+
+// DataTables server-side processing parameters
+$draw = isset($_GET['draw']) ? intval($_GET['draw']) : (isset($_POST['draw']) ? intval($_POST['draw']) : 0);
+$start = isset($_GET['start']) ? intval($_GET['start']) : (isset($_POST['start']) ? intval($_POST['start']) : 0);
+$length = isset($_GET['length']) ? intval($_GET['length']) : (isset($_POST['length']) ? intval($_POST['length']) : 10);
+
+// Advanced search filters (may come via GET or POST)
+$filters = [];
+$filters['nombre'] = isset($_REQUEST['nombre']) ? trim($_REQUEST['nombre']) : '';
+$filters['telefono'] = isset($_REQUEST['telefono']) ? trim($_REQUEST['telefono']) : '';
+$filters['documento'] = isset($_REQUEST['documento']) ? trim($_REQUEST['documento']) : '';
+$filters['periodo'] = isset($_REQUEST['periodo']) ? trim($_REQUEST['periodo']) : '';
+$filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fecha_inicio']) : '';
+$filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : '';
+
+$table = 'clientes';
+
+// Build base SQL using similar logic as ModeloCliente::mdlMostrarClientesFiltrados but with pagination
+$where = [];
+$params = [];
+
+if ($filters['nombre'] !== '') { $where[] = "c.nombre LIKE :nombre"; $params[':nombre'] = '%' . $filters['nombre'] . '%'; }
+if ($filters['documento'] !== '') { $where[] = "c.documento LIKE :documento"; $params[':documento'] = '%' . $filters['documento'] . '%'; }
+if ($filters['telefono'] !== '') { $where[] = "c.telefono LIKE :telefono"; $params[':telefono'] = '%' . $filters['telefono'] . '%'; }
+
+// Date filtering based on periodo or explicit fechas
+if ($filters['periodo'] === 'today') {
+  $where[] = "DATE(c.fecha_creacion) = CURDATE()";
+} elseif ($filters['periodo'] === 'this_week') {
+  $where[] = "YEARWEEK(c.fecha_creacion, 1) = YEARWEEK(CURDATE(), 1)";
+} elseif ($filters['periodo'] === 'this_month') {
+  $where[] = "YEAR(c.fecha_creacion) = YEAR(CURDATE()) AND MONTH(c.fecha_creacion) = MONTH(CURDATE())";
+} elseif ($filters['periodo'] === 'custom' && $filters['fecha_inicio'] !== '' && $filters['fecha_fin'] !== '') {
+  $where[] = "c.fecha_creacion BETWEEN :fi AND :ff";
+  $params[':fi'] = $filters['fecha_inicio'];
+  $params[':ff'] = $filters['fecha_fin'];
+} elseif ($filters['fecha_inicio'] !== '' && $filters['fecha_fin'] !== '') {
+  $where[] = "c.fecha_creacion BETWEEN :fi AND :ff";
+  $params[':fi'] = $filters['fecha_inicio'];
+  $params[':ff'] = $filters['fecha_fin'];
+}
+
+$sqlWhere = '';
+if (!empty($where)) { $sqlWhere = ' WHERE ' . implode(' AND ', $where); }
+
+$pdo = Conexion::conectar();
+
+// Get total records
+$totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM $table");
+$totalStmt->execute();
+$totalTotal = $totalStmt->fetch(PDO::FETCH_ASSOC);
+$recordsTotal = isset($totalTotal['total']) ? intval($totalTotal['total']) : 0;
+
+// Get filtered count
+$countSql = "SELECT COUNT(DISTINCT c.id) as total FROM $table c" . $sqlWhere;
+$countStmt = $pdo->prepare($countSql);
+foreach ($params as $k => $v) { $countStmt->bindValue($k, $v); }
+$countStmt->execute();
+$countRow = $countStmt->fetch(PDO::FETCH_ASSOC);
+$recordsFiltered = isset($countRow['total']) ? intval($countRow['total']) : 0;
+
+// Fetch paginated data
+$dataSql = "SELECT DISTINCT c.* FROM $table c" . $sqlWhere . " ORDER BY c.fecha_creacion DESC LIMIT :start, :length";
+$dataStmt = $pdo->prepare($dataSql);
+foreach ($params as $k => $v) { $dataStmt->bindValue($k, $v); }
+$dataStmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+$dataStmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
+
+try {
+  $dataStmt->execute();
+  $rows = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  error_log('datatable-clientes ERROR: ' . $e->getMessage());
+  $rows = [];
+}
+
+$response = [
+  'draw' => $draw,
+  'recordsTotal' => $recordsTotal,
+  'recordsFiltered' => $recordsFiltered,
+  'data' => []
+];
+
+// Format data rows to match table columns order used in clientes.php
+foreach ($rows as $k => $r) {
+  $actions = '<div class="btn-group">';
+  $actions .= '<button class="btn btn-warning btnEditarCliente" idCliente="'.htmlspecialchars($r['id']).'" data-toggle="modal" data-target="#modalEditarCliente"><i class="fa fa-pencil"></i></button>';
+  $actions .= '<button class="btn btn-info btnRegistrarIncidencia" idCliente="'.htmlspecialchars($r['id']).'" nombreCliente="'.htmlspecialchars($r['nombre']).'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
+  if (isset($_SESSION['perfil']) && $_SESSION['perfil'] !== 'Vendedor') {
+    $actions .= '<button class="btn btn-danger btnEliminarCliente" idCliente="'.htmlspecialchars($r['id']).'"><i class="fa fa-trash"></i></button>';
+  }
+  $actions .= '</div>';
+
+  $selectEstado = '<select class="form-control input-sm select-estado-cliente" data-id="'.htmlspecialchars($r['id']).'">'
+    .'<option value="0"'.($r['estado'] == 0 ? ' selected' : '').'>Prospecto</option>'
+    .'<option value="1"'.($r['estado'] == 1 ? ' selected' : '').'>Seguimiento</option>'
+    .'<option value="2"'.($r['estado'] == 2 ? ' selected' : '').'>Cliente</option>'
+    .'<option value="3"'.($r['estado'] == 3 ? ' selected' : '').'>No Cliente</option>'
+    .'<option value="4"'.($r['estado'] == 4 ? ' selected' : '').'>En Espera</option>'
+    .'</select>';
+
+  $response['data'][] = [
+    $start + $k + 1,
+    $r['nombre'],
+    $r['tipo'],
+    $r['documento'],
+    $r['telefono'],
+    $r['correo'],
+    $r['ciudad'],
+    $r['migracion'],
+    $r['referencia'],
+    $r['fecha_contacto'],
+    $r['empresa'],
+    $r['fecha_creacion'],
+    $selectEstado,
+    $actions
+  ];
+}
+
+echo json_encode($response);
