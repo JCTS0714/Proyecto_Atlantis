@@ -14,7 +14,14 @@ header('Content-Type: application/json');
 switch ($action) {
     case 'getOportunidades':
         $filtrarUltimaSemana = isset($_GET['filtrarUltimaSemana']) ? filter_var($_GET['filtrarUltimaSemana'], FILTER_VALIDATE_BOOLEAN) : false;
-        echo json_encode(ControladorOportunidad::ctrMostrarOportunidades(null, null, $filtrarUltimaSemana));
+        // Collect optional filters
+        $filters = [];
+        $allowed = ['nombre','telefono','documento','periodo','fecha_inicio','fecha_fin'];
+        foreach ($allowed as $k) {
+            if (isset($_GET[$k]) && $_GET[$k] !== '') $filters[$k] = $_GET[$k];
+        }
+        if (empty($filters)) $filters = null;
+        echo json_encode(ControladorOportunidad::ctrMostrarOportunidades(null, null, $filtrarUltimaSemana, $filters));
         break;
     case 'crearOportunidad':
         ControladorOportunidad::ctrCrearOportunidad();

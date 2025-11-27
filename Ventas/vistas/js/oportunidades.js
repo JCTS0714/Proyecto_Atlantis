@@ -1,8 +1,16 @@
-function loadOportunidades() {
+function loadOportunidades(filters) {
+    var dataParams = { action: 'getOportunidades', filtrarUltimaSemana: true };
+    if (filters && typeof filters === 'object') {
+        // map our filter keys to GET params
+        ['nombre','telefono','documento','periodo','fecha_inicio','fecha_fin'].forEach(function(k){
+            if (filters[k]) dataParams[k] = filters[k];
+        });
+    }
+
     $.ajax({
         url: 'ajax/oportunidades.ajax.php',
         method: 'GET',
-        data: { action: 'getOportunidades', filtrarUltimaSemana: true },
+        data: dataParams,
         dataType: 'json',
         success: function(data) {
             // Limpiar todas las columnas antes de agregar tarjetas
@@ -21,7 +29,7 @@ function loadOportunidades() {
                 agregarTarjeta(oportunidad);
             });
 
-            // Aplicar filtros si están activos
+            // Aplicar filtros si están activos (compatibilidad retro)
             if (window.filtrosActivos) {
                 window.filtrarOportunidades(
                     window.filtrosActivos.estado || "",
@@ -217,6 +225,20 @@ $(document).on('click', '.btn-eliminar-oportunidad', function() {
 $(document).on('click', '.btn-zona-espera', function() {
     var id = $(this).data('id');
     moverAZonaEspera(id);
+});
+
+// React to Advanced Search events
+window.addEventListener('advancedSearch:apply', function(e) {
+    try {
+        var filters = e.detail || {};
+        loadOportunidades(filters);
+    } catch(err) {
+        console.error('Error applying advanced search filters:', err);
+    }
+});
+
+window.addEventListener('advancedSearch:clear', function() {
+    loadOportunidades(); // reload default
 });
 
 function moverAZonaEspera(id) {

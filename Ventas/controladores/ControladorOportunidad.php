@@ -9,9 +9,9 @@ class ControladorOportunidad {
     const TABLA_OPORTUNIDADES = "oportunidades";
     const TABLA_CLIENTES = "clientes";
 
-    static public function ctrMostrarOportunidades($item = null, $valor = null, $filtrarUltimaSemana = false) {
+    static public function ctrMostrarOportunidades($item = null, $valor = null, $filtrarUltimaSemana = false, $filters = null) {
         $tabla = "oportunidades";
-        return ModeloCRM::mdlMostrarOportunidades($tabla, $item, $valor, $filtrarUltimaSemana);
+        return ModeloCRM::mdlMostrarOportunidades($tabla, $item, $valor, $filtrarUltimaSemana, $filters);
     }
 
     static public function ctrActualizarOportunidad($datos) {
