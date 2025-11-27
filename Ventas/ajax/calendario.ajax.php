@@ -1,6 +1,9 @@
 <?php
-require_once "../controladores/calendario.controlador.php";
-require_once "../modelos/calendario.modelo.php";
+// Bootstrap for AJAX: session, headers and error handling
+require_once __DIR__ . '/_error_handler.php';
+
+require_once __DIR__ . "/../controladores/calendario.controlador.php";
+require_once __DIR__ . "/../modelos/calendario.modelo.php";
 
 class AjaxCalendario {
 
