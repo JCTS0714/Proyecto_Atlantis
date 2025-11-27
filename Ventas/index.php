@@ -1,6 +1,23 @@
 <?php
 // Configurar parámetros de cookie ANTES de iniciar sesión
-session_set_cookie_params(30 * 24 * 60 * 60); // 30 días en segundos
+$cookieLifetime = 30 * 24 * 60 * 60; // 30 días
+$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+$httponly = true;
+
+// Use SameSite support when available (PHP 7.3+)
+if (defined('PHP_VERSION_ID') && PHP_VERSION_ID >= 70300) {
+    session_set_cookie_params([
+        'lifetime' => $cookieLifetime,
+        'path' => '/',
+        'domain' => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '',
+        'secure' => $secure,
+        'httponly' => $httponly,
+        'samesite' => 'Lax'
+    ]);
+} else {
+    // Fallback for older PHP: set basic params (SameSite may not be supported)
+    session_set_cookie_params($cookieLifetime, '/', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '', $secure, $httponly);
+}
 
 // Iniciar sesión si no está iniciada
 if (session_status() == PHP_SESSION_NONE) {

@@ -158,7 +158,12 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/responsive-tables.js"></script>
 
   </head>
-  <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
+  <?php
+    $bodyClass = (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok")
+      ? 'hold-transition skin-blue sidebar-collapse sidebar-mini'
+      : 'hold-transition skin-blue sidebar-collapse sidebar-mini login-page';
+  ?>
+  <body class="<?php echo $bodyClass; ?>">
   <!-- Site wrapper -->
 
   <script>

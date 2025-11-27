@@ -1,8 +1,10 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Local development: use subdirectory RewriteBase. Change to '/' in production.
-  RewriteBase /Proyecto_Atlantis/Ventas/
+  # Local development: use subdirectory RewriteBase. Change to '/' or your public path in production.
+  # If you deploy to your Hostinger account root, set RewriteBase to '/'
+  # Example for Hostinger in a subfolder: RewriteBase /tu_carpeta/
+    # RewriteBase /Proyecto_Atlantis/Ventas/
 
   # Bypass existing files and directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -10,7 +12,7 @@
   RewriteRule ^ - [L]
 
   # Front controller: route to index.php with `ruta` param
-  RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
+    RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
 </IfModule>
 
 # Disable directory listing
@@ -47,7 +49,8 @@ RedirectMatch 403 ^/Documentacion(/|$)
   Header always set Referrer-Policy "no-referrer-when-downgrade"
 </IfModule>
 
-# HTTPS redirect (uncomment to force HTTPS in production)
+# HTTPS redirect (uncomment to force HTTPS in production). On Hostinger you can
+# also enable "Forced HTTPS" from the control panel and leave this commented.
 # <IfModule mod_rewrite.c>
 #   RewriteCond %{HTTPS} !=on
 #   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
