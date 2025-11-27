@@ -4,12 +4,18 @@
   # Local development: use subdirectory RewriteBase. Change to '/' or your public path in production.
   # If you deploy to your Hostinger account root, set RewriteBase to '/'
   # Example for Hostinger in a subfolder: RewriteBase /tu_carpeta/
-    # RewriteBase /Proyecto_Atlantis/Ventas/
+  # If your site is hosted at the domain root (public_html), use '/'.
+  # If you host in a subfolder, change accordingly (ex: /mi_subcarpeta/)
+  RewriteBase /
 
   # Bypass existing files and directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
+
+  # Explicitly exclude static and ajax folders from front controller to avoid
+  # accidental rewrite when files are missing or paths resolve differently.
+  RewriteRule ^(vistas|ajax|css|js|img|uploads)(/.*)?$ - [L,NC]
 
   # Front controller: route to index.php with `ruta` param
     RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
