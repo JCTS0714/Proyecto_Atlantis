@@ -156,7 +156,8 @@ class ControladorCliente {
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&
                 (empty($_POST["editarReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["editarReferencia"])) &&
                 preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"]) &&
-                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"])
+                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"]) &&
+                (empty($_POST["editarMotivo"]) || is_string($_POST["editarMotivo"]))
             ) {
                 $tabla = "clientes";
                 $datos = array(
@@ -169,6 +170,7 @@ class ControladorCliente {
                     "ciudad" => $_POST["editarCiudad"],
                     "migracion" => $_POST["editarMigracion"],
                     "referencia" => $_POST["editarReferencia"],
+                    "motivo" => $_POST["editarMotivo"],
                     "fecha_contacto" => $_POST["editarFechaContacto"],
                     "empresa" => $_POST["editarEmpresa"]
                     //"fecha_creacion" => $_POST["editarFechaCreacion"]

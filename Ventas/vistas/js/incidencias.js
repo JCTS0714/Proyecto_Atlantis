@@ -106,7 +106,12 @@ $(document).ready(function() {
                         text: response.message || 'Incidencia registrada correctamente',
                         confirmButtonText: 'Aceptar'
                     }).then(function() {
-                        cargarIncidencias(); // Recargar tabla
+                        // Recargar tabla de incidencias
+                        cargarIncidencias();
+                        // Notificar a otras pestañas (backlog) que se creó una incidencia
+                        try {
+                            localStorage.setItem('incidencia_creada', JSON.stringify({ id: response.id || null, ts: Date.now() }));
+                        } catch (e) { /* ignore */ }
                     });
                 } else {
                     Swal.fire({

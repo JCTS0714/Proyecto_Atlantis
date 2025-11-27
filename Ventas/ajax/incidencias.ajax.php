@@ -4,6 +4,15 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// For AJAX responses, always return JSON
+header('Content-Type: application/json');
+
+// Simple auth check: return error if no session user id
+if (!isset($_SESSION["id"])) {
+    echo json_encode(array("status" => "error", "message" => "Usuario no autenticado."));
+    exit;
+}
+
 require_once "../modelos/conexion.php";
 require_once "../modelos/ModeloIncidencias.php";
 require_once "../controladores/ControladorIncidencias.php";

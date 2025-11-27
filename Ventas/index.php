@@ -21,6 +21,7 @@ require_once "controladores/ControladorOportunidad.php";
 require_once "controladores/prospectos.controlador.php";
 require_once "controladores/evento.controlador.php";
 require_once "controladores/calendario.controlador.php";
+require_once "controladores/contador.controlador.php";
 
 
 /**REQUERIMOS DE MODELOS */
@@ -30,6 +31,7 @@ require_once "modelos/ventas.modelo.php";
 require_once "modelos/ModeloCRM.php";
 require_once "modelos/evento.modelo.php";
 require_once "modelos/calendario.modelo.php";
+require_once "modelos/contador.modelo.php";
 
 
 

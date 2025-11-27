@@ -231,15 +231,54 @@ function moverAZonaEspera(id) {
         confirmButtonText: "Sí, mover a zona de espera"
     }).then((result) => {
         if (result.isConfirmed) {
-            cambiarEstado(id, "6"); // Estado 6: KANBAN_ZONA_ESPERA -> Lista Zona de Espera (4)
+            // Llamada AJAX para cambiar estado y luego redirigir al listado zona-espera
+            $.ajax({
+                url: 'ajax/oportunidades.ajax.php',
+                method: 'POST',
+                data: { action: 'cambiarEstado', idOportunidad: id, nuevoEstado: '6' },
+                dataType: 'json',
+                success: function(respuesta) {
+                    if (respuesta && respuesta.status === 'success') {
+                        // Cerrar el modal de detalles
+                        $('#modal-detalles-oportunidad').modal('hide');
 
-            // Cerrar el modal de detalles
-            $('#modal-detalles-oportunidad').modal('hide');
+                        // Obtener la oportunidad para conocer el cliente asociado
+                        $.ajax({
+                            url: 'ajax/oportunidades.ajax.php',
+                            method: 'GET',
+                            data: { action: 'getOportunidad', id: id },
+                            dataType: 'json',
+                            success: function(oportunidad) {
+                                // ctrMostrarOportunidades devuelve un array
+                                var clienteId = null;
+                                if (Array.isArray(oportunidad) && oportunidad.length > 0) {
+                                    clienteId = oportunidad[0].cliente_id || oportunidad[0].clienteId || null;
+                                } else if (oportunidad && oportunidad.cliente_id) {
+                                    clienteId = oportunidad.cliente_id;
+                                }
 
-            // Mostrar modal con últimos prospectos en zona de espera después de un breve delay
-            setTimeout(function() {
-                mostrarUltimosEnZonaEspera();
-            }, 500);
+                                var base = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
+                                if (clienteId) {
+                                    // Redirigir a zona-espera indicando que abra modal motivo para ese cliente
+                                    window.location.href = base + '/zona-espera?open_motivo_id=' + encodeURIComponent(clienteId);
+                                } else {
+                                    // Si no se pudo obtener cliente, mostrar el modal de últimos
+                                    setTimeout(function() { mostrarUltimosEnZonaEspera(); }, 300);
+                                }
+                            },
+                            error: function() {
+                                setTimeout(function() { mostrarUltimosEnZonaEspera(); }, 300);
+                            }
+                        });
+                    } else {
+                        var msg = respuesta && respuesta.message ? respuesta.message : 'No se pudo mover a zona de espera';
+                        Swal.fire('Error', msg, 'error');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    Swal.fire('Error', 'No se pudo cambiar el estado. Intente nuevamente.', 'error');
+                }
+            });
         }
     });
 }
@@ -556,52 +595,99 @@ function mostrarDetalles(id) {
                     console.log('No se pudo determinar la columna de la tarjeta:', e);
                 }
 
-                // Si la plantilla del modal contiene elementos estáticos (los añadidos en PHP),
-                // rellenarlos en lugar de sobrescribir el HTML completo.
-                if ($('#det-titulo').length && $('#det-cliente').length) {
-                    $('#det-titulo').text(oportunidad.titulo || '-');
-                    $('#det-cliente').text(oportunidad.nombre_cliente || '-');
-                    $('#det-descripcion').text(oportunidad.descripcion || '-');
-                    $('#det-fecha').text(oportunidad.fecha_cierre_estimada || '-');
+                    // Si la plantilla del modal contiene elementos estáticos (los añadidos en PHP),
+                    // rellenarlos en lugar de sobrescribir el HTML completo.
+                    if ($('#det-titulo').length && $('#det-cliente').length) {
+                        $('#det-titulo').text(oportunidad.titulo || '-');
+                        $('#det-cliente').text(oportunidad.nombre_cliente || '-');
+                        $('#det-descripcion').text(oportunidad.descripcion || '-');
+                        $('#det-fecha').text(oportunidad.fecha_cierre_estimada || '-');
 
-                    // Intentar obtener teléfono/empresa desde la respuesta de oportunidad
-                    var telefono = oportunidad.telefono || oportunidad.telefono_cliente || oportunidad.cliente_telefono || '';
-                    var empresa = oportunidad.empresa || oportunidad.empresa_cliente || '';
+                        // Intentar obtener teléfono/empresa desde la respuesta de oportunidad
+                        var telefono = oportunidad.telefono || oportunidad.telefono_cliente || oportunidad.cliente_telefono || '';
+                        var empresa = oportunidad.empresa || oportunidad.empresa_cliente || '';
 
-                    // Si no hay teléfono o empresa en la respuesta, pedirlos al endpoint de clientes
-                    if ((!telefono || !empresa) && oportunidad.cliente_id) {
-                        $.ajax({
-                            url: 'ajax/clientes.ajax.php',
-                            method: 'POST',
-                            data: { idCliente: oportunidad.cliente_id },
-                            dataType: 'json',
-                            success: function(clienteData) {
-                                if (clienteData) {
-                                    var tel = clienteData.telefono || clienteData['telefono'] || telefono || '-';
-                                    var emp = clienteData.empresa || clienteData['empresa'] || empresa || '-';
-                                    $('#det-telefono').text(tel || '-');
-                                    $('#det-empresa').text(emp || '-');
-                                } else {
+                        // Inyectar inputs editables (deshabilitados) junto a los elementos estáticos
+                        if ($('#modal-cliente-nombre').length === 0) {
+                            // Añadir input para nombre del cliente
+                            $('#det-cliente').after('<input type="text" class="form-control cliente-field" id="modal-cliente-nombre" name="cliente_nombre" value="' + (oportunidad.nombre_cliente || '') + '" disabled />' +
+                                                     '<div class="form-check mt-1"><input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-nombre" data-field="nombre"><label class="form-check-label" for="toggle-edit-nombre">Editar cliente</label></div>');
+                        } else {
+                            $('#modal-cliente-nombre').val(oportunidad.nombre_cliente || '');
+                        }
+
+                        if ($('#modal-cliente-telefono').length === 0) {
+                            $('#det-telefono').after('<input type="text" class="form-control cliente-field" id="modal-cliente-telefono" name="cliente_telefono" value="' + (telefono || '') + '" disabled />' +
+                                                      '<div class="form-check mt-1"><input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-telefono" data-field="telefono"><label class="form-check-label" for="toggle-edit-telefono">Editar teléfono</label></div>');
+                        } else {
+                            $('#modal-cliente-telefono').val(telefono || '');
+                        }
+
+                        if ($('#modal-cliente-empresa').length === 0) {
+                            $('#det-empresa').after('<input type="text" class="form-control cliente-field" id="modal-cliente-empresa" name="cliente_empresa" value="' + (empresa || '') + '" disabled />' +
+                                                     '<div class="form-check mt-1"><input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-empresa" data-field="empresa"><label class="form-check-label" for="toggle-edit-empresa">Editar empresa</label></div>');
+                        } else {
+                            $('#modal-cliente-empresa').val(empresa || '');
+                        }
+
+                        // Si no hay teléfono o empresa en la respuesta, pedirlos al endpoint de clientes
+                        if ((!telefono || !empresa) && oportunidad.cliente_id) {
+                            $.ajax({
+                                url: 'ajax/clientes.ajax.php',
+                                method: 'POST',
+                                data: { idCliente: oportunidad.cliente_id },
+                                dataType: 'json',
+                                success: function(clienteData) {
+                                    if (clienteData) {
+                                        var tel = clienteData.telefono || clienteData['telefono'] || telefono || '-';
+                                        var emp = clienteData.empresa || clienteData['empresa'] || empresa || '-';
+                                        var nombre = clienteData.nombre || clienteData['nombre'] || oportunidad.nombre_cliente || '-';
+                                        $('#det-telefono').text(tel || '-');
+                                        $('#det-empresa').text(emp || '-');
+                                        $('#modal-cliente-telefono').val(tel || '');
+                                        $('#modal-cliente-empresa').val(emp || '');
+                                        $('#modal-cliente-nombre').val(nombre || '');
+                                    } else {
+                                        $('#det-telefono').text(telefono || '-');
+                                        $('#det-empresa').text(empresa || '-');
+                                    }
+                                },
+                                error: function() {
                                     $('#det-telefono').text(telefono || '-');
                                     $('#det-empresa').text(empresa || '-');
                                 }
-                            },
-                            error: function() {
-                                $('#det-telefono').text(telefono || '-');
-                                $('#det-empresa').text(empresa || '-');
+                            });
+                        } else {
+                            $('#det-telefono').text(telefono || '-');
+                            $('#det-empresa').text(empresa || '-');
+                            // Asegurar que los inputs también muestren los valores
+                            $('#modal-cliente-telefono').val(telefono || '');
+                            $('#modal-cliente-empresa').val(empresa || '');
+                        }
+
+                        // Registrar el handler de toggles (asegurar cobertura)
+                        $(document).off('change', '.toggle-edit-cliente').on('change', '.toggle-edit-cliente', function() {
+                            var field = $(this).data('field');
+                            var $input = $('#modal-cliente-' + field);
+                            if ($(this).is(':checked')) {
+                                $input.prop('disabled', false).focus();
+                                // añadir clase persistente para indicar estado editable
+                                $input.addClass('cliente-field-active');
+                                // añadir pulso temporal para llamar la atención
+                                $input.addClass('cliente-field-pulse');
+                                setTimeout(function() { $input.removeClass('cliente-field-pulse'); }, 1200);
+                            } else {
+                                $input.prop('disabled', true);
+                                $input.removeClass('cliente-field-active cliente-field-pulse');
                             }
                         });
-                    } else {
-                        $('#det-telefono').text(telefono || '-');
-                        $('#det-empresa').text(empresa || '-');
+
+                        // Mostrar modal (sin formulario editable por defecto)
+                        $('#modal-detalles-oportunidad').modal('show');
+
+                        // Deshabilitar guardado desde este modal ya que ahora es de sólo lectura (si así lo deseas)
+                        return;
                     }
-
-                    // Mostrar modal (sin formulario editable)
-                    $('#modal-detalles-oportunidad').modal('show');
-
-                    // Deshabilitar guardado desde este modal ya que ahora es de sólo lectura
-                    return;
-                }
 
                 // Comportamiento previo: si no existen los elementos estáticos, inyectar el formulario editable
                 var contenido =
@@ -612,10 +698,14 @@ function mostrarDetalles(id) {
                             '<input type="text" class="form-control" id="modal-titulo" name="titulo" value="' + (oportunidad.titulo || '') + '" />' +
                         '</div>' +
                         '<div class="col-md-6">' +
-                            '<h6>Cliente:</h6>' +
-                            '<p>' + (oportunidad.nombre_cliente || 'N/A') + '</p>' +
-                            '<input type="hidden" id="modal-cliente-id" value="' + (oportunidad.cliente_id || '') + '" />' +
-                        '</div>' +
+                                '<h6>Cliente:</h6>' +
+                                '<input type="text" spellcheck="false" autocomplete="off" class="form-control cliente-field" id="modal-cliente-nombre" name="cliente_nombre" value="' + (oportunidad.nombre_cliente || '') + '" disabled />' +
+                                '<div class="form-check mt-1">' +
+                                    '<input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-nombre" data-field="nombre">' +
+                                    '<label class="form-check-label" for="toggle-edit-nombre">Editar cliente</label>' +
+                                '</div>' +
+                                '<input type="hidden" id="modal-cliente-id" value="' + (oportunidad.cliente_id || '') + '" />' +
+                            '</div>' +
                     '</div>' +
                     '<div class="row">' +
                         '<div class="col-md-6">' +
@@ -623,15 +713,24 @@ function mostrarDetalles(id) {
                             '<textarea class="form-control" id="modal-descripcion" name="descripcion">' + (oportunidad.descripcion || '') + '</textarea>' +
                         '</div>' +
                         '<div class="col-md-6">' +
-                            '<h6>Teléfono:</h6>' +
-                            '<p id="display-telefono">' + (oportunidad.telefono || '') + '</p>' +
-                            '<input type="hidden" id="modal-valor_estimado" name="valor_estimado" value="' + (oportunidad.valor_estimado || '') + '" />' +
-                        '</div>' +
+                                '<h6>Teléfono:</h6>' +
+                                // Mostrar input deshabilitado con checkbox para habilitar edición
+                                '<input type="text" spellcheck="false" autocomplete="off" class="form-control cliente-field" id="modal-cliente-telefono" name="cliente_telefono" value="' + (oportunidad.telefono || '') + '" disabled />' +
+                                '<div class="form-check mt-1">' +
+                                    '<input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-telefono" data-field="telefono">' +
+                                    '<label class="form-check-label" for="toggle-edit-telefono">Editar teléfono</label>' +
+                                '</div>' +
+                                '<input type="hidden" id="modal-valor_estimado" name="valor_estimado" value="' + (oportunidad.valor_estimado || '') + '" />' +
+                            '</div>' +
                     '</div>' +
                     '<div class="row">' +
                         '<div class="col-md-6">' +
                             '<h6>Empresa:</h6>' +
-                            '<p id="display-empresa">' + (oportunidad.empresa || '') + '</p>' +
+                            '<input type="text" spellcheck="false" autocomplete="off" class="form-control cliente-field" id="modal-cliente-empresa" name="cliente_empresa" value="' + (oportunidad.empresa || '') + '" disabled />' +
+                            '<div class="form-check mt-1">' +
+                                '<input class="form-check-input toggle-edit-cliente" type="checkbox" value="1" id="toggle-edit-empresa" data-field="empresa">' +
+                                '<label class="form-check-label" for="toggle-edit-empresa">Editar empresa</label>' +
+                            '</div>' +
                             '<input type="hidden" id="modal-probabilidad" name="probabilidad" value="' + (oportunidad.probabilidad || '') + '" />' +
                         '</div>' +
                         '<div class="col-md-6">' +
@@ -676,6 +775,21 @@ function mostrarDetalles(id) {
 
                 $('#detalles-oportunidad-contenido').html(contenido);
 
+                // Handler: toggle para habilitar edición de campos de cliente
+                $(document).off('change', '.toggle-edit-cliente').on('change', '.toggle-edit-cliente', function() {
+                    var field = $(this).data('field');
+                    var $input = $('#modal-cliente-' + field);
+                    if ($(this).is(':checked')) {
+                        $input.prop('disabled', false).focus();
+                        // persistente + pulso temporal
+                        $input.addClass('cliente-field-active cliente-field-pulse');
+                        setTimeout(function() { $input.removeClass('cliente-field-pulse'); }, 1200);
+                    } else {
+                        $input.prop('disabled', true);
+                        $input.removeClass('cliente-field-active cliente-field-pulse');
+                    }
+                });
+
                 // Obtener datos de teléfono/empresa a partir de la respuesta de oportunidad
                 var telefono = oportunidad.telefono || oportunidad.telefono_cliente || oportunidad.cliente_telefono || '';
                 var empresa = oportunidad.empresa || oportunidad.empresa_cliente || '';
@@ -690,9 +804,12 @@ function mostrarDetalles(id) {
                         success: function(clienteData) {
                             var tel = clienteData && (clienteData.telefono || clienteData['telefono'] || clienteData.celular) ? (clienteData.telefono || clienteData['telefono'] || clienteData.celular) : telefono || '';
                             var emp = clienteData && (clienteData.empresa || clienteData['empresa'] || clienteData.empresa_nombre) ? (clienteData.empresa || clienteData['empresa'] || clienteData.empresa_nombre) : empresa || '';
-                            // Poner en los <p> visibles solamente (no sobrescribir los inputs editables)
+                            // Poner en los <p> visibles y en los inputs editables (si existen)
                             $('#display-telefono').text(tel || '');
                             $('#display-empresa').text(emp || '');
+                            $('#modal-cliente-telefono').val(tel || '');
+                            $('#modal-cliente-empresa').val(emp || '');
+                            $('#modal-cliente-nombre').val(clienteData.nombre || clienteData['nombre'] || oportunidad.nombre_cliente || '');
                         },
                         error: function() {
                             // Rellenar con lo que tengamos (posiblemente vacío)
@@ -701,11 +818,11 @@ function mostrarDetalles(id) {
                         }
                     });
                 } else {
-                    // Si ya tenemos los datos, colocarlos directamente
+                    // Si ya tenemos los datos, colocarlos directamente y poblar los inputs editables
                     $('#display-telefono').text(telefono || '');
-                    $('#modal-valor_estimado').val(telefono || '');
+                    $('#modal-cliente-telefono').val(telefono || '');
                     $('#display-empresa').text(empresa || '');
-                    $('#modal-probabilidad').val(empresa || '');
+                    $('#modal-cliente-empresa').val(empresa || '');
                 }
 
                 $('#modal-detalles-oportunidad').modal('show');
@@ -753,6 +870,157 @@ function actualizarOportunidad() {
             cliente_id: $('#modal-cliente-id').val(),
             usuario_id: $('#modal-detalles-oportunidad').data('usuario-id')
         };
+
+        // Recolectar cambios en campos de cliente (solo los campos cuyos checkbox estén activados)
+        var idCliente = $('#modal-cliente-id').val();
+        var clientUpdates = {};
+        $('.toggle-edit-cliente:checked').each(function() {
+            var field = $(this).data('field');
+            var val = $('#modal-cliente-' + field).val();
+            if (typeof val !== 'undefined') {
+                clientUpdates[field] = val;
+            }
+        });
+
+        // Función que realiza la actualización de oportunidad (se ejecuta después de actualizar cliente si aplica)
+        function doUpdateOportunidad() {
+            $.ajax({
+                url: 'ajax/oportunidades.ajax.php',
+                method: 'POST',
+                data: datos,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var mensaje = 'Oportunidad actualizada correctamente.';
+                        var redirigirCalendario = false;
+
+                        // Verificar si ambos campos están llenos para redirigir al calendario
+                        if (actividadVal && fechaActividadVal) {
+                            // Verificar si ya existe una reunión para este cliente, actividad y fecha
+                            $.ajax({
+                                url: 'ajax/oportunidades.ajax.php',
+                                method: 'GET',
+                                data: {
+                                    action: 'verificarReunionExistente',
+                                    cliente_id: datos.cliente_id,
+                                    titulo: datos.actividad,
+                                    fecha: datos.fecha_actividad
+                                },
+                                dataType: 'json',
+                                success: function(response) {
+                                    if (response.status === 'success') {
+                                        if (response.existe) {
+                                            mensaje += ' Ya existe una reunión programada para esta actividad y fecha.';
+                                            redirigirCalendario = false;
+                                        } else {
+                                            mensaje += ' Redirigiendo al calendario para crear la reunión.';
+                                            redirigirCalendario = true;
+                                        }
+                                    } else {
+                                        mensaje += ' Error al verificar reuniones existentes.';
+                                        redirigirCalendario = false;
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Éxito',
+                                        text: mensaje,
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        $('#modal-detalles-oportunidad').modal('hide');
+                                        loadOportunidades();
+
+                                        // Solo redirigir si ambos campos están llenos y no existe reunión
+                                        if (redirigirCalendario) {
+                                            var url = 'calendario?cliente_id=' + encodeURIComponent(datos.cliente_id) +
+                                                      '&titulo=' + encodeURIComponent(datos.actividad) +
+                                                      '&fecha=' + encodeURIComponent(datos.fecha_actividad);
+                                            window.location.href = url;
+                                        }
+                                    });
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    mensaje += ' Error al verificar reuniones existentes.';
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Éxito',
+                                        text: mensaje,
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        $('#modal-detalles-oportunidad').modal('hide');
+                                        loadOportunidades();
+                                    });
+                                }
+                            });
+                        } else {
+                            if (actividadVal && !fechaActividadVal) {
+                                mensaje += ' Advertencia: Seleccionaste una actividad pero no especificaste la fecha.';
+                            } else if (!actividadVal && fechaActividadVal) {
+                                mensaje += ' Advertencia: Especificaste una fecha pero no seleccionaste actividad.';
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Éxito',
+                                text: mensaje,
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                $('#modal-detalles-oportunidad').modal('hide');
+                                loadOportunidades();
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al actualizar la oportunidad: ' + response.message,
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Error en la solicitud AJAX: ' + textStatus);
+                }
+            });
+        }
+
+        // Si hay cambios de cliente, enviarlos primero
+        if (idCliente && Object.keys(clientUpdates).length > 0) {
+            var payload = { action: 'actualizarCampos', idCliente: idCliente };
+            // Adjuntar campos al payload
+            for (var k in clientUpdates) { payload[k] = clientUpdates[k]; }
+
+            $.ajax({
+                url: 'ajax/clientes.ajax.php',
+                method: 'POST',
+                data: payload,
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp && resp.status === 'ok') {
+                        // Continuar con la actualización de la oportunidad
+                        doUpdateOportunidad();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al actualizar cliente',
+                            text: (resp && resp.message) ? resp.message : 'No se pudieron guardar los cambios del cliente.',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error en la solicitud para actualizar cliente.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+        } else {
+            // No hay cambios de cliente, proceder directamente
+            doUpdateOportunidad();
+        }
 
         // Validar campos obligatorios antes de enviar
         if (!tituloVal || tituloVal.trim() === "") {

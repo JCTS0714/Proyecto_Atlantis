@@ -49,7 +49,7 @@
             echo '<div class="box-header with-border">';
             echo "<h3 class='box-title'>$titulo</h3>";
             echo '</div>';
-            echo "<div class='box-body kanban-column' id='" . str_replace(' ', '', $id) . "' ondrop='drop(event)' ondragover='allowDrop(event)'>";
+            echo "<div class='box-body kanban-column' id='" . str_replace(' ', '', $id) . "'>";
             echo "<!-- Tarjetas se cargarán aquí -->";
             echo '</div>';
             echo '</div></div>';
@@ -86,9 +86,10 @@
             <label for="editar_cliente_id">Cliente <span style="color:red">*</span></label>
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-tags"></i></span>
-              <select class="form-control input-lg" id="editar_cliente_id" name="cliente_id" required style="width: 100%;">
+              <select class="form-control input-lg" id="editar_cliente_id" name="cliente_id_display" disabled style="width: 100%;">
                 <option value="">Seleccionar cliente</option>
               </select>
+              <input type="hidden" id="editar_cliente_id_hidden" name="cliente_id">
             </div>
           </div>
           <div class="form-group">
@@ -173,6 +174,38 @@
 .border-success {
   border-left: 4px solid #00a65a;
 }
+
+.panel-kanban.highlight {
+  box-shadow: 0 0 14px rgba(60,141,188,0.7);
+  transform: scale(1.01);
+  border: 2px solid rgba(60,141,188,0.9);
+}
+
+.panel-kanban.highlight-alta {
+  box-shadow: 0 0 18px rgba(221,75,57,0.85);
+  border: 2px solid rgba(221,75,57,0.9);
+}
+.panel-kanban.highlight-media {
+  box-shadow: 0 0 18px rgba(0,192,239,0.85);
+  border: 2px solid rgba(0,192,239,0.9);
+}
+.panel-kanban.highlight-baja {
+  box-shadow: 0 0 18px rgba(243,156,18,0.85);
+  border: 2px solid rgba(243,156,18,0.9);
+}
+/* Mantener color original de los badges de prioridad aun cuando el item de la lista esté activo */
+.list-group-item.active .label.label-danger { background-color: #dd4b39 !important; color: #fff !important; }
+.list-group-item.active .label.label-info { background-color: #00c0ef !important; color: #fff !important; }
+.list-group-item.active .label.label-warning { background-color: #f39c12 !important; color: #fff !important; }
+.list-group-item.active .label { opacity: 1 !important; }
+
+/* Lista lateral: remarcado mínimo en vez de teñir todo el interior */
+#lista-incidencias .list-group-item.active {
+  background-color: rgba(60,141,188,0.06) !important; /* muy sutil */
+  color: inherit !important;
+  border-left: 4px solid rgba(60,141,188,0.9) !important;
+  box-shadow: none !important;
+}
 </style>
 
 <script>
@@ -180,6 +213,21 @@ $(document).ready(function() {
   // Cargar incidencias al inicio
   cargarIncidencias();
   cargarListaIncidencias();
+
+  // Escuchar evento storage para actualizaciones desde otras pestañas (p.ej. cuando se crea una incidencia)
+  window.addEventListener('storage', function(e) {
+    if (!e.key) return;
+    if (e.key === 'incidencia_creada') {
+      try {
+        var payload = JSON.parse(e.newValue);
+      } catch (err) {
+        var payload = null;
+      }
+      // Recargar tablero y lista
+      cargarIncidencias();
+      cargarListaIncidencias();
+    }
+  });
 
   // Función para cargar las columnas del Kanban
   function cargarIncidencias() {
@@ -218,7 +266,7 @@ $(document).ready(function() {
             incidenciasPorColumna[columna].forEach(function(incidencia) {
               var prioridadClass = getPrioridadClass(incidencia.prioridad);
               var tarjeta = `
-                <div class="panel panel-default panel-kanban" draggable="true" data-id="${incidencia.id}" data-columna="${columna}">
+                <div class="panel panel-default panel-kanban" draggable="true" data-id="${incidencia.id}" data-columna="${columna}" data-prioridad="${incidencia.prioridad}">
                   <div class="panel-body">
                     <h5 class="panel-title">${incidencia.correlativo} - ${incidencia.nombre_incidencia}</h5>
                     <p class="text-muted small">${incidencia.nombre_cliente}</p>
@@ -233,15 +281,7 @@ $(document).ready(function() {
           console.log('Incidencias cargadas:', response.incidencias);
           console.log('Incidencias por columna:', incidenciasPorColumna);
 
-          // Agregar eventos de drag and drop
-          $('.panel-kanban').on('dragstart', function(e) {
-            e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
-            $(this).addClass('dragging');
-          });
-
-          $('.panel-kanban').on('dragend', function(e) {
-            $(this).removeClass('dragging');
-          });
+                  // (Drag listeners attached globally outside; no per-card handlers aquí)
         }
       },
       error: function(xhr, status, error) {
@@ -277,16 +317,51 @@ $(document).ready(function() {
             $lista.append(item);
           });
 
-          // Agregar evento click a los items de la lista
+          // Agregar evento click a los items de la lista: solo resaltar la tarjeta en el tablero
           $('.incidencia-item').on('click', function(e) {
             e.preventDefault();
             var idIncidencia = $(this).data('id');
-            cargarDetalleIncidencia(idIncidencia);
-            $('#modalDetalleIncidencia').modal('show');
 
-            // Resaltar el item seleccionado
+            // Resaltar el item seleccionado en la lista
             $('.incidencia-item').removeClass('active');
             $(this).addClass('active');
+
+            // Buscar la tarjeta correspondiente en el tablero y hacer scroll/efecto
+            var $tarjeta = $('.panel-kanban[data-id="' + idIncidencia + '"]');
+            if ($tarjeta.length) {
+              // Agregar clase temporal de highlight y de prioridad
+              // Leer atributo directamente y normalizar
+              var prioridadAttr = $tarjeta.attr('data-prioridad') || $tarjeta.data('prioridad') || '';
+              var prioridad = String(prioridadAttr).trim().toLowerCase();
+              var hlClass = 'highlight';
+              var hlPrioClass = '';
+              if (prioridad.indexOf('al') === 0 || prioridad === 'alta') hlPrioClass = 'highlight-alta';
+              else if (prioridad.indexOf('me') === 0 || prioridad === 'media') hlPrioClass = 'highlight-media';
+              else if (prioridad.indexOf('ba') === 0 || prioridad === 'baja') hlPrioClass = 'highlight-baja';
+
+              // Aplicar clase base y estilos inline para asegurar color según prioridad
+              $tarjeta.addClass(hlClass);
+              var inlineStyles = {};
+              if (hlPrioClass === 'highlight-alta') {
+                inlineStyles['box-shadow'] = '0 0 18px rgba(221,75,57,0.85)';
+                inlineStyles['border'] = '2px solid rgba(221,75,57,0.9)';
+              } else if (hlPrioClass === 'highlight-media') {
+                inlineStyles['box-shadow'] = '0 0 18px rgba(0,192,239,0.85)';
+                inlineStyles['border'] = '2px solid rgba(0,192,239,0.9)';
+              } else if (hlPrioClass === 'highlight-baja') {
+                inlineStyles['box-shadow'] = '0 0 18px rgba(243,156,18,0.85)';
+                inlineStyles['border'] = '2px solid rgba(243,156,18,0.9)';
+              } else {
+                inlineStyles['box-shadow'] = '0 0 14px rgba(60,141,188,0.7)';
+                inlineStyles['border'] = '2px solid rgba(60,141,188,0.9)';
+              }
+              $tarjeta.css(inlineStyles);
+              // Scroll a la tarjeta
+              var top = $tarjeta.offset().top - 100;
+              $('html, body').animate({ scrollTop: top }, 300);
+              // Quitar highlight y estilos después
+              setTimeout(function() { $tarjeta.removeClass(hlClass); $tarjeta.css({'box-shadow':'','border':''}); }, 1800);
+            }
           });
         }
       },
@@ -306,6 +381,34 @@ $(document).ready(function() {
     }
   }
 
+  // Delegación: abrir modal al hacer doble click en una tarjeta del Kanban
+  $(document).on('dblclick', '.panel-kanban', function(e) {
+    e.preventDefault();
+    var idIncidencia = $(this).data('id');
+    if (!idIncidencia) return;
+    cargarDetalleIncidencia(idIncidencia);
+    $('#modalDetalleIncidencia').modal('show');
+  });
+
+  // Delegated dragstart/dragend handlers (global) to ensure they run for dynamic elements
+  document.addEventListener('dragstart', function(ev) {
+    var card = ev.target.closest ? ev.target.closest('.panel-kanban') : null;
+    if (card) {
+      var id = card.getAttribute('data-id');
+      console.log('dragstart card id=', id);
+      try { ev.dataTransfer.setData('text/plain', id); ev.dataTransfer.setData('text', id); } catch (err) { console.warn('dataTransfer setData failed', err); }
+      card.classList.add('dragging');
+    }
+  }, false);
+
+  document.addEventListener('dragend', function(ev) {
+    var card = ev.target.closest ? ev.target.closest('.panel-kanban') : null;
+    if (card) {
+      console.log('dragend card id=', card.getAttribute('data-id'));
+      card.classList.remove('dragging');
+    }
+  }, false);
+
   // Función para cargar detalle de incidencia en modal
   function cargarDetalleIncidencia(idIncidencia) {
     $.ajax({
@@ -323,8 +426,9 @@ $(document).ready(function() {
           $('#editar_prioridad').val(incidencia.prioridad);
           $('#editar_observaciones').val(incidencia.observaciones);
 
-          // Cargar cliente en select
+          // Mostrar cliente en select (deshabilitado) y sincronizar hidden
           $('#editar_cliente_id').empty().append('<option value="">Cargando...</option>');
+          $('#editar_cliente_id_hidden').val(incidencia.cliente_id);
           $.ajax({
             url: 'ajax/incidencias.ajax.php',
             method: 'GET',
@@ -336,6 +440,8 @@ $(document).ready(function() {
                 var selected = (cliente.value == incidencia.cliente_id) ? 'selected' : '';
                 $('#editar_cliente_id').append(`<option value="${cliente.value}" ${selected}>${cliente.label}</option>`);
               });
+              // Asegurar que el select muestre el cliente correcto aunque esté deshabilitado
+              $('#editar_cliente_id').val(incidencia.cliente_id);
             }
           });
         }
@@ -347,21 +453,23 @@ $(document).ready(function() {
   }
 
   // Drag and drop functions
-  window.allowDrop = function(ev) {
-    ev.preventDefault();
-    var target = ev.target.closest('.kanban-column');
-    if (target) {
-      target.classList.add('drop-target');
-    }
-  };
-
-  window.drop = function(ev) {
-    ev.preventDefault();
-    var target = ev.target.closest('.kanban-column');
-    if (target) {
-      target.classList.remove('drop-target');
-      var idIncidencia = ev.dataTransfer.getData('text/plain');
-      var nuevaColumna = target.id;
+  // Attach drag/drop handlers to columns (native listeners)
+  document.querySelectorAll('.kanban-column').forEach(function(col) {
+    col.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      this.classList.add('drop-target');
+    });
+    col.addEventListener('dragleave', function(e) {
+      this.classList.remove('drop-target');
+    });
+    col.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('drop-target');
+      var idIncidencia = null;
+      try { idIncidencia = e.dataTransfer.getData('text/plain'); } catch (err) { idIncidencia = null; }
+      console.log('drop on column', this.id, 'dataTransfer id=', idIncidencia);
+      var nuevaColumna = this.id;
+      if (!idIncidencia) return;
 
       // Actualizar columna en base de datos
       $.ajax({
@@ -384,8 +492,8 @@ $(document).ready(function() {
           console.error('Error AJAX actualizar columna:', error);
         }
       });
-    }
-  };
+    });
+  });
 
   // Evento para actualizar incidencia desde modal
   $('#formEditarIncidencia').on('submit', function(e) {

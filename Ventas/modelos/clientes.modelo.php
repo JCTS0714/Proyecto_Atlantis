@@ -159,7 +159,7 @@ class ModeloCliente{
 
   /* MÉTODO PARA EDITAR CLIENTE */
   static public function mdlEditarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, ciudad = :ciudad, migracion = :migracion, referencia = :referencia, fecha_contacto = :fecha_contacto, empresa = :empresa, fecha_creacion = :fecha_creacion WHERE id = :id");
+    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, ciudad = :ciudad, migracion = :migracion, referencia = :referencia, fecha_contacto = :fecha_contacto, empresa = :empresa, motivo = :motivo, fecha_creacion = :fecha_creacion WHERE id = :id");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -171,6 +171,7 @@ class ModeloCliente{
     $stmt->bindParam(":referencia", $datos["referencia"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_contacto", $datos["fecha_contacto"], PDO::PARAM_STR);
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
+    $stmt->bindParam(":motivo", $datos["motivo"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
     $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 

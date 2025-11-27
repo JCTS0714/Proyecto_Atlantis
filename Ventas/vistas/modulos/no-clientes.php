@@ -288,3 +288,63 @@
 <!-- Incluir script específico para No Clientes -->
 <script src="vistas/js/clientes.js"></script>
 <script src="vistas/js/no-clientes.js"></script>
+<script>
+// Si la URL contiene ?editar_id=ID se abre el modal de edición y se rellena
+(function() {
+  function getParam(name) {
+    var regex = new RegExp('[\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  var editarId = getParam('editar_id');
+  var focusField = getParam('focus');
+  if (editarId) {
+    // Solicitar datos del cliente y rellenar modal (usa mismo endpoint que el listado)
+    $.ajax({
+      url: 'ajax/clientes.ajax.php',
+      method: 'POST',
+      data: { idCliente: editarId },
+      dataType: 'json'
+    }).done(function(data) {
+      if (!data || !data.id) return;
+      $('#idCliente').val(data.id);
+      $('#editarNombre').val(data.nombre || '');
+      $('#editarTipo').val(data.tipo || '');
+      $('#editarDocumento').val(data.documento || '');
+      $('#editarTelefono').val(data.telefono || '');
+      $('#editarCorreo').val(data.correo || '');
+      $('#editarCiudad').val(data.ciudad || '');
+      $('#editarMigracion').val(data.migracion || '');
+      $('#editarReferencia').val(data.referencia || '');
+      $('#editarFechaContacto').val(data.fecha_contacto || '');
+      $('#editarEmpresa').val(data.empresa || '');
+      $('#editarFechaCreacion').val(data.fecha_creacion || '');
+
+      // Mostrar modal y enfocar campo si se solicita
+      $('#modalActualizarClientes').modal('show');
+      if (focusField) {
+        setTimeout(function() {
+          var $f = $('#' + focusField);
+          if ($f && $f.length) {
+            $f.focus();
+            // marcar visualmente con un pequeño highlight
+            $f.css('box-shadow', '0 0 0 3px rgba(255,165,0,0.25)');
+            setTimeout(function() { $f.css('box-shadow', ''); }, 2000);
+          }
+        }, 300);
+      }
+
+      // Limpiar parámetros de URL para evitar reapertura al recargar
+      if (window.history && window.history.replaceState) {
+        var url = new URL(window.location);
+        url.searchParams.delete('editar_id');
+        url.searchParams.delete('focus');
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    }).fail(function() {
+      console.warn('No se pudieron obtener los datos del cliente para edición');
+    });
+  }
+})();
+</script>

@@ -50,6 +50,10 @@
               <label>Observacion</label>
             </div>
             <div class="column-toggle-item">
+              <input type="checkbox" class="column-toggle-checkbox" data-table="tablaZonaEspera" data-column="col-motivo" checked>
+              <label>Motivo</label>
+            </div>
+            <div class="column-toggle-item">
               <input type="checkbox" class="column-toggle-checkbox" data-table="tablaZonaEspera" data-column="col-ciudad" checked>
               <label>Ciudad</label>
             </div>
@@ -83,6 +87,47 @@
             </div>
           </div>
         </div>
+
+            <script>
+            // Abrir modal de edición y enfocar motivo si la URL contiene ?open_motivo_id=ID
+            $(function(){
+              try {
+                var params = new URLSearchParams(window.location.search);
+                if (params.has('open_motivo_id')) {
+                  var idCliente = params.get('open_motivo_id');
+                  if (idCliente) {
+                    var datos = new FormData();
+                    datos.append('idCliente', idCliente);
+                    fetch('ajax/clientes.ajax.php', { method: 'POST', body: datos })
+                      .then(function(res){ return res.json(); })
+                      .then(function(cliente){
+                        if (!cliente || !cliente.id) return;
+                        // Rellenar campos del modal de edición
+                        $('#idCliente').val(cliente.id || '');
+                        $('#editarNombre').val(cliente.nombre || '');
+                        $('#editarTipo').val(cliente.tipo || '');
+                        $('#editarDocumento').val(cliente.documento || '');
+                        $('#editarTelefono').val(cliente.telefono || '');
+                        $('#editarCorreo').val(cliente.correo || '');
+                        $('#editarMotivo').val(cliente.motivo || '');
+                        $('#editarCiudad').val(cliente.ciudad || '');
+                        $('#editarMigracion').val(cliente.migracion || '');
+                        $('#editarReferencia').val(cliente.referencia || '');
+                        $('#editarFechaContacto').val(cliente.fecha_contacto || '');
+                        $('#editarEmpresa').val(cliente.empresa || '');
+                        // Mostrar modal y enfocar motivo
+                        $('#modalActualizarClientes').modal('show');
+                        setTimeout(function(){ $('#editarMotivo').focus(); }, 300);
+                        // Remover el parámetro de la URL
+                        params.delete('open_motivo_id');
+                        var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                        window.history.replaceState({}, document.title, newUrl);
+                      }).catch(function(err){ console.error('Error al cargar cliente para motivo', err); });
+                  }
+                }
+              } catch(e) { console.error(e); }
+            });
+            </script>
       </div>
 
       <div class="box-body">
@@ -95,6 +140,7 @@
               <th data-column="col-documento">Documento</th>
               <th data-column="col-telefono">Teléfono</th>
               <th data-column="col-correo">Observacion</th>
+              <th data-column="col-motivo">Motivo</th>
               <th data-column="col-ciudad">Ciudad</th>
               <th data-column="col-migracion">Migración</th>
               <th data-column="col-referencia">Referencia</th>
@@ -117,6 +163,7 @@
               echo '<td data-column="col-documento">'.$value["documento"].'</td>';
               echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
               echo '<td data-column="col-correo">'.$value["correo"].'</td>'; // Mostrar como Observacion
+              echo '<td data-column="col-motivo">'.(isset($value["motivo"]) ? $value["motivo"] : '').'</td>';
               echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
               echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
               echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
@@ -132,10 +179,11 @@
                       .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
                    .'</select>'
               .'</td>';
-              echo '<td data-column="col-acciones">
-                      <div class="btn-group">
-                      <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-                      <button class="btn btn-success btnReactivarCliente" idCliente="'.$value["id"].'"><i class="fa fa-refresh"></i></button>';
+              echo '<td data-column="col-acciones">'
+                  .'<div class="btn-group">'
+                  .'<button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>'
+                  .'<button class="btn btn-success btnReactivarCliente" idCliente="'.$value["id"].'"><i class="fa fa-refresh"></i></button>'
+                  .'<button class="btn btn-info btnInfoCliente" idCliente="'.$value["id"].'" title="Info"><i class="fa fa-info"></i></button>';
                       if($_SESSION["perfil"] !== "Vendedor") {
                         echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="zona-espera"><i class="fa fa-trash"></i></button>';
                       }
@@ -209,6 +257,13 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="editarMotivo">Motivo</label>
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-sticky-note"></i></span>
+                <textarea class="form-control input-lg" id="editarMotivo" name="editarMotivo" rows="2" placeholder="Escribir motivo de zona de espera"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
               <label for="editarCiudad">Ciudad</label>
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-home"></i></span>
@@ -272,3 +327,74 @@
 </div>
 
 <script src="vistas/js/clientes.js"></script>
+
+<!-- MODAL INFO CLIENTE (SOLO LECTURA) -->
+<div id="modalInfoCliente" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#00a65a; color:white;">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Información - Cliente / Oportunidad</h4>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#tabProspecto" aria-controls="tabProspecto" role="tab" data-toggle="tab">Prospecto</a></li>
+          <li role="presentation"><a href="#tabOportunidad" aria-controls="tabOportunidad" role="tab" data-toggle="tab">Oportunidad</a></li>
+        </ul>
+
+        <div class="tab-content" style="margin-top:15px;">
+          <div role="tabpanel" class="tab-pane active" id="tabProspecto">
+            <div class="row">
+              <div class="col-md-6"><b>Nombre:</b> <span id="infoNombre"></span></div>
+              <div class="col-md-6"><b>Tipo:</b> <span id="infoTipo"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Documento:</b> <span id="infoDocumento"></span></div>
+              <div class="col-md-6"><b>Teléfono:</b> <span id="infoTelefono"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Observación:</b> <span id="infoCorreo"></span></div>
+              <div class="col-md-6"><b>Motivo:</b> <span id="infoMotivo"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Ciudad:</b> <span id="infoCiudad"></span></div>
+              <div class="col-md-6"><b>Migración:</b> <span id="infoMigracion"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Referencia:</b> <span id="infoReferencia"></span></div>
+              <div class="col-md-6"><b>Empresa:</b> <span id="infoEmpresa"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Fecha de Contacto:</b> <span id="infoFechaContacto"></span></div>
+              <div class="col-md-6"><b>Fecha de Creación:</b> <span id="infoFechaCreacion"></span></div>
+            </div>
+          </div>
+
+          <div role="tabpanel" class="tab-pane" id="tabOportunidad">
+            <div class="row">
+              <div class="col-md-12"><b>Título:</b> <span id="infoOportTitulo"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-12"><b>Descripción:</b> <div id="infoOportDescripcion"></div></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-4"><b>Valor Estimado:</b> <span id="infoOportValor"></span></div>
+              <div class="col-md-4"><b>Probabilidad:</b> <span id="infoOportProbabilidad"></span></div>
+              <div class="col-md-4"><b>Estado:</b> <span id="infoOportEstado"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Fecha Cierre Estimada:</b> <span id="infoOportFechaCierre"></span></div>
+              <div class="col-md-6"><b>Actividad:</b> <span id="infoOportActividad"></span></div>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <div class="col-md-6"><b>Fecha Actividad:</b> <span id="infoOportFechaActividad"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

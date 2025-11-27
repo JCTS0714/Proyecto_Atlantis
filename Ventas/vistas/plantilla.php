@@ -201,7 +201,8 @@
             $_GET["ruta"]=="zona-espera"   ||
             $_GET["ruta"]=="incidencias"   ||
             $_GET["ruta"]=="backlog"       ||
-            $_GET["ruta"]=="salir"
+            $_GET["ruta"]=="salir" ||
+            $_GET["ruta"]=="contadores"
             ){
             include "modulos/".$_GET["ruta"].".php";
           }
