@@ -1,5 +1,15 @@
 
-    $('.sidebar-menu').tree()
+	// Global AJAX error logger: helps surface server response bodies for 500s/HTML errors
+	$(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+		try {
+			console.error('Global AJAX error:', settings && settings.url, thrownError, jqxhr && jqxhr.responseText);
+			if (jqxhr && jqxhr.responseText) {
+				try { var parsed = JSON.parse(jqxhr.responseText); console.error('Global AJAX server JSON:', parsed); } catch(e) { /* not JSON */ }
+			}
+		} catch(e) { console.warn('Error logging global AJAX error', e); }
+	});
+
+	$('.sidebar-menu').tree()
 
     $('#example2').DataTable({
         "language": {
@@ -99,12 +109,22 @@ initContactTable('tablaZonaEspera');
 	// helper: parse YYYY-MM-DD or other common formats to Date
 	function parseDateString(str){
 		if(!str) return null;
-		// Try ISO first
+		str = String(str).trim();
+		// YYYY-MM-DD[ HH:MM:SS]
+		var m = str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?/);
+		if(m){
+			var y = parseInt(m[1],10), mo = parseInt(m[2],10)-1, da = parseInt(m[3],10);
+			var hh = m[4] ? parseInt(m[4],10) : 0;
+			var mm = m[5] ? parseInt(m[5],10) : 0;
+			var ss = m[6] ? parseInt(m[6],10) : 0;
+			return new Date(y, mo, da, hh, mm, ss);
+		}
+		// Try dd-mm-yyyy or dd/mm/yyyy
+		m = str.match(/^(\d{2})[-\/](\d{2})[-\/](\d{4})(?:[ T](\d{2}):(\d{2}):(\d{2}))?/);
+		if(m){ return new Date(parseInt(m[3],10), parseInt(m[2],10)-1, parseInt(m[1],10), m[4]?parseInt(m[4],10):0, m[5]?parseInt(m[5],10):0, m[6]?parseInt(m[6],10):0); }
+		// Fallback to Date parse
 		var d = new Date(str);
 		if(!isNaN(d)) return d;
-		// Try dd-mm-yyyy or dd/mm/yyyy
-		var m = str.match(/(\d{2})[-\/](\d{2})[-\/](\d{4})/);
-		if(m){ return new Date(m[3], parseInt(m[2],10)-1, m[1]); }
 		return null;
 	}
 
@@ -126,25 +146,41 @@ initContactTable('tablaZonaEspera');
 		var fechaInicio = filters && filters.fecha_inicio ? parseDateString(filters.fecha_inicio) : null;
 		var fechaFin = filters && filters.fecha_fin ? parseDateString(filters.fecha_fin) : null;
 
-		// push a custom filter that checks the specific table only
-		$.fn.dataTable.ext.search.push(function(settings, data){
-			if(settings.nTable.id !== tableId) return true; // only affect this table
-			if(!periodo) return true;
+		// remove previous filter fn for this table if exists to avoid stacking
+		if(!window._dtFilterFns) window._dtFilterFns = {};
+		if(window._dtFilterFns[tableId]){
+			// remove by reference
+			$.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(function(fn){ return fn !== window._dtFilterFns[tableId]; });
+			window._dtFilterFns[tableId] = null;
+		}
 
-			var fechaStr = data[11] || data[10] || ''; // try Fecha Creacion or Fecha Contacto
+		if(!periodo){
+			// nothing to filter by date; redraw and exit
+			table.draw();
+			return;
+		}
+
+		// create filter function for this table
+		var filterFn = function(settings, data){
+			if(settings.nTable.id !== tableId) return true; // only affect this table
+
+			var fechaStr = data[11] || data[10] || data[9] || ''; // try several positions
 			var fecha = parseDateString(fechaStr);
 			if(!fecha) return true;
 
 			var today = new Date();
+			// normalize today's date
 			today.setHours(0,0,0,0);
 			var start, end;
 			if(periodo === 'today'){
 				start = new Date(today);
 				end = new Date(today);
 			} else if(periodo === 'this_week'){
-				var day = today.getDay();
+				// week Monday..Sunday
+				var day = today.getDay(); // 0=Sun..6=Sat
+				var diffToMonday = (day + 6) % 7; // 0 for Monday
 				start = new Date(today);
-				start.setDate(today.getDate() - day + 1);
+				start.setDate(today.getDate() - diffToMonday);
 				end = new Date(start);
 				end.setDate(start.getDate() + 6);
 			} else if(periodo === 'this_month'){
@@ -156,10 +192,17 @@ initContactTable('tablaZonaEspera');
 				return true;
 			}
 
-			// normalize
+			// normalize boundaries inclusive
 			start.setHours(0,0,0,0); end.setHours(23,59,59,999);
 			return fecha >= start && fecha <= end;
-		});
+		};
+
+		// push and remember
+		$.fn.dataTable.ext.search.push(filterFn);
+		window._dtFilterFns[tableId] = filterFn;
+
+		// redraw
+		table.draw();
 
 		table.draw();
 	}
@@ -167,10 +210,11 @@ initContactTable('tablaZonaEspera');
 	// listen for apply/clear events
 	window.addEventListener('advancedSearch:apply', function(e){
 		var filters = (e && e.detail) ? e.detail : {};
+		try { console.debug('plantilla: advancedSearch:apply received', filters); } catch(e){}
 		// store global filters map
 		if (!window._advancedFilters) window._advancedFilters = {};
 
-		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera'].forEach(function(id){
+		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
 			// If server-side table exists, set filters and reload via ajax
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = filters;
@@ -183,13 +227,19 @@ initContactTable('tablaZonaEspera');
 
 	window.addEventListener('advancedSearch:clear', function(){
 		// Clear column searches and redraw or reload server tables
-		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera'].forEach(function(id){
+		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = {};
 				try { window._serverTables[id].ajax.reload(null, false); } catch(e){ console.warn('reload failed', e); }
 			} else if ($.fn.DataTable.isDataTable('#'+id)){
 				var t = $('#'+id).DataTable();
 				try{ t.columns().search('').draw(); } catch(e){ t.search('').draw(); }
+				// remove any custom ext.search filter we may have added for this table
+				if(window._dtFilterFns && window._dtFilterFns[id]){
+					$.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(function(fn){ return fn !== window._dtFilterFns[id]; });
+					window._dtFilterFns[id] = null;
+					try { t.draw(); } catch(e){ /* ignore */ }
+				}
 			}
 		});
 	});

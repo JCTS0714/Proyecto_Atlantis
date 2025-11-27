@@ -236,7 +236,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
       cache: false,
       contentType: false,
       processData: false,
-      success: function(respuesta) {
+        success: function(respuesta) {
         if (respuesta == "ok" || respuesta == 1) {
           alert('El cliente ha sido eliminado correctamente.');
           location.reload();

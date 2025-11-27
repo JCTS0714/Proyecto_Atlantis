@@ -1,11 +1,9 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
 
 require_once "../controladores/ControladorIncidencias.php";
 require_once "../modelos/ModeloIncidencias.php";
-
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
 
 header('Content-Type: application/json');
 

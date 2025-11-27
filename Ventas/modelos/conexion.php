@@ -44,6 +44,13 @@ class Conexion{
 
         try {
             $link = new PDO($dsn, $user, $pass, $options);
+            // Forzar zona horaria de sesión a America/Lima (offset -05:00) para que NOW() y funciones de tiempo usen Lima
+            try {
+                $link->exec("SET time_zone = '-05:00'");
+            } catch (Exception $e) {
+                // No detener la conexión si la sesión no puede cambiar la zona; registrar para diagnóstico
+                error_log('No se pudo establecer time_zone en la conexión MySQL: ' . $e->getMessage());
+            }
             return $link;
         } catch (PDOException $e) {
             // Lanzar la excepción para que el flujo superior la maneje.

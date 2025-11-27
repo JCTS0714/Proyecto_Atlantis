@@ -4,14 +4,16 @@
 
   $(function(){
     var panel = $('#advanced-search-panel-inline');
+    // debug: confirm initialization
+    try { console.debug('advanced_search.js initialized. panel found:', panel.length > 0); } catch(e){}
 
-    // Toggle button (delegated so it works even if injected later)
+    // Toggle button: attach delegated handler and a direct handler to be robust
     $(document).on('click', '#btn-toggle-advanced-search', function(e){
       e.preventDefault();
+      try { console.debug('advanced search toggle clicked (delegated)'); } catch(e){}
       if (!panel.length) return;
       panel.slideToggle(200, function(){
         if (panel.is(':visible')){
-          // focus the first input inside the panel
           var $first = panel.find('input[type=text], input[type=date], select').first();
           if ($first.length) $first.focus();
           $('html, body').animate({ scrollTop: panel.offset().top - 70 }, 200);
@@ -19,9 +21,12 @@
       });
     });
 
-    // Close button
-    $(document).on('click', '#btn-close-advanced-search', function(e){
+    // NOTE: do not bind a direct handler here — use the delegated handler above
+
+    // Close button (support both id and class selectors)
+    $(document).on('click', '#btn-close-advanced-search, .btn-close-advanced-search', function(e){
       e.preventDefault();
+      try { console.debug('advanced search close clicked'); } catch(e){}
       if (panel.length) panel.slideUp(150);
     });
 
@@ -43,8 +48,10 @@
         fecha_inicio: $form.find('[name=adv_fecha_inicio]').val() || '',
         fecha_fin: $form.find('[name=adv_fecha_fin]').val() || ''
       };
+      try { console.debug('advanced_search: submit detected on', $form.attr('id'), 'filters:', filters); } catch(e){}
       var event = new CustomEvent('advancedSearch:apply', { detail: filters });
       window.dispatchEvent(event);
+      try { console.debug('advanced_search: event dispatched advancedSearch:apply'); } catch(e){}
     });
 
     // Clear button (scoped)

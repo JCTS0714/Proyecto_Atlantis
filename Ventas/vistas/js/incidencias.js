@@ -123,11 +123,16 @@ $(document).ready(function() {
                 }
             }.bind(this),
             error: function(xhr, status, error) {
-                console.error('Error AJAX crear incidencia:', error);
+                console.error('Error AJAX crear incidencia:', status, error, xhr && xhr.responseText);
+                // Intentar parsear JSON de error del servidor
+                try {
+                    var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                    var msg = server && (server.message || server.error) ? (server.message || server.error) : 'Error al registrar la incidencia';
+                } catch(e) { var msg = 'Error al registrar la incidencia'; }
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error al registrar la incidencia',
+                    text: msg,
                     confirmButtonText: 'Aceptar'
                 });
             }
@@ -173,8 +178,16 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error al cargar incidencias:', error);
-                $('#tablaIncidencias tbody').html('<tr><td colspan="9" class="text-center">Error al cargar las incidencias</td></tr>');
+                console.error('Error al cargar incidencias:', status, error, xhr && xhr.responseText);
+                // Mostrar texto de error si viene en JSON
+                try {
+                    var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                    var msg = server && (server.message || server.error) ? (server.message || server.error) : null;
+                } catch(e) { var msg = null; }
+                var htmlMsg = '<tr><td colspan="9" class="text-center">Error al cargar las incidencias';
+                if (msg) htmlMsg += ': ' + msg;
+                htmlMsg += '</td></tr>';
+                $('#tablaIncidencias tbody').html(htmlMsg);
             }
         });
     }
@@ -221,11 +234,15 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error al obtener datos de la incidencia:', error);
+                console.error('Error al obtener datos de la incidencia:', status, error, xhr && xhr.responseText);
+                try {
+                    var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                    var msg = server && (server.message || server.error) ? (server.message || server.error) : 'Error al cargar los datos de la incidencia';
+                } catch(e) { var msg = 'Error al cargar los datos de la incidencia'; }
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error al cargar los datos de la incidencia',
+                    text: msg,
                     confirmButtonText: 'Aceptar'
                 });
             }
@@ -318,11 +335,15 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error AJAX editar incidencia:', error);
+                console.error('Error AJAX editar incidencia:', status, error, xhr && xhr.responseText);
+                try {
+                    var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                    var msg = server && (server.message || server.error) ? (server.message || server.error) : 'Error al actualizar la incidencia';
+                } catch(e) { var msg = 'Error al actualizar la incidencia'; }
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error al actualizar la incidencia',
+                    text: msg,
                     confirmButtonText: 'Aceptar'
                 });
             }
@@ -372,11 +393,15 @@ $(document).ready(function() {
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error AJAX eliminar incidencia:', error);
+                        console.error('Error AJAX eliminar incidencia:', status, error, xhr && xhr.responseText);
+                        try {
+                            var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
+                            var msg = server && (server.message || server.error) ? (server.message || server.error) : 'Error al eliminar la incidencia';
+                        } catch(e) { var msg = 'Error al eliminar la incidencia'; }
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Error al eliminar la incidencia',
+                            text: msg,
                             confirmButtonText: 'Aceptar'
                         });
                     }

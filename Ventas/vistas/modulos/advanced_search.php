@@ -100,3 +100,38 @@
   </div>
 </div>
 
+    <!-- Inline debug helper: logs form submit even if external JS fails to load -->
+    <script>
+      (function(){
+        try {
+          document.addEventListener('DOMContentLoaded', function(){
+            var fTop = document.getElementById('form-advanced-search');
+            var fInline = document.getElementById('form-advanced-search-inline');
+            function buildFilters(form){
+              try {
+                return {
+                  nombre: (form.querySelector('[name=adv_nombre]') && form.querySelector('[name=adv_nombre]').value) || '',
+                  telefono: (form.querySelector('[name=adv_telefono]') && form.querySelector('[name=adv_telefono]').value) || '',
+                  documento: (form.querySelector('[name=adv_documento]') && form.querySelector('[name=adv_documento]').value) || '',
+                  periodo: (form.querySelector('[name=adv_periodo]') && form.querySelector('[name=adv_periodo]').value) || '',
+                  fecha_inicio: (form.querySelector('[name=adv_fecha_inicio]') && form.querySelector('[name=adv_fecha_inicio]').value) || '',
+                  fecha_fin: (form.querySelector('[name=adv_fecha_fin]') && form.querySelector('[name=adv_fecha_fin]').value) || ''
+                };
+              } catch(e){ return {}; }
+            }
+
+            function logSubmit(e){
+              try { console.log('advanced_search-inline-debug: submit on', this && this.id, 'target:', e && e.target); } catch(err){}
+              try {
+                var filters = buildFilters(this || e.target || document.getElementById('form-advanced-search-inline'));
+                console.log('advanced_search-inline-debug: built filters', filters);
+                try { window.dispatchEvent(new CustomEvent('advancedSearch:apply', { detail: filters })); console.log('advanced_search-inline-debug: dispatched advancedSearch:apply'); } catch(ex) { console.warn('dispatch failed', ex); }
+              } catch(err){ console.warn('advanced_search-inline-debug error building/dispatching', err); }
+            }
+            if (fTop && !fTop._dbgAttached) { fTop.addEventListener('submit', logSubmit); fTop._dbgAttached = true; }
+            if (fInline && !fInline._dbgAttached) { fInline.addEventListener('submit', logSubmit); fInline._dbgAttached = true; }
+          });
+        } catch(e){ console.warn('advanced_search debug helper failed', e); }
+      })();
+    </script>
+

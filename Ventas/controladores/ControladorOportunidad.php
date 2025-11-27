@@ -351,6 +351,7 @@ class ControladorOportunidad {
         }
         return $stmt->rowCount(); // Retorna número de filas afectadas
     }
+    
 
 static private function mapearActividadATitulo($actividad) {
     $mapeo = [

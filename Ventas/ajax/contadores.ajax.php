@@ -1,4 +1,6 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
 require_once "../modelos/contador.modelo.php";
 
 $q = $_GET['q'] ?? '';

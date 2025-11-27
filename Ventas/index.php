@@ -24,6 +24,10 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Asegurar zona horaria consistente para toda la aplicación
+// Si prefieres controlar esto desde php.ini, quita esta línea.
+date_default_timezone_set('America/Lima');
+
 /**REQUERIMOS CONFIGURACIÓN */
 require_once "config/estados.php";
 // Rutas base (detecta entorno y arma BASE_URL)

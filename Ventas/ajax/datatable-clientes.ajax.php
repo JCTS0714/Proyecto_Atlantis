@@ -1,4 +1,7 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
+
 header('Content-Type: application/json; charset=utf-8');
 require_once "../modelos/conexion.php";
 require_once "../modelos/clientes.modelo.php";
