@@ -11,13 +11,23 @@ class ModeloUsuarios {
     if ($item != null) {
       $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item");
       $stmt->bindParam(":" . $item, $valor, PDO::PARAM_STR);
-      $stmt->execute();
+      try {
+        $stmt->execute();
+      } catch (PDOException $e) {
+        error_log("mdlMostrarUsuarios SELECT ERROR: " . $e->getMessage());
+        return false;
+      }
       $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
       $stmt->closeCursor();
       return $resultado; // Devuelve una sola fila
     } else {
       $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla");
-      $stmt->execute();
+      try {
+        $stmt->execute();
+      } catch (PDOException $e) {
+        error_log("mdlMostrarUsuarios(ALL) SELECT ERROR: " . $e->getMessage());
+        return [];
+      }
       $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
       $stmt->closeCursor();
       return $resultado; // Devuelve todas las filas
@@ -36,12 +46,17 @@ class ModeloUsuarios {
     $stmt->bindParam(":perfil", $datos["perfil"], PDO::PARAM_STR);
     $stmt->bindParam(":foto", $datos["foto"], PDO::PARAM_STR);
 
-    if ($stmt->execute()) {
-      error_log("mdlRegistrarUsuario: execute OK for usuario=" . $datos["usuario"] . " | hash_prefix=" . substr($datos["password"],0,10) . " | hash_len=" . strlen($datos["password"]));
-      return "ok";
-    } else {
-      $err = $stmt->errorInfo();
-      error_log("mdlRegistrarUsuario: execute ERROR for usuario=" . $datos["usuario"] . " | SQLSTATE=" . $err[0] . " | code=" . $err[1] . " | message=" . $err[2]);
+    try {
+      if ($stmt->execute()) {
+        error_log("mdlRegistrarUsuario: execute OK for usuario=" . $datos["usuario"] . " | hash_prefix=" . substr($datos["password"],0,10) . " | hash_len=" . strlen($datos["password"]));
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlRegistrarUsuario: execute ERROR for usuario=" . $datos["usuario"] . " | SQLSTATE=" . $err[0] . " | code=" . $err[1] . " | message=" . $err[2]);
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlRegistrarUsuario EXCEPTION: " . $e->getMessage());
       return "error";
     }
   }
@@ -59,9 +74,16 @@ class ModeloUsuarios {
     $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
     $stmt->bindParam(":usuario", $datos["usuario"], PDO::PARAM_STR);
 
-    if ($stmt->execute()) {
-      return "ok";
-    } else {
+    try {
+      if ($stmt->execute()) {
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlEditarUsuario ERROR: " . json_encode($err));
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlEditarUsuario EXCEPTION: " . $e->getMessage());
       return "error";
     }
   }
@@ -72,9 +94,14 @@ class ModeloUsuarios {
   static public function mdlExisteUsuario($usuarioId) {
     $stmt = Conexion::conectar()->prepare("SELECT id FROM usuarios WHERE id = :id");
     $stmt->bindParam(":id", $usuarioId, PDO::PARAM_INT);
-    $stmt->execute();
-    $existe = $stmt->fetch();
-    return $existe ? true : false;
+    try {
+      $stmt->execute();
+      $existe = $stmt->fetch();
+      return $existe ? true : false;
+    } catch (PDOException $e) {
+      error_log("mdlExisteUsuario ERROR: " . $e->getMessage());
+      return false;
+    }
   }
 
   /** ============================
@@ -84,10 +111,17 @@ class ModeloUsuarios {
     $stmt = Conexion::conectar()->prepare("DELETE FROM $tabla WHERE id = :id");
     $stmt->bindParam(":id", $datos, PDO::PARAM_INT);
 
-    if ($stmt->execute()) {
-      return "ok";
-    } else {
-      return "error"; 
+    try {
+      if ($stmt->execute()) {
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlBorrarUsuario ERROR: " . json_encode($err));
+        return "error"; 
+      }
+    } catch (PDOException $e) {
+      error_log("mdlBorrarUsuario EXCEPTION: " . $e->getMessage());
+      return "error";
     }
   }
 
@@ -104,9 +138,16 @@ class ModeloUsuarios {
       $stmt->bindParam(":foto", $datos["foto"], PDO::PARAM_STR);
       $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 
-      if ($stmt->execute()) {
-        return "ok";
-      } else {
+      try {
+        if ($stmt->execute()) {
+          return "ok";
+        } else {
+          $err = $stmt->errorInfo();
+          error_log("mdlActualizarUsuario ERROR: " . json_encode($err));
+          return "error";
+        }
+      } catch (PDOException $e) {
+        error_log("mdlActualizarUsuario EXCEPTION: " . $e->getMessage());
         return "error";
       }
     }
@@ -125,9 +166,16 @@ class ModeloUsuarios {
         }
 
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-        if ($stmt->execute()) {
-          return "ok";
-        } else {
+        try {
+          if ($stmt->execute()) {
+            return "ok";
+          } else {
+            $err = $stmt->errorInfo();
+            error_log("mdlActualizarCampoUsuario ERROR: " . json_encode($err));
+            return "error";
+          }
+        } catch (PDOException $e) {
+          error_log("mdlActualizarCampoUsuario EXCEPTION: " . $e->getMessage());
           return "error";
         }
       }
@@ -142,9 +190,16 @@ class ModeloUsuarios {
         $stmt->bindParam(":remember_expires", $remember_expires, PDO::PARAM_STR);
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
-        if ($stmt->execute()) {
-          return "ok";
-        } else {
+        try {
+          if ($stmt->execute()) {
+            return "ok";
+          } else {
+            $err = $stmt->errorInfo();
+            error_log("mdlActualizarRememberToken ERROR: " . json_encode($err));
+            return "error";
+          }
+        } catch (PDOException $e) {
+          error_log("mdlActualizarRememberToken EXCEPTION: " . $e->getMessage());
           return "error";
         }
       }
@@ -156,8 +211,13 @@ class ModeloUsuarios {
         $stmt = Conexion::conectar()->prepare("SELECT * FROM usuarios WHERE remember_token = :remember_token AND remember_expires > NOW()");
 
         $stmt->bindParam(":remember_token", $remember_token, PDO::PARAM_STR);
-        $stmt->execute();
-        $resultado = $stmt->fetch();
+        try {
+          $stmt->execute();
+          $resultado = $stmt->fetch();
+        } catch (PDOException $e) {
+          error_log("mdlMostrarUsuarioPorRememberToken ERROR: " . $e->getMessage());
+          return false;
+        }
         $stmt->closeCursor();
         return $resultado;
       }

@@ -1,4 +1,6 @@
 <?php
+// Bootstrap for AJAX: session, headers and error handling
+require_once __DIR__ . '/_error_handler.php';
 require_once "../controladores/clientes.controlador.php";
 require_once "../modelos/clientes.modelo.php";
 

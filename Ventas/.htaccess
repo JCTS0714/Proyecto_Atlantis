@@ -1,27 +1,95 @@
+# Archivo .htaccess para desarrollo local
+# Ajusta `RewriteBase` si mueves el proyecto a otra ruta en el servidor.
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Si tu proyecto está en un subdirectorio, ajusta RewriteBase manualmente.
+  # Ej: RewriteBase /Proyecto_Atlantis/Ventas/
+  # Por defecto no seteamos RewriteBase para que funcione en caminos raíz y subcarpetas.
 
-  # --- Ajusta RewriteBase según despliegue ---
-  # Si el sitio está desplegado en la raíz pública (ej. https://example.com/) usar:
-  #   RewriteBase /
-  # Si el sitio está en un subdirectorio (ej. XAMPP local):
-  #   RewriteBase /Proyecto_Atlantis/Ventas/
-  # Descomenta la línea que corresponda y deja la otra comentada.
-  RewriteBase /
-
-  # No reescribir archivos o carpetas existentes
+  # No reescribir si el archivo o directorio existe
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Redirigir todo lo demás al front controller `index.php?ruta=...`
-  RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
+  # Redirigir todo lo demás a index.php (preserva query string)
+  RewriteRule ^ index.php [L,QSA]
 </IfModule>
 
-# Notas de despliegue:
-# - Asegúrate de que Apache tenga `mod_rewrite` habilitado (LoadModule rewrite_module ...).
-# - Si las reglas no se aplican, configura `AllowOverride All` para el directorio público en httpd.conf o el VirtualHost:
-#     <Directory "C:/xampp/htdocs">
-#         AllowOverride All
-#     </Directory>
-# - Reinicia Apache tras cualquier cambio.
+# Protecciones adicionales
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Evitar listado de directorios
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Local development: use subdirectory RewriteBase. Change to '/' or your public path in production.
+  # If you deploy to your Hostinger account root, set RewriteBase to '/'
+  # Example for Hostinger in a subfolder: RewriteBase /tu_carpeta/
+  # If your site is hosted at the domain root (public_html), use '/'.
+  # If you host in a subfolder, change accordingly (ex: /mi_subcarpeta/)
+  RewriteBase /
+
+  # Bypass existing files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Explicitly exclude static and ajax folders from front controller to avoid
+  # accidental rewrite when files are missing or paths resolve differently.
+  RewriteRule ^(vistas|ajax|css|js|img|uploads)(/.*)?$ - [L,NC]
+
+  # Front controller: route to index.php with `ruta` param
+    RewriteRule ^(.+)$ index.php?ruta=$1 [L,QSA]
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Deny access to sensitive files and backups
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(?:.*(\.bak|\.sql)$|\.env|bd\.txt)$">
+    Require all denied
+  </FilesMatch>
+  <FilesMatch "^(production\.php|config/.*)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  # Fallback for older Apache
+  <FilesMatch "^(?:.*(\.bak|\.sql)$|\.env|bd\.txt)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Deny access to VCS and archive folders
+RedirectMatch 403 \.git
+RedirectMatch 403 ^/archive_dev(/|$)
+RedirectMatch 403 ^/sql(/|$)
+RedirectMatch 403 ^/scripts(/|$)
+RedirectMatch 403 ^/Documentacion(/|$)
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "no-referrer-when-downgrade"
+</IfModule>
+
+# HTTPS redirect (uncomment to force HTTPS in production). On Hostinger you can
+# also enable "Forced HTTPS" from the control panel and leave this commented.
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# Notes:
+# - If you use a VirtualHost, prefer configuring redirects and rewrite base
+#   at the vhost level and keep AllowOverride minimal.
+# - Keep `archive_dev/`, `bd.txt`, `.env` and other sensitive files outside webroot
+#   or ensure they are denied as above.

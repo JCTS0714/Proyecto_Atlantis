@@ -21,26 +21,35 @@
             <h3 class="box-title">Clientes Recientes</h3>
           </div>
           <div class="box-body">
+            <div style="margin-bottom:8px;">
+              <button id="btnReunionesArchivadas" class="btn btn-sm btn-primary">Historial de reuniones</button>
+            </div>
             <?php
               // Controlador ya incluido globalmente en index.php
               $clientes = ControladorOportunidad::ctrMostrarClientesOrdenados();
-              $clientesLimit = array_slice($clientes, 0, 5); // Mostrar solo los primeros 5
 
-              // Obtener ids de clientes para consultar reuniones
-              $clienteIds = array_column($clientesLimit, 'id');
-
-              // Incluir modelo de calendario
-              // El require_once no es necesario si ya está incluido globalmente en plantilla.php
-              // require_once "../../modelos/calendario.modelo.php";
-
-              // Obtener reuniones de estos clientes
-              $reuniones = ModeloCalendario::mdlMostrarReunionesPorClientes($clienteIds);
+              // Obtener reuniones activas (no archivadas) para todos los clientes
+              $allClientIds = array_column($clientes, 'id');
+              // Evitar llamadas vacías
+              if (!empty($allClientIds)) {
+                $reuniones = ModeloCalendario::mdlMostrarReunionesPorClientes($allClientIds);
+              } else {
+                $reuniones = [];
+              }
 
               // Agrupar reuniones por cliente_id
               $reunionesPorCliente = [];
               foreach ($reuniones as $reunion) {
                 $reunionesPorCliente[$reunion['cliente_id']][] = $reunion['titulo'];
               }
+
+              // Filtrar lista de clientes para incluir solo aquellos que tengan reuniones activas
+              $clientesConReuniones = array_filter($clientes, function($c) use ($reunionesPorCliente) {
+                return isset($reunionesPorCliente[$c['id']]);
+              });
+
+              // Mostrar solo los primeros 5 clientes que realmente tienen reuniones activas
+              $clientesLimit = array_slice(array_values($clientesConReuniones), 0, 5);
             ?>
             <ul class="list-group">
               <?php if (!empty($clientesLimit)): ?>
@@ -91,6 +100,37 @@
   </section>
   <!-- /.content -->
 
+  <!-- Modal Reuniones Pasadas (abre automáticamente si hay reuniones pasadas) -->
+  <div class="modal fade" id="modalReunionesPasadas" tabindex="-1" role="dialog" aria-labelledby="modalReunionesPasadasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalReunionesPasadasLabel">Reuniones pasadas</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-condensed table-striped" id="tablaReunionesPasadas">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Título</th>
+                <th>Cliente</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Eliminada la inclusión del modal de eventos para evitar abrir modal innecesario -->
   <!-- <?php // include "evento_modals.php"; ?> -->
 
@@ -112,7 +152,7 @@
               <input type="hidden" id="usuario_id" name="usuario_id" value="<?php echo $_SESSION['id']; ?>">
                 <div class="form-group">
                   <label for="titulo">Título <span style="color:red">*</span></label>
-                  <input type="text" class="form-control" id="titulo" name="titulo" required readonly>
+                  <input type="text" class="form-control" id="titulo" name="titulo" required>
                 </div>
                 <div class="form-group">
                   <label for="cliente_id">Cliente <span style="color:red">*</span></label>

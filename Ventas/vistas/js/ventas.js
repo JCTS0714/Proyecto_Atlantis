@@ -105,8 +105,9 @@ $(".tablaVentas tbody").on("click","button.btnAgregarProductos",function(){
                           
                         '</div>'+
                       '</div>'+
-					  '</div>')
-    }
+
+											'</div>');
+
 		},
 		error: function(xhr, status, error) {
 			// Productos endpoint removed — show message and restore button

@@ -104,6 +104,12 @@ $(document).ready(function() {
     function crearGraficoClientes(data) {
         const canvas = document.getElementById('grafico-clientes');
 
+        // Si no existe el canvas, evitar lanzar excepciones (p. ej. en páginas sin dashboard)
+        if (!canvas) {
+            console.warn('grafico-clientes no encontrado en el DOM. Saltando renderizado.');
+            return;
+        }
+
         // Destruir gráfico previo si existe
         if (chartClientes) {
             try {
@@ -114,9 +120,16 @@ $(document).ready(function() {
             }
         }
 
+        // Obtener contexto de dibujo con seguridad
+        var ctx = null;
+        try { ctx = canvas.getContext && canvas.getContext('2d'); } catch(e) { ctx = null; }
+        if (!ctx) {
+            console.warn('No se pudo obtener contexto 2D para grafico-clientes.');
+            return;
+        }
+
         // Limpiar canvas completamente
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        try { ctx.clearRect(0, 0, canvas.width, canvas.height); } catch(e) { /* ignore */ }
 
         // Procesar datos para el gráfico
         const estados = {
@@ -265,6 +278,12 @@ $(document).ready(function() {
     function crearGraficoEvolucion(data) {
         const canvas = document.getElementById('grafico-evolucion');
 
+        // Si no existe el canvas, evitar excepciones
+        if (!canvas) {
+            console.warn('grafico-evolucion no encontrado en el DOM. Saltando renderizado.');
+            return;
+        }
+
         // Destruir gráfico previo si existe
         if (chartEvolucion) {
             try {
@@ -275,9 +294,16 @@ $(document).ready(function() {
             }
         }
 
+        // Obtener contexto de dibujo con seguridad
+        var ctx = null;
+        try { ctx = canvas.getContext && canvas.getContext('2d'); } catch(e) { ctx = null; }
+        if (!ctx) {
+            console.warn('No se pudo obtener contexto 2D para grafico-evolucion.');
+            return;
+        }
+
         // Limpiar canvas completamente
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        try { ctx.clearRect(0, 0, canvas.width, canvas.height); } catch(e) { /* ignore */ }
 
         const meses = data.map(item => {
             const [year, month] = item.mes.split('-');

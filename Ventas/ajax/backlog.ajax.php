@@ -1,7 +1,11 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
 
 require_once "../controladores/ControladorIncidencias.php";
-require_once "../modelos/incidencias.modelo.php";
+require_once "../modelos/ModeloIncidencias.php";
+
+header('Content-Type: application/json');
 
 class AjaxBacklog {
 
@@ -70,11 +74,12 @@ class AjaxBacklog {
     }
 }
 
-// Manejar las acciones AJAX
-if (isset($_GET['action'])) {
-    $backlog = new AjaxBacklog();
+// Manejar las acciones AJAX (acepta GET o POST mediante REQUEST)
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+$backlog = new AjaxBacklog();
 
-    switch ($_GET['action']) {
+if ($action) {
+    switch ($action) {
         case 'mostrarIncidencias':
             $backlog->ajaxMostrarIncidencias();
             break;

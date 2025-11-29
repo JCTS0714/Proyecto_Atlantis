@@ -1,12 +1,16 @@
 <?php
-// Iniciar sesión si no está iniciada
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+// Bootstrap for AJAX: session, headers and error handling
+require_once __DIR__ . '/_error_handler.php';
+
+// Simple auth check: return error if no session user id
+if (!isset($_SESSION["id"])) {
+    echo json_encode(array("status" => "error", "message" => "Usuario no autenticado."));
+    exit;
 }
 
-require_once "../modelos/conexion.php";
-require_once "../modelos/ModeloIncidencias.php";
-require_once "../controladores/ControladorIncidencias.php";
+require_once __DIR__ . "/../modelos/conexion.php";
+require_once __DIR__ . "/../modelos/ModeloIncidencias.php";
+require_once __DIR__ . "/../controladores/ControladorIncidencias.php";
 
 class AjaxIncidencias {
 

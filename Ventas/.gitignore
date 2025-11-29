@@ -1,0 +1,40 @@
+# .gitignore for Proyecto_Atlantis/Ventas
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Env / secrets
+.env
+.env.*.local
+.env.local
+.env.production
+
+# PHP / composer
+/vendor/
+/composer.lock
+
+# Node / front-end deps
+node_modules/
+/vistas/bower_components/
+
+# Logs / caches / uploads
+*.log
+/tmp/
+uploads/
+cache/
+
+# Build / runtime artifacts
+dist/
+build/
+
+# Backups (do not commit local backups)
+/backups_pre_deploy/
+
+# Other
+*.sql
+*.sql.gz
+
+\n# Ignore local per-developer config\nconfig/local.php\n

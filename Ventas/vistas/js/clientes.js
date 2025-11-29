@@ -2,8 +2,7 @@
 // ARCHIVO CLIENTES.JS
 // ========================================
 
-// console.log('Archivo clientes.js cargado correctamente');
-// console.log('jQuery está disponible, versión:', $.fn.jquery);
+// Archivo clientes.js — manejadores de clientes/prospectos
 
 $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", function(event) {
   event.preventDefault();
@@ -88,6 +87,7 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarDocumento").val(respuesta["documento"]);
       $("#editarTelefono").val(respuesta["telefono"]);
       $("#editarCorreo").val(respuesta["correo"]);
+      $("#editarMotivo").val(respuesta["motivo"] || '');
       $("#editarCiudad").val(respuesta["ciudad"]);
       $("#editarMigracion").val(respuesta["migracion"]);
       $("#editarReferencia").val(respuesta["referencia"]);
@@ -107,7 +107,6 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarFechaContacto").attr("placeholder", "Ingresar fecha de contacto");
       $("#editarEmpresa").attr("placeholder", "Ingresar empresa");
 
-      console.log("Mostrando modal");
       $("#modalActualizarClientes").modal("show");
     },
     error: function(xhr, status, error) {
@@ -118,12 +117,97 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
   });
 });
 
+// Manejador para botón Info (solo lectura) en zona de espera
+$(document).off("click", ".btnInfoCliente").on("click", ".btnInfoCliente", function() {
+  var idCliente = $(this).attr("idCliente");
+  if (!idCliente) {
+    alert('ID de cliente no encontrado');
+    return;
+  }
+
+  // Primero obtener datos del cliente
+  var datos = new FormData();
+  datos.append("idCliente", idCliente);
+
+  $.ajax({
+    url: "ajax/clientes.ajax.php",
+    method: "POST",
+    data: datos,
+    cache: false,
+    contentType: false,
+    processData: false,
+    dataType: "json",
+    success: function(cliente) {
+      if (!cliente || !cliente.id) {
+        alert('No se pudieron cargar los datos del cliente');
+        return;
+      }
+
+      // Rellenar campos prospecto (solo lectura)
+      $("#infoNombre").text(cliente.nombre || '');
+      $("#infoTipo").text(cliente.tipo || '');
+      $("#infoDocumento").text(cliente.documento || '');
+      $("#infoTelefono").text(cliente.telefono || '');
+      $("#infoCorreo").text(cliente.correo || '');
+      $("#infoMotivo").text(cliente.motivo || '');
+      $("#infoCiudad").text(cliente.ciudad || '');
+      $("#infoMigracion").text(cliente.migracion || '');
+      $("#infoReferencia").text(cliente.referencia || '');
+      $("#infoEmpresa").text(cliente.empresa || '');
+      $("#infoFechaContacto").text(cliente.fecha_contacto || '');
+      $("#infoFechaCreacion").text(cliente.fecha_creacion || '');
+
+      // Luego obtener oportunidad(s) asociadas (si las hay)
+      $.ajax({
+        url: 'ajax/oportunidades.ajax.php',
+        method: 'GET',
+        data: { action: 'getOportunidadByCliente', clienteId: idCliente },
+        dataType: 'json',
+        success: function(oportunidades) {
+          if (Array.isArray(oportunidades) && oportunidades.length > 0) {
+            // Tomar la primera (más reciente según consulta)
+            var op = oportunidades[0];
+            $("#infoOportTitulo").text(op.titulo || '');
+            $("#infoOportDescripcion").text(op.descripcion || '');
+            $("#infoOportValor").text(op.valor_estimado || '');
+            $("#infoOportProbabilidad").text(op.probabilidad != null ? op.probabilidad + '%' : '');
+            $("#infoOportEstado").text(op.estado || '');
+            $("#infoOportFechaCierre").text(op.fecha_cierre_estimada || '');
+            $("#infoOportActividad").text(op.actividad || '');
+            $("#infoOportFechaActividad").text(op.fecha_actividad || '');
+          } else {
+            $("#infoOportTitulo").text('Sin oportunidades');
+            $("#infoOportDescripcion").text('');
+            $("#infoOportValor").text('');
+            $("#infoOportProbabilidad").text('');
+            $("#infoOportEstado").text('');
+            $("#infoOportFechaCierre").text('');
+            $("#infoOportActividad").text('');
+            $("#infoOportFechaActividad").text('');
+          }
+          // Mostrar modal (pestaña prospecto por defecto)
+          $('#modalInfoCliente').modal('show');
+          $('a[href="#tabProspecto"]').tab('show');
+        },
+        error: function(xhr, status, error) {
+          console.error('Error al cargar oportunidades:', error, xhr.responseText);
+          $('#modalInfoCliente').modal('show');
+          $('a[href="#tabProspecto"]').tab('show');
+        }
+      });
+    },
+    error: function(xhr, status, error) {
+      console.error('Error al cargar cliente:', error, xhr.responseText);
+      alert('Error al cargar los datos del cliente');
+    }
+  });
+});
+
 // ========================================
 // MANEJADOR PARA ELIMINAR CLIENTE
 // ========================================
 $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente", function(e) {
   e.preventDefault();
-  console.log("Click en botón eliminar cliente detectado");
   var idCliente = $(this).attr("idCliente");
   var dataRuta = $(this).attr("data-ruta");
   
@@ -133,7 +217,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
     return;
   }
 
-  console.log("ID Cliente:", idCliente, "Ruta:", dataRuta);
+  // ID y ruta leídos correctamente
 
   // Confirmación con SweetAlert
   if (typeof Swal === 'undefined') {
@@ -152,8 +236,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
       cache: false,
       contentType: false,
       processData: false,
-      success: function(respuesta) {
-        console.log("Respuesta eliminar cliente:", respuesta);
+        success: function(respuesta) {
         if (respuesta == "ok" || respuesta == 1) {
           alert('El cliente ha sido eliminado correctamente.');
           location.reload();
@@ -191,7 +274,6 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
           contentType: false,
           processData: false,
           success: function(respuesta) {
-            console.log("Respuesta eliminar cliente:", respuesta);
             if (respuesta == "ok" || respuesta == 1) {
               Swal.fire({
                 title: 'Eliminado',
@@ -225,23 +307,19 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
 
 // Manejador para botón Reactivar en zona de espera
 $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarCliente', function() {
-  console.log('Click detectado en botón Reactivar');
+  // Click Reactivar detectado
   var idCliente = $(this).attr('idCliente');
-  console.log('ID Cliente obtenido:', idCliente);
 
   if (!idCliente) {
-    console.error('ID de cliente no encontrado en el botón');
     alert('ID de cliente no encontrado');
     return;
   }
-
-  console.log('Mostrando confirmación al usuario');
   if (!confirm('¿Está seguro que desea reactivar este cliente y pasarlo a seguimiento?')) {
     console.log('Usuario canceló la confirmación');
     return;
   }
 
-  console.log('Buscando oportunidad para cliente ID:', idCliente);
+  // Buscar oportunidad para cliente
 
   // Primero buscar la oportunidad del cliente
   $.ajax({
@@ -252,16 +330,8 @@ $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarClien
     },
     dataType: 'json',
     success: function(oportunidadResponse) {
-      console.log('Respuesta búsqueda oportunidad:', oportunidadResponse);
-
       if (oportunidadResponse && oportunidadResponse.length > 0) {
         var idOportunidad = oportunidadResponse[0].id;
-        console.log('ID Oportunidad encontrado:', idOportunidad);
-
-        console.log('Enviando petición AJAX para cambiar estado con datos:', {
-          idOportunidad: idOportunidad,
-          nuevoEstado: 1
-        });
 
         // Ahora cambiar el estado de la oportunidad
         $.ajax({
@@ -273,39 +343,23 @@ $(document).off('click', '.btnReactivarCliente').on('click', '.btnReactivarClien
           },
           dataType: 'json',
           success: function(response) {
-            console.log('Respuesta AJAX cambio estado exitosa:', response);
             if (response.status === 'success') {
-              console.log('Estado actualizado correctamente, recargando página');
-              alert('Cliente reactivado correctamente');
-              // Recargar la página o tabla para reflejar cambios
-              location.reload();
+              // Redirigir al CRM y pedir que destaque la oportunidad reactivada
+              var base = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
+              window.location.href = base + '/crm?highlight_oportunidad_id=' + encodeURIComponent(idOportunidad);
             } else {
-              console.error('Error en respuesta:', response.message);
               alert('Error al reactivar cliente: ' + response.message);
             }
           },
           error: function(xhr, status, error) {
-            console.error('Error AJAX cambio estado:', {
-              xhr: xhr,
-              status: status,
-              error: error,
-              responseText: xhr.responseText
-            });
             alert('Error en la petición AJAX: ' + error);
           }
         });
       } else {
-        console.error('No se encontró oportunidad para el cliente');
         alert('No se encontró la oportunidad asociada al cliente');
       }
     },
     error: function(xhr, status, error) {
-      console.error('Error AJAX búsqueda oportunidad:', {
-        xhr: xhr,
-        status: status,
-        error: error,
-        responseText: xhr.responseText
-      });
       alert('Error al buscar la oportunidad del cliente: ' + error);
     }
   });
@@ -467,13 +521,73 @@ $(document).off("click", ".btnRegistrarIncidencia").on("click", ".btnRegistrarIn
 
 // Manejador para selects de cambio de estado en la tabla de clientes (similar a prospectos)
 $(document).off('change', '.select-estado-cliente').on('change', '.select-estado-cliente', function() {
-  var idCliente = $(this).data('id');
-  var nuevoEstado = $(this).val();
-
-  console.log('select-estado-cliente changed', { idCliente: idCliente, nuevoEstado: nuevoEstado });
+  var $select = $(this);
+  var idCliente = $select.data('id');
+  var nuevoEstado = $select.val();
+  var previo = $select.data('previous') !== undefined ? parseInt($select.data('previous')) : null;
 
   if (!idCliente || nuevoEstado === undefined) {
     console.error('select-estado-cliente: parámetros inválidos', {idCliente: idCliente, nuevoEstado: nuevoEstado});
+    return;
+  }
+
+  // CASOS ESPECIALES
+  // Si venimos de Prospecto (0) y el nuevo estado es Seguimiento (1)
+  if (previo === 0 && parseInt(nuevoEstado) === 1) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: 'Para realizar esta acción primero debe crear una oportunidad',
+        text: 'Si acepta será redirigido al CRM y se abrirá el modal para crear la oportunidad',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Crear oportunidad',
+        cancelButtonText: 'Cancelar'
+      }).then(function(result) {
+        if (result.isConfirmed) {
+          var base = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
+          window.location.href = base + '/crm?cliente_id=' + encodeURIComponent(idCliente);
+        } else {
+          // Restaurar el valor previo
+          $select.val(previo);
+        }
+      });
+    } else {
+      if (confirm('Para realizar esta acción primero debe crear una oportunidad. ¿Desea crearla ahora?')) {
+        var base = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
+        window.location.href = base + '/crm?cliente_id=' + encodeURIComponent(idCliente);
+      } else {
+        $select.val(previo);
+      }
+    }
+
+    return; // No llamar al endpoint genérico
+  }
+
+  // Si venimos de Prospecto (0) y el nuevo estado es No Cliente (3): actualizar DB y redirigir a no-clientes abriendo modal de edición
+  if (previo === 0 && parseInt(nuevoEstado) === 3) {
+    $.post('ajax/clientes.ajax.php', { activarId: idCliente, activarEstado: nuevoEstado }, function(resp) {
+      var trimmed = (typeof resp === 'string') ? resp.trim() : resp;
+      if (trimmed === 'ok' || (trimmed && trimmed.status && trimmed.status === 'ok')) {
+        var base = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
+        window.location.href = base + '/no-clientes?editar_id=' + encodeURIComponent(idCliente) + '&focus=editarCorreo';
+      } else {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire('Error', 'No se pudo actualizar el estado a No Cliente', 'error');
+        } else {
+          alert('No se pudo actualizar el estado a No Cliente');
+        }
+        // Restaurar valor
+        $select.val(previo);
+      }
+    }).fail(function() {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
+      } else {
+        alert('No se pudo actualizar el estado (request failed)');
+      }
+      $select.val(previo);
+    });
+
     return;
   }
 
@@ -492,6 +606,8 @@ $(document).off('change', '.select-estado-cliente').on('change', '.select-estado
     }
 
     if (res && res.status && res.status === 'ok') {
+      // Marcar previo para el select (para futuros cambios)
+      $select.data('previous', parseInt(nuevoEstado));
       if (typeof Swal !== 'undefined') {
         Swal.fire('Actualizado', 'Estado actualizado correctamente', 'success').then(function() { location.reload(); });
       } else {
@@ -514,5 +630,19 @@ $(document).off('change', '.select-estado-cliente').on('change', '.select-estado
     } else {
       alert('No se pudo actualizar el estado (request failed)');
     }
+  });
+});
+
+// Inicializar valor previo al cargar la página para cada select-estado-cliente
+$(document).ready(function() {
+  $('.select-estado-cliente').each(function() {
+    var $s = $(this);
+    var v = $s.val();
+    $s.data('previous', v !== undefined ? v : null);
+  });
+  // Actualizar data previous cuando el select recibe foco (por seguridad)
+  $(document).on('focus', '.select-estado-cliente', function() {
+    var $s = $(this);
+    $s.data('previous', $s.val());
   });
 });

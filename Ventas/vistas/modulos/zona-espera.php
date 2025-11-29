@@ -16,7 +16,6 @@
     <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Clientes en Zona de Espera</h3>
-      </div>
       <!-- Botón Mostrar/Ocultar Columnas -->
       <div class="column-toggle-container" style="margin-top:10px;">
         <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -48,6 +47,10 @@
             <div class="column-toggle-item">
               <input type="checkbox" class="column-toggle-checkbox" data-table="tablaZonaEspera" data-column="col-correo" checked>
               <label>Observacion</label>
+            </div>
+            <div class="column-toggle-item">
+              <input type="checkbox" class="column-toggle-checkbox" data-table="tablaZonaEspera" data-column="col-motivo" checked>
+              <label>Motivo</label>
             </div>
             <div class="column-toggle-item">
               <input type="checkbox" class="column-toggle-checkbox" data-table="tablaZonaEspera" data-column="col-ciudad" checked>
@@ -85,6 +88,49 @@
         </div>
       </div>
 
+      <?php include 'advanced_search.php'; ?>
+
+            <script>
+            // Abrir modal de edición y enfocar motivo si la URL contiene ?open_motivo_id=ID
+            $(function(){
+              try {
+                var params = new URLSearchParams(window.location.search);
+                if (params.has('open_motivo_id')) {
+                  var idCliente = params.get('open_motivo_id');
+                  if (idCliente) {
+                    var datos = new FormData();
+                    datos.append('idCliente', idCliente);
+                    fetch('ajax/clientes.ajax.php', { method: 'POST', body: datos })
+                      .then(function(res){ return res.json(); })
+                      .then(function(cliente){
+                        if (!cliente || !cliente.id) return;
+                        // Rellenar campos del modal de edición
+                        $('#idCliente').val(cliente.id || '');
+                        $('#editarNombre').val(cliente.nombre || '');
+                        $('#editarTipo').val(cliente.tipo || '');
+                        $('#editarDocumento').val(cliente.documento || '');
+                        $('#editarTelefono').val(cliente.telefono || '');
+                        $('#editarCorreo').val(cliente.correo || '');
+                        $('#editarMotivo').val(cliente.motivo || '');
+                        $('#editarCiudad').val(cliente.ciudad || '');
+                        $('#editarMigracion').val(cliente.migracion || '');
+                        $('#editarReferencia').val(cliente.referencia || '');
+                        $('#editarFechaContacto').val(cliente.fecha_contacto || '');
+                        $('#editarEmpresa').val(cliente.empresa || '');
+                        // Mostrar modal y enfocar motivo
+                        $('#modalActualizarClientes').modal('show');
+                        setTimeout(function(){ $('#editarMotivo').focus(); }, 300);
+                        // Remover el parámetro de la URL
+                        params.delete('open_motivo_id');
+                        var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                        window.history.replaceState({}, document.title, newUrl);
+                      }).catch(function(err){ console.error('Error al cargar cliente para motivo', err); });
+                  }
+                }
+              } catch(e) { console.error(e); }
+            });
+            </script>
+
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaZonaEspera">
           <thead>
@@ -95,6 +141,7 @@
               <th data-column="col-documento">Documento</th>
               <th data-column="col-telefono">Teléfono</th>
               <th data-column="col-correo">Observacion</th>
+              <th data-column="col-motivo">Motivo</th>
               <th data-column="col-ciudad">Ciudad</th>
               <th data-column="col-migracion">Migración</th>
               <th data-column="col-referencia">Referencia</th>
@@ -117,6 +164,7 @@
               echo '<td data-column="col-documento">'.$value["documento"].'</td>';
               echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
               echo '<td data-column="col-correo">'.$value["correo"].'</td>'; // Mostrar como Observacion
+              echo '<td data-column="col-motivo">'.(isset($value["motivo"]) ? $value["motivo"] : '').'</td>';
               echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
               echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
               echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
@@ -132,10 +180,11 @@
                       .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
                    .'</select>'
               .'</td>';
-              echo '<td data-column="col-acciones">
-                      <div class="btn-group">
-                      <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-                      <button class="btn btn-success btnReactivarCliente" idCliente="'.$value["id"].'"><i class="fa fa-refresh"></i></button>';
+              echo '<td data-column="col-acciones">'
+                  .'<div class="btn-group">'
+                  .'<button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>'
+                  .'<button class="btn btn-success btnReactivarCliente" idCliente="'.$value["id"].'"><i class="fa fa-refresh"></i></button>'
+                  .'<button class="btn btn-info btnInfoCliente" idCliente="'.$value["id"].'" title="Info"><i class="fa fa-info"></i></button>';
                       if($_SESSION["perfil"] !== "Vendedor") {
                         echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="zona-espera"><i class="fa fa-trash"></i></button>';
                       }
@@ -154,121 +203,5 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE EN ZONA DE ESPERA
 =========================================== -->
-<div id="modalActualizarClientes" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#3c8dbc; color:white;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Editar Cliente en Zona de Espera</h4>
-        </div>
-        <div class="modal-body">
-          <div class="box-body">
-            <input type="hidden" id="idCliente" name="idCliente">
-            <input type="hidden" name="ruta" value="zona-espera">
-
-            <!-- Campos editables -->
-            <div class="form-group">
-              <label for="editarNombre">Nombre <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control input-lg" id="editarNombre" name="editarNombre" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarTipo">Tipo <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-users"></i></span>
-                <select class="form-control input-lg" id="editarTipo" name="editarTipo" required>
-                  <option value="">Seleccionar tipo</option>
-                  <option value="DNI">DNI</option>
-                  <option value="RUC">RUC</option>
-                  <option value="otros">otros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarDocumento">Documento <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
-                <input type="text" class="form-control input-lg" id="editarDocumento" name="editarDocumento" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarTelefono">Teléfono <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" maxlength="15" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCorreo">Observacion</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCorreo" name="editarCorreo">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCiudad">Ciudad</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCiudad" name="editarCiudad">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarMigracion">Migración</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                <input type="text" class="form-control input-lg" id="editarMigracion" name="editarMigracion">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarReferencia">Referencia</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                <select class="form-control input-lg" id="editarReferencia" name="editarReferencia">
-                  <option value="">Seleccionar referencia</option>
-                  <option value="TIK TOK">TIK TOK</option>
-                  <option value="FACEBOOK">FACEBOOK</option>
-                  <option value="INSTAGRAM">INSTAGRAM</option>
-                  <option value="whatsapp">whatsapp</option>
-                  <option value="otros">otros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarFechaContacto">Fecha de Contacto <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaContacto" name="editarFechaContacto" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarEmpresa">Empresa <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-building"></i></span>
-                <input type="text" class="form-control input-lg" id="editarEmpresa" name="editarEmpresa" required>
-              </div>
-            </div>
-            <div class="form-group" style="display:none;">
-              <label for="editarFechaCreacion">Fecha de Creación</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Editar Cliente</button>
-        </div>
-        <?php
-          ControladorCliente::ctrEditarCliente();
-        ?>
-      </form>
-    </div>
-  </div>
-</div>
-
-<script src="vistas/js/clientes.js"></script>
+<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
+<?php include 'modulos/partials/modal_info_cliente.php'; ?>

@@ -1,4 +1,7 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
+
 require_once "../controladores/evento.controlador.php";
 require_once "../modelos/evento.modelo.php";
 
