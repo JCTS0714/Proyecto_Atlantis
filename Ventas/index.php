@@ -1,4 +1,14 @@
 <?php
+// If this file is placed at the webroot (e.g. public_html) and a `Ventas`
+// subfolder exists, forward execution into that folder so the app loads
+// correctly without changing all the internal require paths.
+$__base_dir_name = strtolower(basename(__DIR__));
+if ($__base_dir_name !== 'ventas' && (is_dir(__DIR__ . '/Ventas') || is_dir(__DIR__ . '/ventas')) ) {
+    $targetDir = is_dir(__DIR__ . '/Ventas') ? __DIR__ . '/Ventas' : __DIR__ . '/ventas';
+    chdir($targetDir);
+    require $targetDir . '/index.php';
+    exit;
+}
 // Configurar parámetros de cookie ANTES de iniciar sesión
 $cookieLifetime = 30 * 24 * 60 * 60; // 30 días
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);

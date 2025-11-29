@@ -34,3 +34,27 @@
 #advanced-search-panel-inline {
   margin: 10px 15px 0 15px;
 }
+
+/* Fix Select2 inside large input groups to match .input-lg height */
+.select2-container--default .select2-selection--single {
+  height: 46px; /* matches Bootstrap .input-lg height roughly */
+  padding: 6px 12px;
+  border-radius: 0;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 32px; /* vertically center text inside the selection */
+}
+.select2-container .select2-selection--single .select2-selection__arrow {
+  height: 46px;
+}
+
+/* Ensure Select2 dropdown occupies full width of the control */
+#nuevoClienteSelect, #editarClienteSelect {
+  width: 100% !important;
+}
+
+/* On small screens keep consistent spacing */
+@media (max-width: 768px) {
+  .select2-container--default .select2-selection--single { height: 44px; }
+  .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 30px; }
+}

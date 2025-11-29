@@ -7,14 +7,13 @@ $(document).ready(function() {
     var nombreCliente = urlParams.get('nombreCliente');
 
     if (idCliente && nombreCliente) {
-        // Preseleccionar cliente y abrir modal
-        $('#nuevoNombreCliente').val(decodeURIComponent(nombreCliente));
-        $('#idClienteSeleccionado').val(idCliente);
-        $('#nuevoNombreCliente').prop('disabled', true);
-
+        // Marcar para preselección: aplicaremos la selección cuando el modal se muestre
+        window.preselectIncidencia = {
+            id: idCliente,
+            name: decodeURIComponent(nombreCliente)
+        };
         // Generar correlativo antes de abrir el modal
         generarCorrelativo();
-
         $('#modalRegistrarIncidencia').modal('show');
     }
 
@@ -38,37 +37,88 @@ $(document).ready(function() {
         });
     }
 
-    // Configurar autocomplete para nombre del cliente
-    $('#nuevoNombreCliente').autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: 'ajax/incidencias.ajax.php',
-                method: 'GET',
-                data: {
-                    action: 'buscarClientes',
-                    term: request.term
-                },
+    // Inicializar búsqueda de cliente usando Select2 (mejor experiencia que autocomplete)
+    // Reutiliza el endpoint `ajax/clientes_oportunidades.ajax.php` usado por CRM
+    // Mantener el input original como referencia pero ocultarlo y usar un <select> para Select2
+    $('#nuevoNombreCliente').hide();
+    if ($('#nuevoClienteSelect').length === 0) {
+        $('<select id="nuevoClienteSelect" class="form-control input-lg" style="width:100%"></select>').insertAfter('#nuevoNombreCliente');
+    }
+
+    function initNuevoClienteSelect2() {
+        var $sel = $('#nuevoClienteSelect');
+        try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+
+        $sel.select2({
+            placeholder: 'Buscar cliente',
+            minimumInputLength: 1,
+            dropdownParent: $('#modalRegistrarIncidencia'),
+            ajax: {
+                url: 'ajax/clientes_oportunidades.ajax.php',
                 dataType: 'json',
-                success: function(data) {
-                    response(data);
-                }
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            $('#nuevoNombreCliente').val(ui.item.label);
-            $('#idClienteSeleccionado').val(ui.item.value);
-            return false;
-        },
-        focus: function(event, ui) {
-            $('#nuevoNombreCliente').val(ui.item.label);
-            return false;
+                delay: 250,
+                data: function(params) {
+                    return { q: params.term };
+                },
+                processResults: function(data) {
+                    if (!Array.isArray(data)) return { results: [] };
+                    return {
+                        results: data.map(function(cliente) {
+                            return { id: cliente.id, text: cliente.nombre };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $sel.on('select2:select', function(e) {
+            var data = e.params.data;
+            $('#idClienteSeleccionado').val(data.id);
+            // mantener compatibilidad visual: poner texto en el input oculto (por si algo lo lee)
+            $('#nuevoNombreCliente').val(data.text);
+        });
+
+        // Cuando se limpia el select, limpiar el id oculto
+        $sel.on('select2:clear', function() {
+            $('#idClienteSeleccionado').val('');
+            $('#nuevoNombreCliente').val('');
+        });
+    }
+
+    initNuevoClienteSelect2();
+    $('#modalRegistrarIncidencia').on('shown.bs.modal', function() {
+        initNuevoClienteSelect2();
+        // Si hay una preselección pendiente (viene desde la tabla clientes), aplicarla ahora
+        if (window.preselectIncidencia && window.preselectIncidencia.id) {
+            var decName = window.preselectIncidencia.name || '';
+            var id = window.preselectIncidencia.id;
+            try {
+                var option = new Option(decName, id, true, true);
+                $('#nuevoClienteSelect').empty().append(option).trigger('change');
+                $('#nuevoClienteSelect').prop('disabled', true);
+                $('#nuevoNombreCliente').hide();
+                $('#idClienteSeleccionado').val(id);
+            } catch(e) {
+                // fallback: setear el input tradicional y deshabilitar
+                $('#nuevoNombreCliente').val(decName).prop('disabled', true);
+                $('#idClienteSeleccionado').val(id);
+            }
+            // Limpiar la bandera para futuros usos
+            delete window.preselectIncidencia;
+        } else {
+            // Asegurar que cuando el modal se abre manualmente (botón registrar incidencia)
+            // el select esté habilitado y vacío
+            try { $('#nuevoClienteSelect').prop('disabled', false).val(null).trigger('change'); } catch(e) {}
+            $('#idClienteSeleccionado').val('');
+            $('#nuevoNombreCliente').val('').prop('disabled', false); // keep the original text input hidden; Select2 is primary control
         }
     });
 
-    // Limpiar campo oculto cuando se cambia el texto manualmente
+    // Si el usuario edita el texto manualmente (por compatibilidad), limpiar el id
     $('#nuevoNombreCliente').on('input', function() {
         $('#idClienteSeleccionado').val('');
+        try { $('#nuevoClienteSelect').val(null).trigger('change'); } catch(e) {}
     });
 
     // Validación y envío AJAX del formulario de crear incidencia
@@ -195,11 +245,19 @@ $(document).ready(function() {
     // Recargar tabla después de crear incidencia
     $('#modalRegistrarIncidencia').on('hidden.bs.modal', function() {
         cargarIncidencias();
+        // Reset Select2 and inputs
+        try { $('#nuevoClienteSelect').val(null).trigger('change'); } catch(e) {}
+        $('#idClienteSeleccionado').val('');
+        $('#nuevoNombreCliente').val('').prop('disabled', false); // keep hidden
     });
 
     // Recargar tabla después de editar incidencia
     $('#modalEditarIncidencia').on('hidden.bs.modal', function() {
         cargarIncidencias();
+        // Reset edit Select2 and inputs
+        try { $('#editarClienteSelect').val(null).trigger('change'); } catch(e) {}
+        $('#editarIdClienteSeleccionado').val('');
+        $('#editarNombreCliente').val('').prop('disabled', false); // keep hidden; Select2 is primary control
     });
 
     // Botón editar incidencia
@@ -225,6 +283,15 @@ $(document).ready(function() {
                     $('#editarNombreIncidencia').val(incidencia.nombre_incidencia);
                     $('#editarNombreCliente').val(incidencia.nombre_cliente || '');
                     $('#editarIdClienteSeleccionado').val(incidencia.cliente_id);
+                    // Si el select2 existe, setear la opción seleccionada y deshabilitarla (comportamiento previo)
+                    if ($('#editarClienteSelect').length) {
+                        var opt = new Option(incidencia.nombre_cliente || '', incidencia.cliente_id, true, true);
+                        $('#editarClienteSelect').empty().append(opt).trigger('change');
+                        $('#editarClienteSelect').prop('disabled', true);
+                        $('#editarNombreCliente').hide();
+                    } else {
+                        $('#editarNombreCliente').prop('disabled', true);
+                    }
                     $('#editarFecha').val(incidencia.fecha_solicitud);
                     $('#editarPrioridad').val(incidencia.prioridad);
                     $('#editarObservaciones').val(incidencia.observaciones || '');
@@ -249,45 +316,57 @@ $(document).ready(function() {
         });
     });
 
-    // Configurar autocomplete para editar cliente
-    $('#editarNombreCliente').autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: 'ajax/incidencias.ajax.php',
-                method: 'GET',
-                data: {
-                    action: 'buscarClientes',
-                    term: request.term
-                },
+    // Inicializar Select2 para editar cliente (similar a nuevo)
+    $('#editarNombreCliente').hide();
+    if ($('#editarClienteSelect').length === 0) {
+        $('<select id="editarClienteSelect" class="form-control input-lg" style="width:100%"></select>').insertAfter('#editarNombreCliente');
+    }
+
+    function initEditarClienteSelect2() {
+        var $sel = $('#editarClienteSelect');
+        try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+
+        $sel.select2({
+            placeholder: 'Buscar cliente',
+            minimumInputLength: 1,
+            dropdownParent: $('#modalEditarIncidencia'),
+            ajax: {
+                url: 'ajax/clientes_oportunidades.ajax.php',
                 dataType: 'json',
-                success: function(data) {
-                    response(data);
-                }
-            });
-        },
-        minLength: 2,
-        select: function(event, ui) {
-            $('#editarNombreCliente').val(ui.item.label);
-            $('#editarIdClienteSeleccionado').val(ui.item.value);
-            return false;
-        },
-        focus: function(event, ui) {
-            $('#editarNombreCliente').val(ui.item.label);
-            return false;
-        }
-    });
+                delay: 250,
+                data: function(params) {
+                    return { q: params.term };
+                },
+                processResults: function(data) {
+                    if (!Array.isArray(data)) return { results: [] };
+                    return {
+                        results: data.map(function(cliente) {
+                            return { id: cliente.id, text: cliente.nombre };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
 
-    // Limpiar campo oculto al editar cliente
-    $('#editarNombreCliente').on('input', function() {
-        if ($(this).val() !== $(this).data('selected-label')) {
+        $sel.on('select2:select', function(e) {
+            var data = e.params.data;
+            $('#editarIdClienteSeleccionado').val(data.id);
+            $('#editarNombreCliente').val(data.text);
+        });
+
+        $sel.on('select2:clear', function() {
             $('#editarIdClienteSeleccionado').val('');
-        }
+            $('#editarNombreCliente').val('');
+        });
+    }
+
+    initEditarClienteSelect2();
+    $('#modalEditarIncidencia').on('shown.bs.modal', function() {
+        initEditarClienteSelect2();
     });
 
-    // Deshabilitar campo de cliente al abrir modal de edición
-    $('#modalEditarIncidencia').on('show.bs.modal', function() {
-        $('#editarNombreCliente').prop('disabled', true);
-    });
+    // Cuando se abra el modal de edición, deshabilitamos el select si corresponde más abajo cuando se cargue el registro
 
     // Validación del formulario de edición
     $('#modalEditarIncidencia form').on('submit', function(e) {

@@ -25,7 +25,8 @@ $forceHttp = $config['FORCE_HTTP'] ?? getenv('FORCE_HTTP');
 // Forzar protocolo HTTP en desarrollo/local si se solicita
 if ($appEnv === 'local' || $forceHttp == '1') {
 	$protocol = 'http';
-	$host = getenv('BASE_HOST') ?: (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
+	// Priorizar configuración explícita en config/local.php (clave BASE_HOST)
+	$host = $config['BASE_HOST'] ?? getenv('BASE_HOST') ?: (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
 } else {
 	// Detectar protocolo (producción)
 	$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);

@@ -1,4 +1,13 @@
 
+	// Silence debug/info logs unless `window.PLANTILLA_DEV === true`
+	// Set `window.PLANTILLA_DEV = true` in console for temporary local debugging.
+	if (!(window.PLANTILLA_DEV === true)) {
+		if (window.console) {
+			console.debug = function(){};
+			console.info = function(){};
+		}
+	}
+
 	// Global AJAX error logger: helps surface server response bodies for 500s/HTML errors
 	$(document).ajaxError(function(event, jqxhr, settings, thrownError) {
 		try {
@@ -79,13 +88,39 @@ function initContactTable(tableId) {
 			dtOptions.processing = true;
 			dtOptions.ajax = {
 				url: ajaxUrl,
-				type: 'GET',
-				data: function(d) {
+				type: 'POST', // use POST to reliably send filters and avoid URL length issues
+				cache: false,
+						beforeSend: function(jqXhr, settings) {
+							try { console.debug('DataTable ajax beforeSend for', tableId, settings.url); } catch(e){}
+						},
+						data: function(d) {
 					// merge last known advanced filters for this table
 					var filters = window._advancedFilters && window._advancedFilters[tableId] ? window._advancedFilters[tableId] : {};
-					return $.extend({}, d, filters);
+							try {
+								var merged = $.extend({}, d, filters);
+								// Add debug flag so server can return diagnostic info
+								merged.adv_debug = 1;
+								if (window.console && window.console.debug) console.debug('DataTable ajax data for', tableId, { dtParams: d, filters: filters, merged: merged });
+								return merged;
+							} catch(e) {
+								console.warn('Error merging DataTable params', e);
+								return d;
+							}
 				}
-			};
+						,dataSrc: function(json) {
+							try { console.debug('DataTable ajax response for', tableId, json); } catch(e){}
+							// store last ajax response for debugging
+							if (!window._lastAjaxResponse) window._lastAjaxResponse = {};
+							window._lastAjaxResponse[tableId] = json;
+							if (!json) return [];
+							// If server returned DataTables error format, log it
+							if (json.error) console.error('DataTable server error:', json.error);
+							return json.data || [];
+						},
+						error: function(xhr, textStatus, errorThrown) {
+							console.error('DataTable AJAX error for', tableId, { status: xhr.status, statusText: xhr.statusText, responseText: xhr.responseText });
+						}
+					};
 		}
 
 		// store instance
@@ -215,15 +250,106 @@ initContactTable('tablaZonaEspera');
 		if (!window._advancedFilters) window._advancedFilters = {};
 
 		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
-			// If server-side table exists, set filters and reload via ajax
+			// If server-side table exists, use debugReplaceTableWithRaw to fetch filtered rows and show them client-side
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = filters;
-				try { window._serverTables[id].ajax.reload(null, false); } catch(err) { console.warn('reload failed', err); }
+				try {
+					console.debug('plantilla: using debugReplaceTableWithRaw for', id);
+					// Replace table with raw rows and reinit client-side DataTable
+					debugReplaceTableWithRaw(id, filters);
+				} catch(err) { console.warn('debugReplaceTableWithRaw failed', err); }
 			} else {
+				console.debug('plantilla: server table not found for', id, 'falling back to client filter');
 				applyFiltersToTable(id, filters);
 			}
 		});
 	});
+
+// Debug helpers: only enabled when `window.PLANTILLA_DEV === true`.
+if (window.PLANTILLA_DEV === true) {
+	// expose a function to manually reload a server table and print its last server JSON
+	window.debugReloadTable = function(tableId){
+		if (window._serverTables && window._serverTables[tableId]){
+			try {
+				console.debug('debugReloadTable: forcing reload for', tableId);
+				window._serverTables[tableId].ajax.reload(function(){
+					try { var js = window._serverTables[tableId].ajax.json(); console.debug('debugReloadTable: server json for', tableId, js); } catch(e){ console.warn('debugReloadTable: could not read ajax.json', e); }
+				}, false);
+			} catch(e){ console.error('debugReloadTable error', e); }
+		} else {
+			console.warn('debugReloadTable: no server table registered for', tableId);
+		}
+	};
+
+	// fetch raw server data and replace the table tbody (temporary, destructive)
+	window.debugReplaceTableWithRaw = function(tableId, filters){
+		filters = filters || (window._advancedFilters && window._advancedFilters[tableId]) || {};
+		var url = $('#' + tableId).data('ajax') || ('ajax/datatable-clientes.ajax.php');
+		var postData = {
+			adv_debug: 1,
+			draw: 1,
+			start: 0,
+			length: 1000,
+			nombre: filters.nombre || '',
+			telefono: filters.telefono || '',
+			documento: filters.documento || '',
+			adv_nombre: filters.nombre || '',
+			adv_telefono: filters.telefono || '',
+			adv_documento: filters.documento || '',
+			adv_periodo: filters.periodo || '',
+			adv_fecha_inicio: filters.fecha_inicio || '',
+			adv_fecha_fin: filters.fecha_fin || ''
+		};
+
+		console.debug('debugReplaceTableWithRaw: sending POST to', url, postData);
+		$.ajax({
+			url: url,
+			method: 'POST',
+			data: postData,
+			dataType: 'json'
+		}).done(function(resp){
+			console.debug('debugReplaceTableWithRaw: server response', resp);
+			if(!resp){ console.warn('No response'); return; }
+
+			// Build a debug banner showing counts only when 0 or 1 row fetched (helpful for pinpointing)
+			try {
+				// Debug banner removed: do not insert debug info into the DOM in production
+			} catch(e){ console.warn('Could not render debug banner', e); }
+
+			// Replace table body (destroy DataTable temporarily if exists)
+			try {
+				if ($.fn.DataTable.isDataTable('#'+tableId)) {
+					try { $('#'+tableId).DataTable().destroy(); } catch(e){ console.warn('Error destroying DataTable', e); }
+				}
+
+				var $tbody = $('#'+tableId+' tbody');
+				if ($tbody.length === 0) {
+					$('#'+tableId).append('<tbody></tbody>');
+					$tbody = $('#'+tableId+' tbody');
+				}
+				$tbody.empty();
+				if (Array.isArray(resp.data) && resp.data.length>0) {
+					resp.data.forEach(function(row){
+						// row is expected to be array of columns
+						var tr = '<tr>';
+						row.forEach(function(col){ tr += '<td>'+ (col === null ? '' : col) +'</td>'; });
+						tr += '</tr>';
+						$tbody.append(tr);
+					});
+				} else {
+					$tbody.append('<tr><td colspan="14" style="text-align:center;">No hay datos (resp.data vacío)</td></tr>');
+				}
+
+			} catch(e){ console.error('debugReplaceTableWithRaw failed', e); }
+		}).fail(function(xhr){
+			console.error('debugReplaceTableWithRaw AJAX failed', xhr.status, xhr.responseText);
+		});
+	};
+} else {
+	// stubs that avoid errors but inform the developer how to enable debug helpers
+	window.debugReloadTable = function(tableId){ console.warn('debugReloadTable disabled; set window.PLANTILLA_DEV = true to enable'); };
+	window.debugReplaceTableWithRaw = function(tableId, filters){ console.warn('debugReplaceTableWithRaw disabled; set window.PLANTILLA_DEV = true to enable'); };
+}
 
 	window.addEventListener('advancedSearch:clear', function(){
 		// Clear column searches and redraw or reload server tables

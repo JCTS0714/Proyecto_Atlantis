@@ -13,12 +13,21 @@ $length = isset($_GET['length']) ? intval($_GET['length']) : (isset($_POST['leng
 
 // Advanced search filters (may come via GET or POST)
 $filters = [];
-$filters['nombre'] = isset($_REQUEST['nombre']) ? trim($_REQUEST['nombre']) : '';
-$filters['telefono'] = isset($_REQUEST['telefono']) ? trim($_REQUEST['telefono']) : '';
-$filters['documento'] = isset($_REQUEST['documento']) ? trim($_REQUEST['documento']) : '';
-$filters['periodo'] = isset($_REQUEST['periodo']) ? trim($_REQUEST['periodo']) : '';
-$filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fecha_inicio']) : '';
-$filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : '';
+// Accept both direct names and the advanced-search prefixed names (adv_*) coming from the UI
+$filters['nombre'] = isset($_REQUEST['nombre']) ? trim($_REQUEST['nombre']) : (isset($_REQUEST['adv_nombre']) ? trim($_REQUEST['adv_nombre']) : '');
+$filters['telefono'] = isset($_REQUEST['telefono']) ? trim($_REQUEST['telefono']) : (isset($_REQUEST['adv_telefono']) ? trim($_REQUEST['adv_telefono']) : '');
+$filters['documento'] = isset($_REQUEST['documento']) ? trim($_REQUEST['documento']) : (isset($_REQUEST['adv_documento']) ? trim($_REQUEST['adv_documento']) : '');
+$filters['periodo'] = isset($_REQUEST['periodo']) ? trim($_REQUEST['periodo']) : (isset($_REQUEST['adv_periodo']) ? trim($_REQUEST['adv_periodo']) : '');
+$filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fecha_inicio']) : (isset($_REQUEST['adv_fecha_inicio']) ? trim($_REQUEST['adv_fecha_inicio']) : '');
+$filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : (isset($_REQUEST['adv_fecha_fin']) ? trim($_REQUEST['adv_fecha_fin']) : '');
+
+// Debug mode flag (client can request with adv_debug=1)
+$debugMode = isset($_REQUEST['adv_debug']) && intval($_REQUEST['adv_debug']) === 1;
+
+// Log incoming filters only when debug mode requested
+if ($debugMode) {
+  error_log('datatable-clientes incoming filters: ' . json_encode($filters));
+}
 
 $table = 'clientes';
 
@@ -50,36 +59,60 @@ if ($filters['periodo'] === 'today') {
 $sqlWhere = '';
 if (!empty($where)) { $sqlWhere = ' WHERE ' . implode(' AND ', $where); }
 
-$pdo = Conexion::conectar();
 
-// Get total records
-$totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM $table");
-$totalStmt->execute();
-$totalTotal = $totalStmt->fetch(PDO::FETCH_ASSOC);
-$recordsTotal = isset($totalTotal['total']) ? intval($totalTotal['total']) : 0;
-
-// Get filtered count
-$countSql = "SELECT COUNT(DISTINCT c.id) as total FROM $table c" . $sqlWhere;
-$countStmt = $pdo->prepare($countSql);
-foreach ($params as $k => $v) { $countStmt->bindValue($k, $v); }
-$countStmt->execute();
-$countRow = $countStmt->fetch(PDO::FETCH_ASSOC);
-$recordsFiltered = isset($countRow['total']) ? intval($countRow['total']) : 0;
-
-// Fetch paginated data
-$dataSql = "SELECT DISTINCT c.* FROM $table c" . $sqlWhere . " ORDER BY c.fecha_creacion DESC LIMIT :start, :length";
-$dataStmt = $pdo->prepare($dataSql);
-foreach ($params as $k => $v) { $dataStmt->bindValue($k, $v); }
-$dataStmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
-$dataStmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
-
+$rows = [];
+// Debug mode if client requested it
+$debugMode = isset($_REQUEST['adv_debug']) && intval($_REQUEST['adv_debug']) === 1;
+$debugInfo = [];
 try {
+  $pdo = Conexion::conectar();
+
+  // Get total records
+  $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM $table");
+  $totalStmt->execute();
+  $totalTotal = $totalStmt->fetch(PDO::FETCH_ASSOC);
+  $recordsTotal = isset($totalTotal['total']) ? intval($totalTotal['total']) : 0;
+
+  // Get filtered count
+  $countSql = "SELECT COUNT(DISTINCT c.id) as total FROM $table c" . $sqlWhere;
+  $countStmt = $pdo->prepare($countSql);
+  foreach ($params as $k => $v) { $countStmt->bindValue($k, $v); }
+  $countStmt->execute();
+  $countRow = $countStmt->fetch(PDO::FETCH_ASSOC);
+  $recordsFiltered = isset($countRow['total']) ? intval($countRow['total']) : 0;
+
+  // Fetch paginated data
+  $dataSql = "SELECT DISTINCT c.* FROM $table c" . $sqlWhere . " ORDER BY c.fecha_creacion DESC LIMIT :start, :length";
+  $dataStmt = $pdo->prepare($dataSql);
+  foreach ($params as $k => $v) { $dataStmt->bindValue($k, $v); }
+  $dataStmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+  $dataStmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
+
   $dataStmt->execute();
   $rows = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+  if ($debugMode) {
+    $debugInfo['filters'] = $filters;
+    $debugInfo['sqlWhere'] = $sqlWhere;
+    $debugInfo['countSql'] = $countSql;
+    $debugInfo['dataSql'] = $dataSql;
+    $debugInfo['params'] = $params;
+  }
+
 } catch (PDOException $e) {
   error_log('datatable-clientes ERROR: ' . $e->getMessage());
-  $rows = [];
+  // In case of error, return a valid DataTables structure with zero rows
+  $response = [
+    'draw' => $draw,
+    'recordsTotal' => isset($recordsTotal) ? intval($recordsTotal) : 0,
+    'recordsFiltered' => isset($recordsFiltered) ? intval($recordsFiltered) : 0,
+    'data' => []
+  ];
+  if ($debugMode) $response['debug'] = $debugInfo;
+  echo json_encode($response);
+  exit;
 }
+
 
 $response = [
   'draw' => $draw,
@@ -87,6 +120,20 @@ $response = [
   'recordsFiltered' => $recordsFiltered,
   'data' => []
 ];
+
+// Attach debug info only when requested by client
+if ($debugMode) {
+  $response['debug'] = array_merge($debugInfo, [
+    'filters' => $filters,
+    'sqlWhere' => $sqlWhere,
+    'params' => $params,
+    'countSql' => isset($countSql) ? $countSql : null,
+    'dataSql' => isset($dataSql) ? $dataSql : null,
+    'recordsTotal' => $recordsTotal,
+    'recordsFiltered' => $recordsFiltered,
+    'rowsFetched' => is_array($rows) ? count($rows) : 0
+  ]);
+}
 
 // Format data rows to match table columns order used in clientes.php
 foreach ($rows as $k => $r) {

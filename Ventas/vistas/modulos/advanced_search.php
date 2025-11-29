@@ -109,27 +109,48 @@
             var fInline = document.getElementById('form-advanced-search-inline');
             function buildFilters(form){
               try {
+                function clean(v){
+                  try { return (v||'').toString().replace(/[\t\r\n]+/g,' ').trim(); } catch(e) { return ''; }
+                }
                 return {
-                  nombre: (form.querySelector('[name=adv_nombre]') && form.querySelector('[name=adv_nombre]').value) || '',
-                  telefono: (form.querySelector('[name=adv_telefono]') && form.querySelector('[name=adv_telefono]').value) || '',
-                  documento: (form.querySelector('[name=adv_documento]') && form.querySelector('[name=adv_documento]').value) || '',
-                  periodo: (form.querySelector('[name=adv_periodo]') && form.querySelector('[name=adv_periodo]').value) || '',
-                  fecha_inicio: (form.querySelector('[name=adv_fecha_inicio]') && form.querySelector('[name=adv_fecha_inicio]').value) || '',
-                  fecha_fin: (form.querySelector('[name=adv_fecha_fin]') && form.querySelector('[name=adv_fecha_fin]').value) || ''
+                  nombre: clean(form.querySelector('[name=adv_nombre]') && form.querySelector('[name=adv_nombre]').value),
+                  telefono: clean(form.querySelector('[name=adv_telefono]') && form.querySelector('[name=adv_telefono]').value),
+                  documento: clean(form.querySelector('[name=adv_documento]') && form.querySelector('[name=adv_documento]').value),
+                  periodo: clean(form.querySelector('[name=adv_periodo]') && form.querySelector('[name=adv_periodo]').value),
+                  fecha_inicio: clean(form.querySelector('[name=adv_fecha_inicio]') && form.querySelector('[name=adv_fecha_inicio]').value),
+                  fecha_fin: clean(form.querySelector('[name=adv_fecha_fin]') && form.querySelector('[name=adv_fecha_fin]').value)
                 };
               } catch(e){ return {}; }
             }
 
             function logSubmit(e){
-              try { console.log('advanced_search-inline-debug: submit on', this && this.id, 'target:', e && e.target); } catch(err){}
+              try {
+                var _dev = (window.PLANTILLA_DEV === true);
+                if (_dev) { try { console.log('advanced_search-inline-debug: submit on', this && this.id, 'target:', e && e.target); } catch(err){} }
+              } catch(ignore){}
               try {
                 var filters = buildFilters(this || e.target || document.getElementById('form-advanced-search-inline'));
-                console.log('advanced_search-inline-debug: built filters', filters);
-                try { window.dispatchEvent(new CustomEvent('advancedSearch:apply', { detail: filters })); console.log('advanced_search-inline-debug: dispatched advancedSearch:apply'); } catch(ex) { console.warn('dispatch failed', ex); }
-              } catch(err){ console.warn('advanced_search-inline-debug error building/dispatching', err); }
+                if (window.PLANTILLA_DEV === true) { try { console.log('advanced_search-inline-debug: built filters', filters); } catch(e){} }
+                try { window.dispatchEvent(new CustomEvent('advancedSearch:apply', { detail: filters })); if (window.PLANTILLA_DEV === true) try { console.log('advanced_search-inline-debug: dispatched advancedSearch:apply'); } catch(e){} } catch(ex) { if (window.PLANTILLA_DEV === true) console.warn('dispatch failed', ex); }
+              } catch(err){ if (window.PLANTILLA_DEV === true) console.warn('advanced_search-inline-debug error building/dispatching', err); }
             }
             if (fTop && !fTop._dbgAttached) { fTop.addEventListener('submit', logSubmit); fTop._dbgAttached = true; }
             if (fInline && !fInline._dbgAttached) { fInline.addEventListener('submit', logSubmit); fInline._dbgAttached = true; }
+
+            // jQuery fallback: attach direct click handler to the Buscar button(s) to ensure event fires
+            try {
+              if (window.jQuery) {
+                (function($){
+                  $(document).on('click', '.adv-apply', function(ev){
+                    ev.preventDefault();
+                    var $form = $(this).closest('form');
+                    var filters = buildFilters($form[0]);
+                    try { if (window.PLANTILLA_DEV === true) console.log('advanced_search-jquery-fallback: dispatching', filters); } catch(e){}
+                    try { window.dispatchEvent(new CustomEvent('advancedSearch:apply', { detail: filters })); } catch(ex) { if (window.PLANTILLA_DEV === true) console.warn('dispatch failed (jquery fallback)', ex); }
+                  });
+                })(window.jQuery);
+              }
+            } catch(e){ console.warn('advanced_search jquery fallback failed', e); }
           });
         } catch(e){ console.warn('advanced_search debug helper failed', e); }
       })();

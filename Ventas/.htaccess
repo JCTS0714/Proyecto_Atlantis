@@ -1,3 +1,29 @@
+# Archivo .htaccess para desarrollo local
+# Ajusta `RewriteBase` si mueves el proyecto a otra ruta en el servidor.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Si tu proyecto está en un subdirectorio, ajusta RewriteBase manualmente.
+  # Ej: RewriteBase /Proyecto_Atlantis/Ventas/
+  # Por defecto no seteamos RewriteBase para que funcione en caminos raíz y subcarpetas.
+
+  # No reescribir si el archivo o directorio existe
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Redirigir todo lo demás a index.php (preserva query string)
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+# Protecciones adicionales
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Evitar listado de directorios
+Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
