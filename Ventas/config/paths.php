@@ -37,9 +37,25 @@ if ($appEnv === 'local' || $forceHttp == '1') {
 
 // Path base (carpeta donde está index.php), útil para entornos locales
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '\\/');
+// Normalize scriptDir returned by some environments ('.' or '/')
+if ($scriptDir === '.' || $scriptDir === '\\' || $scriptDir === '/') {
+	$scriptDir = '';
+}
+
+// Normalize host: trim whitespace and remove accidental trailing dots
+$host = is_string($host) ? trim($host) : $host;
+if (is_string($host)) {
+	$host = rtrim($host, '.');
+}
 
 // Construir BASE_URL sin slash final (ej: http://localhost/Proyecto_Atlantis/Ventas)
-define('BASE_URL', $protocol . '://' . $host . $scriptDir);
+$base = $protocol . '://' . $host;
+if ($scriptDir !== '') {
+	// scriptDir already contains leading slash from dirname(); append directly
+	$base .= $scriptDir;
+}
+// Ensure no trailing slash
+define('BASE_URL', rtrim($base, '/'));
 
 // Opcional: ruta absoluta del filesystem a la raíz del proyecto
 define('BASE_PATH', rtrim(str_replace('\\', '/', dirname(__FILE__)), '/'));
