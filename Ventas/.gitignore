@@ -37,3 +37,4 @@ build/
 *.sql
 *.sql.gz
 
+\n# Ignore local per-developer config\nconfig/local.php\n
