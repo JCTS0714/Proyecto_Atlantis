@@ -20,8 +20,12 @@ class ModeloCliente{
       }
 
       $stmt->bindParam(":".$item,$valor,PDO::PARAM_STR);
-
-      $stmt->execute();
+      try {
+        $stmt->execute();
+      } catch (PDOException $e) {
+        error_log("mdlMostrarCliente SELECT ERROR: " . $e->getMessage());
+        return [];
+      }
 
       return $stmt->fetchAll(); /**Nos retorna todas las filas que coinciden */
     }
@@ -29,7 +33,12 @@ class ModeloCliente{
     {
       $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla ORDER BY fecha_creacion DESC");
 
-      $stmt->execute();
+      try {
+        $stmt->execute();
+      } catch (PDOException $e) {
+        error_log("mdlMostrarCliente(ALL) SELECT ERROR: " . $e->getMessage());
+        return [];
+      }
 
       return $stmt->fetchAll(); /**Nos retorna toda las filas de la tabla */
     }
@@ -50,9 +59,16 @@ class ModeloCliente{
     $stmt->bindParam(":".$item1, $valor1, PDO::PARAM_STR);
     $stmt->bindParam(":".$item2, $valor2, PDO::PARAM_STR);
 
-    if ($stmt->execute()) {
-      return "ok";
-    } else {
+    try {
+      if ($stmt->execute()) {
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlActualizarCliente ERROR: " . json_encode($err));
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlActualizarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
   }
@@ -68,11 +84,46 @@ class ModeloCliente{
       // Cuando no hay término de búsqueda, devolver un conjunto limitado para evitar sobrecarga
       $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes ORDER BY nombre ASC LIMIT 50");
     }
-    $stmt->execute();
-    return $stmt->fetchAll();
+    try {
+      $stmt->execute();
+      $result = $stmt->fetchAll();
+    } catch (PDOException $e) {
+      error_log("mdlMostrarClientesParaOportunidad ERROR: " . $e->getMessage());
+      return [];
+    }
+
     $stmt->closeCursor();
     $stmt = null;
+    return $result;
   }
+
+    /* MÉTODO PARA BUSCAR CLIENTE POR TELÉFONO (normalizando caracteres comunes) */
+    static public function mdlBuscarPorTelefono($telefono) {
+      // Normalizar: eliminar todo lo que no sea dígito
+      $telefonoNormalizado = preg_replace('/[^0-9]/', '', $telefono);
+      $stmt = Conexion::conectar()->prepare("SELECT * FROM clientes WHERE REPLACE(REPLACE(REPLACE(telefono, ' ', ''), '-', ''), '+', '') = :telefono LIMIT 1");
+      $stmt->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
+      try {
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      } catch (PDOException $e) {
+        error_log("mdlBuscarPorTelefono ERROR: " . $e->getMessage());
+        return [];
+      }
+    }
+
+    /* MÉTODO PARA BUSCAR CLIENTE POR DOCUMENTO */
+    static public function mdlBuscarPorDocumento($documento) {
+      $stmt = Conexion::conectar()->prepare("SELECT * FROM clientes WHERE documento = :documento LIMIT 1");
+      $stmt->bindParam(':documento', $documento, PDO::PARAM_STR);
+      try {
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      } catch (PDOException $e) {
+        error_log("mdlBuscarPorDocumento ERROR: " . $e->getMessage());
+        return [];
+      }
+    }
 
   /* MÉTODO PARA REGISTRAR CLIENTE */
   static public function mdlRegistrarCliente($tabla,$datos){
@@ -90,10 +141,16 @@ class ModeloCliente{
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
     $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
 
-    if($stmt->execute()){
-      return "ok";
-    }
-    else{
+    try {
+      if($stmt->execute()){
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlRegistrarCliente ERROR: " . json_encode($err));
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlRegistrarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
     $stmt->closeCursor();
@@ -102,7 +159,7 @@ class ModeloCliente{
 
   /* MÉTODO PARA EDITAR CLIENTE */
   static public function mdlEditarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, ciudad = :ciudad, migracion = :migracion, referencia = :referencia, fecha_contacto = :fecha_contacto, empresa = :empresa, fecha_creacion = :fecha_creacion WHERE id = :id");
+    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, ciudad = :ciudad, migracion = :migracion, referencia = :referencia, fecha_contacto = :fecha_contacto, empresa = :empresa, motivo = :motivo, fecha_creacion = :fecha_creacion WHERE id = :id");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -114,13 +171,20 @@ class ModeloCliente{
     $stmt->bindParam(":referencia", $datos["referencia"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_contacto", $datos["fecha_contacto"], PDO::PARAM_STR);
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
+    $stmt->bindParam(":motivo", $datos["motivo"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
     $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 
-    if($stmt->execute()){
-      return "ok";
-    }
-    else{
+    try {
+      if($stmt->execute()){
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlEditarCliente ERROR: " . json_encode($err));
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlEditarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
     $stmt->closeCursor();
@@ -132,9 +196,16 @@ class ModeloCliente{
     $stmt = Conexion::conectar()->prepare("DELETE FROM clientes WHERE id = :id");
     $stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
-    if ($stmt->execute()) {
-      return "ok";
-    } else {
+    try {
+      if ($stmt->execute()) {
+        return "ok";
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlEliminarCliente ERROR: " . json_encode($err));
+        return "error";
+      }
+    } catch (PDOException $e) {
+      error_log("mdlEliminarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
     $stmt->closeCursor();
@@ -145,9 +216,14 @@ class ModeloCliente{
   static public function mdlVerificarOportunidades($idCliente) {
     $stmt = Conexion::conectar()->prepare("SELECT COUNT(*) as total FROM oportunidades WHERE cliente_id = :cliente_id");
     $stmt->bindParam(":cliente_id", $idCliente, PDO::PARAM_INT);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result['total'] > 0;
+    try {
+      $stmt->execute();
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $result['total'] > 0;
+    } catch (PDOException $e) {
+      error_log("mdlVerificarOportunidades ERROR: " . $e->getMessage());
+      return false;
+    }
   }
 
   /* MÉTODO PARA MOSTRAR CLIENTES FILTRADOS */
@@ -263,7 +339,12 @@ class ModeloCliente{
       $stmt->bindValue($key, $value, PDO::PARAM_STR);
     }
 
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+      $stmt->execute();
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("mdlMostrarClientesFiltrados ERROR: " . $e->getMessage());
+      return [];
+    }
   }
 }

@@ -28,43 +28,48 @@
 
 <!-- Estilos adicionales para mejorar la presentación del modal -->
 <style>
-#detalles-oportunidad-contenido .row { margin-bottom: 20px; }
+/* Layout refinado para modal de detalles: espaciado, tipografía y controles */
+#detalles-oportunidad-contenido { font-family: 'Helvetica Neue', Arial, sans-serif; color: #343a40; }
+
+#detalles-oportunidad-contenido .row { margin-bottom: 12px; }
 
 #detalles-oportunidad-contenido h6 {
     color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 8px;
-    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
 }
 
-#detalles-oportunidad-contenido p {
+/* Presentación de los valores (p) y campos editables */
+#detalles-oportunidad-contenido p,
+#detalles-oportunidad-contenido .cliente-field {
     color: #495057;
-    font-size: 16px;
+    font-size: 15px;
     margin-bottom: 0;
-    padding: 8px 12px;
-    background: white;
-    border-radius: 8px;
-    border-left: 4px solid #007bff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 10px 12px;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e6e9ed;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
 }
 
-#detalles-oportunidad-contenido .btn { margin: 5px; border-radius: 20px; font-weight: 600; padding: 10px 20px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
-#detalles-oportunidad-contenido .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+#detalles-oportunidad-contenido .cliente-field { padding: 8px 10px; }
 
-/* Estilos específicos para botones de estado */
-.btn-success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; }
-.btn-warning { background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); border: none; color: #212529 !important; }
-.btn-info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border: none; }
-.btn-danger { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: none; }
+#detalles-oportunidad-contenido .form-check { margin-top: 6px; }
+
+#detalles-oportunidad-contenido .btn { margin: 6px 6px 0 0; border-radius: 8px; font-weight: 600; padding: 8px 16px; transition: all 0.18s ease; box-shadow: 0 2px 6px rgba(16,24,40,0.06); }
+#detalles-oportunidad-contenido .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,24,40,0.08); }
+
+/* Tonos más sutiles para botones de estado */
+.btn-success { background: linear-gradient(135deg, #2bb673 0%, #20c997 100%); border: none; }
+.btn-warning { background: linear-gradient(135deg, #ffd659 0%, #ffb459 100%); border: none; color: #212529 !important; }
+.btn-info { background: linear-gradient(135deg, #5bc0de 0%, #17a2b8 100%); border: none; }
+.btn-danger { background: linear-gradient(135deg, #f76767 0%, #e55353 100%); border: none; }
 
 /* Iconos para mejor visualización (clases en lugar de nth-child para más robustez) */
-#detalles-oportunidad-contenido h6::before {
-    margin-right: 8px;
-    font-family: 'FontAwesome';
-    font-weight: normal;
-}
+#detalles-oportunidad-contenido h6::before { margin-right: 8px; font-family: 'FontAwesome'; font-weight: normal; }
 
 #detalles-oportunidad-contenido h6.title::before { content: '\f02b'; }       /* Título */
 #detalles-oportunidad-contenido h6.client::before { content: '\f007'; }      /* Cliente */
@@ -72,6 +77,51 @@
 #detalles-oportunidad-contenido h6.telefono::before { content: '\f095'; }    /* Teléfono (phone) */
 #detalles-oportunidad-contenido h6.empresa::before { content: '\f1ad'; }     /* Empresa (building) */
 #detalles-oportunidad-contenido h6.fecha::before { content: '\f073'; }       /* Fecha */
+
+/* Checkbox personalizado: color azul para el modal */
+#detalles-oportunidad-contenido .form-check-input {
+    accent-color: #007bff; /* navegadores modernos */
+    width: 18px;
+    height: 18px;
+    margin-top: 0.15rem;
+}
+
+#detalles-oportunidad-contenido .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+#detalles-oportunidad-contenido .form-check-label {
+    margin-left: 6px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Highlight temporal cuando un campo se habilita para edición */
+@keyframes pulse-highlight {
+    0% { transform: scale(1); box-shadow: 0 8px 24px rgba(0,123,255,0.18), 0 0 0 6px rgba(0,123,255,0.08); }
+    50% { transform: scale(1.01); box-shadow: 0 18px 48px rgba(0,123,255,0.28), 0 0 0 10px rgba(0,123,255,0.14); }
+    100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,123,255,0.18), 0 0 0 6px rgba(0,123,255,0.08); }
+}
+
+/* Estado persistente: fondo y borde permanecen mientras checkbox está marcado */
+#detalles-oportunidad-contenido .cliente-field.cliente-field-active {
+    border: 2px solid #0056d6; /* azul más intenso */
+    background-color: #e6f0ff; /* fondo azul claro más marcado */
+    box-shadow: 0 10px 28px rgba(0, 86, 214, 0.12);
+    transition: box-shadow 0.28s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+/* Clase temporal: pulso breve al activarse, se quita automáticamente pero el estado persistente queda */
+#detalles-oportunidad-contenido .cliente-field-pulse {
+    animation: pulse-highlight 0.7s ease 1;
+}
+
+/* Hacer que el estilo de foco por defecto sea sutil para que el destaque temporal destaque claramente */
+#detalles-oportunidad-contenido .cliente-field:focus {
+    outline: none;
+    border-color: #d1d5db; /* gris claro */
+    box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+}
 /* Aumentar tamaño del título del modal (no confundir con los h6 internos) */
 #modal-detalles-oportunidad-label {
     font-size: 22px;

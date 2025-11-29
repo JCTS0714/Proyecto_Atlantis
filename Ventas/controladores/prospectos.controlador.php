@@ -44,6 +44,43 @@ class ControladorProspectos {
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoEmpresa"])
             ) {
                 $tabla = "clientes";
+
+                // (Se omitió la validación por documento: solo se validará por teléfono)
+
+                // Verificar teléfono existente (normalizando)
+                $telefonoParaBuscar = preg_replace('/\s+/', '', $_POST["nuevoTelefono"]);
+                if (!empty($telefonoParaBuscar)) {
+                        $existeTelefono = ModeloCliente::mdlBuscarPorTelefono($telefonoParaBuscar);
+                        if (!empty($existeTelefono)) {
+                            // Determinar el estado del registro existente y mostrarlo en el mensaje
+                            $estadoRegistro = isset($existeTelefono[0]['estado']) ? $existeTelefono[0]['estado'] : null;
+                            $mapEstado = array(
+                                0 => 'Prospecto',
+                                1 => 'Seguimiento',
+                                2 => 'Cliente',
+                                3 => 'No Cliente',
+                                4 => 'En Espera'
+                            );
+                            $estadoTexto = isset($mapEstado[$estadoRegistro]) ? $mapEstado[$estadoRegistro] : 'Desconocido';
+
+                            $ruta = isset($_POST['ruta']) ? $_POST['ruta'] : 'prospectos';
+                            echo '<script>
+                                swal.fire({
+                                    icon: "error",
+                                    title: "Ya existe un registro con ese número de teléfono",
+                                    html: "Este número ya está registrado en la lista: <strong>'.$estadoTexto.'</strong>",
+                                    showConfirmButton: true,
+                                    confirmButtonText: "Cerrar"
+                                }).then((result) => {
+                                    if (result.value) {
+                                        window.location = "'.$ruta.'";
+                                    }
+                                });
+                            </script>';
+                            return;
+                        }
+                }
+
                 $datos = array(
                     "nombre" => $_POST["nuevoNombre"],
                     "tipo" => $_POST["nuevoTipo"],

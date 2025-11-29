@@ -130,7 +130,7 @@
   <!-- Select2 JS -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/select2/dist/js/select2.min.js"></script>
   <!-- Calendario JS -->
-  <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
+  <!-- moved to end of body to avoid duplicate execution -->
     <!-- Chart.js para gráficos del dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!-- Bootstrap 3.3.7 -->
@@ -158,7 +158,12 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/responsive-tables.js"></script>
 
   </head>
-  <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
+  <?php
+    $bodyClass = (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok")
+      ? 'hold-transition skin-blue sidebar-collapse sidebar-mini'
+      : 'hold-transition skin-blue sidebar-collapse sidebar-mini login-page';
+  ?>
+  <body class="<?php echo $bodyClass; ?>">
   <!-- Site wrapper -->
 
   <script>
@@ -181,6 +186,7 @@
          *  MENU LATERAL(ESTÁTICO)
          ==================== */
         include "modulos/menu.php";
+        // Búsqueda avanzada: ahora se incluye directamente en los módulos con tablas
   
         /**==================
          *  CONTENIDO PRINCIPAL
@@ -189,6 +195,7 @@
           if($_GET["ruta"]=="inicio"       ||
             $_GET["ruta"]=="usuarios"     ||
             $_GET["ruta"]=="clientes"     ||
+            $_GET["ruta"]=="reuniones-archivadas" ||
             $_GET["ruta"]=="ventas"       ||
             $_GET["ruta"]=="crear-venta"  ||
             $_GET["ruta"]=="reportes"     ||
@@ -200,7 +207,8 @@
             $_GET["ruta"]=="zona-espera"   ||
             $_GET["ruta"]=="incidencias"   ||
             $_GET["ruta"]=="backlog"       ||
-            $_GET["ruta"]=="salir"
+            $_GET["ruta"]=="salir" ||
+            $_GET["ruta"]=="contadores"
             ){
             include "modulos/".$_GET["ruta"].".php";
           }
@@ -238,9 +246,11 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/calendario.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/evento.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/dashboard.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.module.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/alarma.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/advanced_search.js"></script>
 
   </body>
   </html>

@@ -105,6 +105,12 @@
                             <span>Backlog</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?php echo BASE_URL; ?>/contadores">
+                            <i class="fa fa-circle-o"></i>
+                            <span>Contadores</span>
+                        </a>
+                    </li>
                     <li >
                         <a href="<?php echo BASE_URL; ?>/clientes">
                             <i class="fa fa-circle-o"></i>

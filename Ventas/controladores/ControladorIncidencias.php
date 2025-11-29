@@ -45,11 +45,24 @@ class ControladorIncidencias {
                 "observaciones" => isset($_POST["nuevaObservaciones"]) ? $_POST["nuevaObservaciones"] : ""
             );
 
-            $respuesta = ModeloIncidencias::mdlCrearIncidencia($datos);
+                $respuesta = ModeloIncidencias::mdlCrearIncidencia($datos);
 
-            if ($respuesta == "ok") {
-                return array("status" => "success", "message" => "Incidencia registrada correctamente.");
-            } else {
+                if ($respuesta === "ok" || (is_array($respuesta) && isset($respuesta['status']) && $respuesta['status'] === 'ok')) {
+                    $insertedId = is_array($respuesta) && isset($respuesta['id']) ? $respuesta['id'] : null;
+                    return array("status" => "success", "message" => "Incidencia registrada correctamente.", "id" => $insertedId);
+                } else {
+                // Modelo puede devolver detalles de error
+                if (is_array($respuesta)) {
+                    if (isset($respuesta['exception'])) {
+                        $msg = 'DB Exception: ' . $respuesta['exception'];
+                    } elseif (isset($respuesta['db_error'])) {
+                        $msg = 'DB Error: ' . json_encode($respuesta['db_error']);
+                    } else {
+                        $msg = 'Error desconocido en la base de datos.';
+                    }
+                    return array("status" => "error", "message" => $msg);
+                }
+
                 return array("status" => "error", "message" => "Error al registrar la incidencia.");
             }
         }
@@ -59,16 +72,20 @@ class ControladorIncidencias {
         return ModeloIncidencias::mdlMostrarIncidencias($item, $valor);
     }
 
-    static public function ctrEditarIncidencia() {
-        if (isset($_POST["editarNombreIncidencia"])) {
-            // Validar campos requeridos
-            if (empty($_POST["editarNombreIncidencia"]) || empty($_POST["editarIdClienteSeleccionado"]) || empty($_POST["editarFecha"]) || empty($_POST["editarPrioridad"])) {
-                return array("status" => "error", "message" => "Todos los campos obligatorios deben ser completados.");
+    static public function ctrEditarIncidencia($datos = null) {
+        // Soporta llamada directa (desde AJAX que pasa $datos) o lectura desde POST tradicional
+        if ($datos === null) {
+            // flujo antiguo (leer desde $_POST)
+            if (!isset($_POST["editarNombreIncidencia"])) {
+                return array("success" => false, "message" => "No hay datos para actualizar.");
             }
 
-            // Obtener el ID del usuario actual (asumiendo que está en la sesión)
+            if (empty($_POST["editarNombreIncidencia"]) || empty($_POST["editarIdClienteSeleccionado"]) || empty($_POST["editarFecha"]) || empty($_POST["editarPrioridad"])) {
+                return array("success" => false, "message" => "Todos los campos obligatorios deben ser completados.");
+            }
+
             if (!isset($_SESSION["id"])) {
-                return array("status" => "error", "message" => "Usuario no autenticado.");
+                return array("success" => false, "message" => "Usuario no autenticado.");
             }
 
             $datos = array(
@@ -80,14 +97,28 @@ class ControladorIncidencias {
                 "prioridad" => $_POST["editarPrioridad"],
                 "observaciones" => isset($_POST["editarObservaciones"]) ? $_POST["editarObservaciones"] : ""
             );
-
-            $respuesta = ModeloIncidencias::mdlEditarIncidencia($datos);
-
-            if ($respuesta == "ok") {
-                return array("status" => "success", "message" => "Incidencia actualizada correctamente.");
-            } else {
-                return array("status" => "error", "message" => "Error al actualizar la incidencia.");
+        } else {
+            // $datos fue pasado por el AJAX (ajax/backlog.ajax.php)
+            // Validar campos mínimos
+            if (empty($datos["nombre_incidencia"]) || empty($datos["cliente_id"]) || empty($datos["fecha"]) || empty($datos["prioridad"])) {
+                return array("success" => false, "message" => "Todos los campos obligatorios deben ser completados.");
             }
+            // Asegurar usuario_id
+            if (!isset($datos["usuario_id"]) || empty($datos["usuario_id"])) {
+                if (isset($_SESSION["id"])) {
+                    $datos["usuario_id"] = $_SESSION["id"];
+                } else {
+                    return array("success" => false, "message" => "Usuario no autenticado.");
+                }
+            }
+        }
+
+        $respuesta = ModeloIncidencias::mdlEditarIncidencia($datos);
+
+        if ($respuesta == "ok") {
+            return array("success" => true, "message" => "Incidencia actualizada correctamente.");
+        } else {
+            return array("success" => false, "message" => "Error al actualizar la incidencia.");
         }
     }
 

@@ -2,7 +2,7 @@
 require_once "conexion.php";
 
 class ModeloCRM {
-    static public function mdlMostrarOportunidades($tabla, $item = null, $valor = null, $filtrarUltimaSemana = false) {
+    static public function mdlMostrarOportunidades($tabla, $item = null, $valor = null, $filtrarUltimaSemana = false, $filters = null) {
         if ($filtrarUltimaSemana) {
             $fechaLimite = date('Y-m-d', strtotime('-7 days'));
             if ($item != null) {
@@ -23,6 +23,77 @@ class ModeloCRM {
             $stmt->execute();
             $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
+            // If filters are provided and no specific item lookup, apply filter logic
+            if ($filters && is_array($filters) && empty($item)) {
+                $where = [];
+                $params = [];
+
+                // Filter by cliente fields (joined table c)
+                if (!empty($filters['nombre'])) {
+                    $where[] = "c.nombre LIKE :nombre";
+                    $params[':nombre'] = '%' . $filters['nombre'] . '%';
+                }
+                if (!empty($filters['telefono'])) {
+                    $where[] = "c.telefono LIKE :telefono";
+                    $params[':telefono'] = '%' . $filters['telefono'] . '%';
+                }
+                if (!empty($filters['documento'])) {
+                    $where[] = "c.documento LIKE :documento";
+                    $params[':documento'] = '%' . $filters['documento'] . '%';
+                }
+
+                // Date filters: either periodo shortcuts or explicit fecha_inicio/fecha_fin
+                $fechaInicio = null; $fechaFin = null;
+                if (!empty($filters['periodo']) && $filters['periodo'] !== '') {
+                    switch ($filters['periodo']) {
+                        case 'today':
+                            $fechaInicio = date('Y-m-d');
+                            $fechaFin = $fechaInicio;
+                            break;
+                        case 'this_week':
+                            $fechaInicio = date('Y-m-d', strtotime('monday this week'));
+                            $fechaFin = date('Y-m-d', strtotime('sunday this week'));
+                            break;
+                        case 'this_month':
+                            $fechaInicio = date('Y-m-01');
+                            $fechaFin = date('Y-m-t');
+                            break;
+                        case 'custom':
+                            if (!empty($filters['fecha_inicio'])) $fechaInicio = $filters['fecha_inicio'];
+                            if (!empty($filters['fecha_fin'])) $fechaFin = $filters['fecha_fin'];
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    if (!empty($filters['fecha_inicio'])) $fechaInicio = $filters['fecha_inicio'];
+                    if (!empty($filters['fecha_fin'])) $fechaFin = $filters['fecha_fin'];
+                }
+
+                if ($fechaInicio && $fechaFin) {
+                    // apply to fecha_apertura if available, fallback to fecha_creacion
+                    $where[] = "(COALESCE(o.fecha_apertura, o.fecha_creacion) BETWEEN :fechaInicio AND :fechaFin)";
+                    $params[':fechaInicio'] = $fechaInicio;
+                    $params[':fechaFin'] = $fechaFin;
+                }
+
+                $sql = "SELECT o.*, c.nombre AS nombre_cliente FROM $tabla o LEFT JOIN clientes c ON o.cliente_id = c.id";
+                if (!empty($where)) {
+                    $sql .= " WHERE " . implode(" AND ", $where);
+                }
+                $sql .= " ORDER BY o.fecha_modificacion DESC LIMIT 200";
+
+                $stmt = Conexion::conectar()->prepare($sql);
+                foreach ($params as $k => $v) {
+                    $stmt->bindValue($k, $v, PDO::PARAM_STR);
+                }
+                $stmt->execute();
+                $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
+                $stmt = null;
+                return $resultado;
+            }
+
             if ($item != null) {
                 // Especificar explícitamente la tabla para evitar ambigüedad en la columna 'id'
                 if ($item === 'id') {

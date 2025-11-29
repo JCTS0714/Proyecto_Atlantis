@@ -646,6 +646,73 @@ $(document).ready(function () {
     });
   </script>
   
+  <style>
+    /* Highlight styles for reactivated opportunity */
+    .oportunidad-highlight { 
+      border: 2px solid #ffc107;
+      box-shadow: 0 0 0 6px rgba(255,193,7,0.18);
+      transition: box-shadow 0.3s, transform 0.15s;
+      border-radius: 6px;
+    }
+    .oportunidad-highlight.pulse {
+      animation: oportunidadPulse 1s ease-in-out 0s 3;
+    }
+    @keyframes oportunidadPulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,193,7,0.35); }
+      50% { box-shadow: 0 0 18px 8px rgba(255,193,7,0.22); }
+      100% { box-shadow: 0 0 0 0 rgba(255,193,7,0); }
+    }
+  </style>
+
+  <script>
+    // If the URL includes highlight_oportunidad_id, attempt to find and mark the card
+    (function() {
+      function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+      }
+
+      var highlightId = getUrlParameter('highlight_oportunidad_id');
+      if (!highlightId) return;
+
+      // Remove param from URL so it doesn't re-trigger on reload
+      try {
+        if (window.history.replaceState) {
+          var url = new URL(window.location);
+          url.searchParams.delete('highlight_oportunidad_id');
+          window.history.replaceState({}, document.title, url.toString());
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // Try to highlight the card several times (waiting for AJAX render)
+      var attempts = 0;
+      function tryHighlight() {
+        attempts++;
+        var el = document.getElementById('oportunidad-' + highlightId);
+        if (el) {
+          el.classList.add('oportunidad-highlight');
+          // Scroll into view centered
+          try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) { el.scrollIntoView(); }
+          // Add pulse animation
+          setTimeout(function() { el.classList.add('pulse'); }, 50);
+          // Remove highlight after a while
+          setTimeout(function() { el.classList.remove('oportunidad-highlight'); el.classList.remove('pulse'); }, 6000);
+          return;
+        }
+        if (attempts < 12) {
+          setTimeout(tryHighlight, 350);
+        }
+      }
+
+      // Start trying after a small delay to let initial loadOportunidades() run
+      setTimeout(tryHighlight, 300);
+    })();
+  </script>
+
   <!-- Incluir el modal de detalles de oportunidad -->
   <?php include 'modal_detalles.php'; ?>
   

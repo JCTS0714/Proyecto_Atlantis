@@ -1,4 +1,6 @@
 <?php
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
 require_once __DIR__ . '/../controladores/dashboard.controlador.php';
 
 header('Content-Type: application/json');

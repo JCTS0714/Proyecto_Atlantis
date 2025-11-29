@@ -133,18 +133,22 @@ class ControladorCliente {
         if(isset($_POST["editarNombre"])){
             $tipo = $_POST["editarTipo"];
             $documento = $_POST["editarDocumento"];
-            $documentoValido = false;
 
-            if ($tipo === "DNI" && preg_match('/^[0-9]{8}$/', $documento)) {
-                $documentoValido = true;
-            } elseif ($tipo === "RUC" && preg_match('/^[0-9]{11}$/', $documento)) {
-                $documentoValido = true;
+            // Aceptar tipos: DNI, RUC, otros
+            $allowedTipos = ["DNI", "RUC", "otros"];
+
+            // Validar documento según tipo; para 'otros' permitimos cualquier valor (o vacío)
+            $documentoValido = true;
+            if ($tipo === "DNI") {
+                $documentoValido = preg_match('/^[0-9]{8}$/', $documento) === 1;
+            } elseif ($tipo === "RUC") {
+                $documentoValido = preg_match('/^[0-9]{11}$/', $documento) === 1;
             }
 
-            // Validaciones similares a ctrCrearCliente
+            // Validaciones similares a ctrCrearCliente, pero permitiendo 'otros' tipo
             if (
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"]) &&
-                in_array($tipo, ["DNI", "RUC"]) &&
+                in_array($tipo, $allowedTipos) &&
                 $documentoValido &&
                 isset($_POST["editarCorreo"]) &&
                 preg_match('/^[0-9]{9}$/', $_POST["editarTelefono"]) &&
@@ -152,7 +156,8 @@ class ControladorCliente {
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&
                 (empty($_POST["editarReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["editarReferencia"])) &&
                 preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"]) &&
-                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"])
+                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"]) &&
+                (empty($_POST["editarMotivo"]) || is_string($_POST["editarMotivo"]))
             ) {
                 $tabla = "clientes";
                 $datos = array(
@@ -165,6 +170,7 @@ class ControladorCliente {
                     "ciudad" => $_POST["editarCiudad"],
                     "migracion" => $_POST["editarMigracion"],
                     "referencia" => $_POST["editarReferencia"],
+                    "motivo" => $_POST["editarMotivo"],
                     "fecha_contacto" => $_POST["editarFechaContacto"],
                     "empresa" => $_POST["editarEmpresa"]
                     //"fecha_creacion" => $_POST["editarFechaCreacion"]

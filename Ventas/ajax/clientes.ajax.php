@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Bootstrap for AJAX: session, headers and error handling
+require_once __DIR__ . '/_error_handler.php';
 
 require_once "../controladores/clientes.controlador.php";
 require_once "../modelos/clientes.modelo.php";
@@ -64,7 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && isset
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && !isset($_POST["ruta"]) && !isset($_POST["activarId"])) {
+// Si la petición POST incluye 'action', dejar que los endpoints específicos la manejen.
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && !isset($_POST["ruta"]) && !isset($_POST["activarId"]) && !isset($_POST["action"])) {
     $item = "id";
     $valor = $_POST["idCliente"];
     $cliente = ModeloCliente::MdlMostrarCliente("clientes", $item, $valor);
@@ -155,6 +157,53 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
         echo json_encode(['status' => 'ok']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'No se pudo actualizar']);
+    }
+    exit;
+}
+
+// Endpoint AJAX: actualizar campos específicos de cliente (usado por modal de detalles de oportunidad)
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === 'actualizarCampos') {
+    header('Content-Type: application/json');
+
+    $idCliente = isset($_POST['idCliente']) ? intval($_POST['idCliente']) : 0;
+    if ($idCliente <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'ID de cliente inválido']);
+        exit;
+    }
+
+    // Campos permitidos para actualizar desde este endpoint
+    $allowed = ['nombre','tipo','documento','telefono','correo','ciudad','migracion','referencia','fecha_contacto','empresa'];
+
+    // Logging entrada para depuración temporal
+    error_log("[ajax/clientes.ajax.php] actualizarCampos payload: " . json_encode($_POST));
+
+    $results = ['success' => [], 'failed' => []];
+    foreach ($allowed as $campo) {
+        if (isset($_POST[$campo])) {
+            $valor = $_POST[$campo];
+            try {
+                $respuesta = ModeloCliente::mdlActualizarCliente('clientes', $campo, $valor, 'id', $idCliente);
+            } catch (Exception $e) {
+                $respuesta = 'error';
+                error_log("[ajax/clientes.ajax.php] Exception updating $campo for client $idCliente: " . $e->getMessage());
+            }
+
+            if ($respuesta === 'ok') {
+                $results['success'][] = $campo;
+            } else {
+                $results['failed'][] = ['field' => $campo, 'result' => $respuesta];
+                error_log("[ajax/clientes.ajax.php] Failed updating $campo for client $idCliente. Response: " . json_encode($respuesta));
+            }
+        }
+    }
+
+    // Determinar estado general
+    if (count($results['success']) > 0 && count($results['failed']) === 0) {
+        echo json_encode(['status' => 'ok', 'updated' => $results['success']]);
+    } elseif (count($results['success']) > 0 && count($results['failed']) > 0) {
+        echo json_encode(['status' => 'partial', 'updated' => $results['success'], 'failed' => $results['failed'], 'message' => 'Algunos campos no se pudieron actualizar']);
+    } else {
+        echo json_encode(['status' => 'error', 'failed' => $results['failed'], 'message' => 'No se actualizaron campos']);
     }
     exit;
 }

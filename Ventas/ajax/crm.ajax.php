@@ -1,8 +1,6 @@
 <?php
-// Iniciar sesión si no está iniciada
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// Ensure consistent timezone + session for AJAX
+require_once __DIR__ . '/_timezone.php';
 
 require_once "../controladores/ControladorOportunidad.php";
 require_once "../modelos/ModeloCRM.php";
