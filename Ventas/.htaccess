@@ -12,6 +12,11 @@
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
+  # Force root to show the `inicio` route (safe default)
+  # If the request URI is exactly '/', rewrite to index.php?ruta=inicio
+  RewriteCond %{REQUEST_URI} ^/$
+  RewriteRule ^$ index.php?ruta=inicio [L,R=302]
+
   # Redirigir todo lo demás a index.php (preserva query string)
   RewriteRule ^ index.php [L,QSA]
 </IfModule>
