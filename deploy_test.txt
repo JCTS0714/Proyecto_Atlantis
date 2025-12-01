@@ -1,4 +1,0 @@
-Archivo de prueba para despliegue automático
-Fecha: 2025-12-01  (hora local)
-Generado por asistente para verificar webhook y deploy automático.
-Si ves este archivo en tu hosting, el deploy se reflejó correctamente.
