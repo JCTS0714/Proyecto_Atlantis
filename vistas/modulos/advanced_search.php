@@ -104,7 +104,7 @@
     <script>
       (function(){
         try {
-          document.addEventListener('DOMContentLoaded', function(){
+          function attachAdvancedSearchHandlers(){
             var fTop = document.getElementById('form-advanced-search');
             var fInline = document.getElementById('form-advanced-search-inline');
             // Resilient fallback for toggle button when jQuery or other scripts fail:
@@ -167,7 +167,13 @@
                 })(window.jQuery);
               }
             } catch(e){ console.warn('advanced_search jquery fallback failed', e); }
-          });
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', attachAdvancedSearchHandlers);
+          } else {
+            attachAdvancedSearchHandlers();
+          }
         } catch(e){ console.warn('advanced_search debug helper failed', e); }
       })();
     </script>
