@@ -23,11 +23,17 @@
       $usuario = ModeloUsuarios::MdlMostrarUsuarios($tabla, $item, $valor);
 
       // Validar token de sesión único (protección contra acceso múltiple)
-      if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
+      // Primero verificar que $usuario existe y es un array válido
+      if (!$usuario || !is_array($usuario) || !isset($usuario["sesion_token"])) {
         session_destroy();
-          echo '<script>
-            window.location.href = "'.BASE_URL.'/login";
-          </script>';
+        echo '<script>window.location.href = "'.BASE_URL.'/login";</script>';
+        exit;
+      }
+      
+      // Luego validar que el token coincida
+      if ($usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
+        session_destroy();
+        echo '<script>window.location.href = "'.BASE_URL.'/login";</script>';
         exit;
       }
 
@@ -86,9 +92,6 @@
     <!-- AdminLTE Skins. Choose a skin from the css/skins
         folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/skins/_all-skins.min.css">
-
-    <!-- AdminLTE CSS (local) -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

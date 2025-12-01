@@ -108,45 +108,7 @@
             </tr>
           </thead>
           <tbody>
-          <?php
-          // Mostrar clientes con estado 2 (clientes - oportunidades ganadas)
-          $clientes = ControladorOportunidad::ctrMostrarClientes("estado", 2);
-          foreach ($clientes as $key => $value) {
-              echo '<tr>';
-              echo '<td data-column="col-numero">'.($key+1).'</td>';
-              echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
-              echo '<td data-column="col-tipo">'.$value["tipo"].'</td>';
-              echo '<td data-column="col-documento">'.$value["documento"].'</td>';
-              echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
-              echo '<td data-column="col-correo">'.$value["correo"].'</td>';
-              echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
-              echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
-              echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
-              echo '<td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>';
-              echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
-              echo '<td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>';
-              // Select para cambiar estado
-              echo '<td data-column="col-cambiar-estado">'
-                   .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
-                      .'<option value="0"'.($value["estado"] == 0 ? ' selected' : '').'>Prospecto</option>'
-                      .'<option value="1"'.($value["estado"] == 1 ? ' selected' : '').'>Seguimiento</option>'
-                      .'<option value="2"'.($value["estado"] == 2 ? ' selected' : '').'>Cliente</option>'
-                      .'<option value="3"'.($value["estado"] == 3 ? ' selected' : '').'>No Cliente</option>'
-                      .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
-                   .'</select>'
-              .'</td>';
-              echo '<td data-column="col-acciones">
-                      <div class="btn-group">
-                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalEditarCliente"><i class="fa fa-pencil"></i></button>
-                        <button class="btn btn-info btnRegistrarIncidencia" idCliente="'.$value["id"].'" nombreCliente="'.$value["nombre"].'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
-                        if($_SESSION["perfil"] !== "Vendedor") {
-                          echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-trash"></i></button>';
-                        }
-              echo '      </div>
-                    </td>';
-              echo '</tr>';
-          }
-          ?>
+          <!-- DataTables carga los datos vía AJAX desde data-ajax="ajax/datatable-clientes.ajax.php" -->
           </tbody>
         </table>
       </div>

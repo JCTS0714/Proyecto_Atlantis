@@ -1,3 +1,5 @@
+// Envolver todo en $(document).ready() para asegurar que el DOM esté listo
+$(document).ready(function() {
 
 	// Silence debug/info logs unless `window.PLANTILLA_DEV === true`
 	// Set `window.PLANTILLA_DEV = true` in console for temporary local debugging.
@@ -250,21 +252,16 @@ initContactTable('tablaZonaEspera');
 		if (!window._advancedFilters) window._advancedFilters = {};
 
 		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
-			// If server-side table exists, use debugReplaceTableWithRaw to fetch filtered rows and show them client-side
+			// If server-side table exists, store filters and reload via AJAX
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = filters;
+				// Reload server-side DataTable with new filters (no destruir, solo recargar)
 				try {
-					console.debug('plantilla: using debugReplaceTableWithRaw for', id);
-					// Replace table with raw rows and reinit client-side DataTable
-					debugReplaceTableWithRaw(id, filters);
-				} catch(err) { console.warn('debugReplaceTableWithRaw failed', err); }
-	                // Ensure server-side DataTable is reloaded with new filters so it requests the server
-	                try {
-	                    if (window._serverTables && window._serverTables[id] && window._serverTables[id].ajax && typeof window._serverTables[id].ajax.reload === 'function') {
-	                        window._serverTables[id].ajax.reload(null, false);
-	                        console.debug('plantilla: triggered ajax.reload for', id);
-	                    }
-	                } catch(reloadErr) { console.warn('server table reload failed for', id, reloadErr); }
+					if (window._serverTables[id].ajax && typeof window._serverTables[id].ajax.reload === 'function') {
+						window._serverTables[id].ajax.reload(null, false);
+						console.debug('plantilla: triggered ajax.reload for', id);
+					}
+				} catch(reloadErr) { console.warn('server table reload failed for', id, reloadErr); }
 			} else {
 				console.debug('plantilla: server table not found for', id, 'falling back to client filter');
 				applyFiltersToTable(id, filters);
@@ -378,3 +375,5 @@ if (window.PLANTILLA_DEV === true) {
 	});
 
 })();
+
+}); // Fin de $(document).ready()
