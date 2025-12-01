@@ -1,5 +1,8 @@
 function loadOportunidades(filters) {
-    var dataParams = { action: 'getOportunidades', filtrarUltimaSemana: true };
+    // No aplicar filtro de "última semana" por defecto — dejar que el cliente
+    // (o el usuario) decida si quiere limitar por periodo. El servidor ya limita
+    // a 200 registros cuando no se pasan filtros para evitar sobrecarga.
+    var dataParams = { action: 'getOportunidades', filtrarUltimaSemana: false };
     if (filters && typeof filters === 'object') {
         // map our filter keys to GET params
         ['nombre','telefono','documento','periodo','fecha_inicio','fecha_fin'].forEach(function(k){
