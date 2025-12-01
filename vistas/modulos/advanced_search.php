@@ -49,7 +49,7 @@
 
 <!-- Compact toggle bar (visible) placed to mimic header area) -->
 <div id="advanced-search-bar" style="margin: 10px 15px;">
-  <a href="#" id="btn-toggle-advanced-search" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> <strong style="margin-left:6px;">Búsqueda Avanzada</strong></a>
+  <button type="button" id="btn-toggle-advanced-search" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> <strong style="margin-left:6px;">Búsqueda Avanzada</strong></button>
 </div>
 
 <!-- Inline panel that expands in-place when the toggle is clicked -->
@@ -107,6 +107,22 @@
           document.addEventListener('DOMContentLoaded', function(){
             var fTop = document.getElementById('form-advanced-search');
             var fInline = document.getElementById('form-advanced-search-inline');
+            // Resilient fallback for toggle button when jQuery or other scripts fail:
+            try {
+              var toggle = document.getElementById('btn-toggle-advanced-search');
+              var panelInline = document.getElementById('advanced-search-panel-inline');
+              if (toggle && panelInline && !toggle._fallbackAttached) {
+                toggle.addEventListener('click', function(e){
+                  try { e.preventDefault(); } catch(ignore){}
+                  if (panelInline.style.display === 'none' || !panelInline.style.display) {
+                    panelInline.style.display = '';
+                  } else {
+                    panelInline.style.display = 'none';
+                  }
+                });
+                toggle._fallbackAttached = true;
+              }
+            } catch(err) { /* ignore fallback errors */ }
             function buildFilters(form){
               try {
                 function clean(v){
