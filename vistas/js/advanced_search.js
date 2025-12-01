@@ -70,6 +70,68 @@
         if (panel.length) panel.slideUp(150);
       }
     });
+
+    // Debug helper: when an advancedSearch:apply event fires, try to query the server-side ajax
+    // of the visible '.tabla' and show a temporary debug banner with counts/rows to help
+    // diagnose why searches return no changes.
+    window.addEventListener('advancedSearch:apply', function(e){
+      try {
+        var filters = (e && e.detail) ? e.detail : {};
+        // find the first visible table with class 'tabla' inside the same module/area
+        var $visibleTable = $('.tabla:visible').first();
+        if (!$visibleTable || $visibleTable.length === 0) return;
+        var ajaxUrl = $visibleTable.data('ajax');
+        if (!ajaxUrl) return;
+
+        // build post payload mirroring DataTable debug usage
+        var postData = {
+          adv_debug: 1,
+          draw: 1,
+          start: 0,
+          length: 10,
+          nombre: filters.nombre || '',
+          telefono: filters.telefono || '',
+          documento: filters.documento || '',
+          adv_nombre: filters.nombre || '',
+          adv_telefono: filters.telefono || '',
+          adv_documento: filters.documento || '',
+          adv_periodo: filters.periodo || '',
+          adv_fecha_inicio: filters.fecha_inicio || '',
+          adv_fecha_fin: filters.fecha_fin || ''
+        };
+
+        // show a loading banner
+        var $banner = $('<div class="advanced-search-debug-banner alert alert-info" style="margin:10px 15px;">Buscando... (debug)</div>');
+        // insert banner before the table's container
+        $visibleTable.before($banner);
+
+        // perform AJAX POST
+        $.ajax({
+          url: ajaxUrl,
+          method: 'POST',
+          data: postData,
+          dataType: 'json'
+        }).done(function(resp){
+          try {
+            var recordsTotal = resp && resp.recordsTotal !== undefined ? resp.recordsTotal : 'N/A';
+            var recordsFiltered = resp && resp.recordsFiltered !== undefined ? resp.recordsFiltered : 'N/A';
+            var rowsFetched = (resp && resp.data && Array.isArray(resp.data)) ? resp.data.length : 'N/A';
+            var html = '<strong>Debug búsqueda:</strong> total=' + recordsTotal + ', filtrados=' + recordsFiltered + ', filas devueltas=' + rowsFetched;
+            if (resp && resp.debug && resp.debug.sqlWhere) html += '<br><small>SQL WHERE: ' + (resp.debug.sqlWhere || '') + '</small>';
+            $banner.removeClass('alert-info').addClass('alert-success').html(html);
+          } catch(err){
+            $banner.removeClass('alert-info').addClass('alert-danger').text('Debug: respuesta inválida o error al mostrar datos');
+          }
+        }).fail(function(xhr){
+          try { $banner.removeClass('alert-info').addClass('alert-danger').text('Debug: error al consultar el servidor (status ' + xhr.status + ')'); } catch(e){}
+        }).always(function(){
+          // remove banner after 6 seconds
+          setTimeout(function(){ $banner.fadeOut(300, function(){ $banner.remove(); }); }, 6000);
+        });
+      } catch(e){
+        // silent
+      }
+    });
   });
 
 })(window, window.jQuery);
