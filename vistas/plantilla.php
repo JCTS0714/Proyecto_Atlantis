@@ -261,5 +261,44 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/advanced_search.js"></script>
 
+  <script>
+    // Global JS error overlay to help surface runtime errors that stop event handlers
+    (function(){
+      function renderOverlay(msg){
+        try {
+          var existing = document.getElementById('js-error-overlay');
+          if (existing) existing.parentNode.removeChild(existing);
+          var div = document.createElement('div');
+          div.id = 'js-error-overlay';
+          div.style.position = 'fixed';
+          div.style.left = '10px';
+          div.style.right = '10px';
+          div.style.bottom = '10px';
+          div.style.zIndex = 99999;
+          div.style.background = 'rgba(255,230,230,0.98)';
+          div.style.border = '1px solid #cc0000';
+          div.style.padding = '12px';
+          div.style.fontSize = '13px';
+          div.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+          div.innerHTML = '<strong>JS Error:</strong> ' + msg + ' <button id="js-error-overlay-close" style="margin-left:12px;">Cerrar</button>';
+          document.body.appendChild(div);
+          document.getElementById('js-error-overlay-close').addEventListener('click', function(){ div.parentNode.removeChild(div); });
+        } catch(e){ console.error('Could not render overlay', e); }
+      }
+
+      window.addEventListener('error', function(ev){
+        try {
+          var msg = (ev && ev.message) ? ev.message : String(ev || 'Unknown error');
+          var src = ev && ev.filename ? (' at ' + ev.filename + ':' + ev.lineno + ':' + ev.colno) : '';
+          renderOverlay(msg + src);
+          console.error('Global JS error caught:', ev.error || ev, ev);
+        } catch(e){ console.error('error overlay handler failure', e); }
+      });
+
+      window.addEventListener('unhandledrejection', function(ev){
+        try { renderOverlay('Unhandled Promise Rejection: ' + (ev.reason && ev.reason.message ? ev.reason.message : String(ev.reason))); console.error('UnhandledRejection', ev); } catch(e){}
+      });
+    })();
+  </script>
   </body>
   </html>
