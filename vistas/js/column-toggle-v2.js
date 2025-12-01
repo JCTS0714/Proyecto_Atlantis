@@ -63,13 +63,8 @@ function toggleColumnByName(table, columnName, isVisible) {
   const cellsToToggle = table.querySelectorAll(`[data-column="${columnName}"]`);
 
   if (cellsToToggle.length === 0) {
+    // No cells found for this column; keep a single warn for visibility in console
     console.warn('[ColumnToggle-v2] NO se encontraron celdas con data-column=', columnName);
-    console.log('[ColumnToggle-v2] Buscando todas las celdas con data-column...');
-    const allCells = table.querySelectorAll('[data-column]');
-    console.log('[ColumnToggle-v2] Total celdas con data-column:', allCells.length);
-    allCells.forEach(cell => {
-      console.log('[ColumnToggle-v2]   - data-column:', cell.dataset.column, '| content:', cell.textContent.substring(0, 20));
-    });
   }
 
   cellsToToggle.forEach(cell => {
@@ -79,7 +74,6 @@ function toggleColumnByName(table, columnName, isVisible) {
     } else {
       cell.style.setProperty('display', 'none', 'important');
     }
-    console.log('[ColumnToggle-v2] Celda toggled:', cell.textContent.substring(0, 20), '| Style:', cell.style.display);
   });
 }
 
@@ -89,7 +83,8 @@ function saveColumnPreference(tableId, columnName, isVisible) {
     const prefs = prefsStr ? JSON.parse(prefsStr) : {};
     prefs[columnName] = isVisible;
     localStorage.setItem('columnPrefs_' + tableId, JSON.stringify(prefs));
-    console.log('[ColumnToggle-v2] Preferencia guardada:', tableId, columnName, isVisible);
+    // prefer silent operation in production; use debug flag to enable logs
+    if (window.COLUMN_TOGGLE_DEBUG === true) console.debug('[ColumnToggle-v2] Preferencia guardada:', tableId, columnName, isVisible);
   } catch (e) {
     console.warn('[ColumnToggle-v2] Error:', e);
   }
