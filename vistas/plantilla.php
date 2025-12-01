@@ -52,7 +52,7 @@
     PLUGINS DE CSS
   =====================================-->
     <!-- Bootstrap 3.3.7 (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-rH1Y6t6Y5Y7yZQ6qv6K6Jf2z5k2Q5bF6R7Z4m1Q6s5Y3Z6j4K" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/font-awesome/css/font-awesome.min.css">
@@ -89,7 +89,7 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/skins/_all-skins.min.css">
 
     <!-- AdminLTE CSS (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/AdminLTE.min.css" integrity="sha384-PLACEHOLDER" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/AdminLTE.min.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -126,7 +126,7 @@
     =====================================-->
   <!-- jQuery 3 -->
   <!-- jQuery (CDN with local fallback) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ+Y2gQv3Q4a2k2w3VZ6b/Ji5c5f5a6b7c8" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>window.jQuery || document.write('<script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"><\/script>')</script>
 
   <!-- jQuery UI -->
@@ -148,7 +148,7 @@
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/fastclick/lib/fastclick.js"></script>
   <!-- AdminLTE App -->
   <!-- AdminLTE (CDN with local fallback) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js" integrity="sha384-PLACEHOLDER" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js"></script>
   <script>if(typeof $.fn.boxWidget === 'undefined'){document.write('<script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"><\\/script>');}</script>
   <!-- AdminLTE for demo purposes -->
   <script src="<?php echo BASE_URL; ?>/vistas/dist/js/demo.js"></script>
