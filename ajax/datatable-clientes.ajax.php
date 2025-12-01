@@ -39,6 +39,18 @@ if ($filters['nombre'] !== '') { $where[] = "c.nombre LIKE :nombre"; $params[':n
 if ($filters['documento'] !== '') { $where[] = "c.documento LIKE :documento"; $params[':documento'] = '%' . $filters['documento'] . '%'; }
 if ($filters['telefono'] !== '') { $where[] = "c.telefono LIKE :telefono"; $params[':telefono'] = '%' . $filters['telefono'] . '%'; }
 
+// Estado filter: accept either `estado` or advanced `adv_estado` from client
+$filters['estado'] = isset($_REQUEST['estado']) ? trim($_REQUEST['estado']) : (isset($_REQUEST['adv_estado']) ? trim($_REQUEST['adv_estado']) : '');
+if ($filters['estado'] !== '') {
+  if (is_numeric($filters['estado'])) {
+    $where[] = "c.estado = :estado";
+    $params[':estado'] = intval($filters['estado']);
+  }
+} else {
+  // Default: show only records with estado = 2 (Clientes / Oportunidades ganadas)
+  $where[] = "c.estado = 2";
+}
+
 // Date filtering based on periodo or explicit fechas
 if ($filters['periodo'] === 'today') {
   $where[] = "DATE(c.fecha_creacion) = CURDATE()";
