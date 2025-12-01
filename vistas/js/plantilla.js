@@ -258,6 +258,13 @@ initContactTable('tablaZonaEspera');
 					// Replace table with raw rows and reinit client-side DataTable
 					debugReplaceTableWithRaw(id, filters);
 				} catch(err) { console.warn('debugReplaceTableWithRaw failed', err); }
+	                // Ensure server-side DataTable is reloaded with new filters so it requests the server
+	                try {
+	                    if (window._serverTables && window._serverTables[id] && window._serverTables[id].ajax && typeof window._serverTables[id].ajax.reload === 'function') {
+	                        window._serverTables[id].ajax.reload(null, false);
+	                        console.debug('plantilla: triggered ajax.reload for', id);
+	                    }
+	                } catch(reloadErr) { console.warn('server table reload failed for', id, reloadErr); }
 			} else {
 				console.debug('plantilla: server table not found for', id, 'falling back to client filter');
 				applyFiltersToTable(id, filters);
