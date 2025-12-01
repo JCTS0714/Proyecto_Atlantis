@@ -173,11 +173,11 @@
 
       <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar periodo por defecto a 'mensual'
-        var filtroPeriodo = document.getElementById('filtro-periodo');
-        if (filtroPeriodo) {
-          filtroPeriodo.value = 'mensual';
-        }
+        // Inicializar periodo por defecto a vacío (sin filtro)
+          var filtroPeriodo = document.getElementById('filtro-periodo');
+          if (filtroPeriodo) {
+            filtroPeriodo.value = '';
+          }
 
         function showHidePersonalizado() {
           var el = document.getElementById('filtro-fechas-personalizado');
@@ -198,7 +198,7 @@
         // Limpiar filtros
         document.getElementById('btn-limpiar-filtros-inline').addEventListener('click', function() {
           document.getElementById('filtro-estado').value = '';
-          document.getElementById('filtro-periodo').value = 'mensual';
+          document.getElementById('filtro-periodo').value = '';
           document.getElementById('fecha-inicio').value = '';
           document.getElementById('fecha-fin').value = '';
           showHidePersonalizado();
