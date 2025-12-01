@@ -477,8 +477,8 @@ $(document).ready(function () {
     initClienteSelect2();
   });
   // Ya no se usa loadClientes porque select2 carga dinámicamente
-  // Aplicar filtro por defecto: periodo mensual
-  window.filtrosActivos = { estado: '', periodo: 'mensual', fechaInicio: '', fechaFin: '' };
+  // No aplicar periodo por defecto al cargar
+  window.filtrosActivos = { estado: '', periodo: '', fechaInicio: '', fechaFin: '' };
   loadOportunidades();
 
   // Nueva funcionalidad: abrir modal con cliente preseleccionado y bloqueado si cliente_id está en URL
