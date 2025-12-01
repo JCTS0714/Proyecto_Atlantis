@@ -87,8 +87,7 @@
         folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/skins/_all-skins.min.css">
 
-    <!-- AdminLTE CSS (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/AdminLTE.min.css">
+    <!-- AdminLTE CSS (local) -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -144,9 +143,8 @@
   <!-- FastClick -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/fastclick/lib/fastclick.js"></script>
   <!-- AdminLTE App -->
-  <!-- AdminLTE (CDN with local fallback) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js"></script>
-  <script>if(typeof $.fn.boxWidget === 'undefined'){document.write('<script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"><\\/script>');}</script>
+  <!-- AdminLTE (local) -->
+  <script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"></script>
   <!-- AdminLTE for demo purposes -->
   <script src="<?php echo BASE_URL; ?>/vistas/dist/js/demo.js"></script>
 
