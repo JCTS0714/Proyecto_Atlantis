@@ -38,9 +38,9 @@
         </div>
       </div>
 
-      <div class="pull-right" style="margin-left:8px;">
+        <div class="pull-right" style="margin-left:8px;">
         <button type="button" class="btn btn-primary adv-clear">Limpiar</button>
-        <button type="submit" class="btn btn-primary adv-apply">Buscar</button>
+        <button type="submit" class="btn btn-primary adv-apply" onclick="return window.__advancedSearchApply && window.__advancedSearchApply(this);">Buscar</button>
         <button type="button" class="btn btn-default btn-close-advanced-search">Cerrar</button>
       </div>
     </form>
@@ -92,7 +92,7 @@
 
         <div class="pull-right" style="margin-left:8px;">
           <button type="button" class="btn btn-default adv-clear">Limpiar</button>
-          <button type="submit" class="btn btn-primary adv-apply">Buscar</button>
+          <button type="submit" class="btn btn-primary adv-apply" onclick="return window.__advancedSearchApply && window.__advancedSearchApply(this);">Buscar</button>
           <button type="button" class="btn btn-default btn-close-advanced-search">Cerrar</button>
         </div>
       </form>
@@ -169,6 +169,33 @@
             } catch(e){ console.warn('advanced_search jquery fallback failed', e); }
           });
         } catch(e){ console.warn('advanced_search debug helper failed', e); }
+      })();
+    </script>
+    <script>
+      // Global fallback function invoked inline from the Buscar buttons.
+      // It builds filters from the closest form and dispatches the advancedSearch:apply event.
+      (function(){
+        window.__advancedSearchApply = function(btn){
+          try {
+            var el = btn || this;
+            var form = (el && el.closest) ? el.closest('form') : (document.getElementById('form-advanced-search-inline') || document.getElementById('form-advanced-search'));
+            if (!form) return true; // allow normal submit as last resort
+
+            function val(name){ try { var f = form.querySelector('[name="'+name+'"]'); return f ? (f.value || '') : ''; } catch(e){ return ''; } }
+
+            var filters = {
+              nombre: val('adv_nombre'),
+              telefono: val('adv_telefono'),
+              documento: val('adv_documento'),
+              periodo: val('adv_periodo'),
+              fecha_inicio: val('adv_fecha_inicio'),
+              fecha_fin: val('adv_fecha_fin')
+            };
+
+            try { window.dispatchEvent(new CustomEvent('advancedSearch:apply', { detail: filters })); } catch(e){ /* ignore */ }
+            return false; // prevent form submit
+          } catch(err){ return true; }
+        };
       })();
     </script>
 
