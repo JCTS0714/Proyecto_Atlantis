@@ -30,9 +30,9 @@ class Conexion{
         }
 
         $host = getenv('DB_HOST') ?: 'localhost';
-        $name = getenv('DB_NAME') ?: 'atlantisbd';
-        $user = getenv('DB_USER') ?: 'root';
-        $pass = getenv('DB_PASS') ?: '';
+        $name = getenv('DB_NAME') ?: 'u652153415_atlantisdb';
+        $user = getenv('DB_USER') ?: 'u652153415_atlantis';
+        $pass = getenv('DB_PASS') ?: 'Atlantisfact@123';
         $charset = getenv('DB_CHARSET') ?: 'utf8mb4';
 
         $dsn = "mysql:host={$host};dbname={$name};charset={$charset}";
