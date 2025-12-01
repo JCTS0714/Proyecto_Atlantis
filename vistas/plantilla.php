@@ -51,8 +51,7 @@
     <!--=================================
     PLUGINS DE CSS
   =====================================-->
-    <!-- Bootstrap 3.3.7 (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <!-- Bootstrap 3.3.7 (use local bower copy) -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/font-awesome/css/font-awesome.min.css">
@@ -124,10 +123,8 @@
     <!--=================================
     ==========PLUGINS DE JAVASCRIP
     =====================================-->
-  <!-- jQuery 3 -->
-  <!-- jQuery (CDN with local fallback) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>window.jQuery || document.write('<script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"><\/script>')</script>
+  <!-- jQuery (local bower copy) -->
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"></script>
 
   <!-- jQuery UI -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
