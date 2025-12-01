@@ -257,6 +257,72 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/advanced_search.js"></script>
 
   <script>
+    // Diagnostic helper: detect missing DataTables controls (pagination / filter)
+    (function(){
+      function showDiag(msg, level){
+        try {
+          var el = document.getElementById('diagnostic-banner');
+          if (!el) {
+            el = document.createElement('div');
+            el.id = 'diagnostic-banner';
+            el.style.position = 'fixed';
+            el.style.top = '10px';
+            el.style.right = '10px';
+            el.style.zIndex = 100000;
+            el.style.background = 'rgba(255,255,200,0.98)';
+            el.style.border = '1px solid #999';
+            el.style.padding = '8px 12px';
+            el.style.fontSize = '13px';
+            el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+            document.body.appendChild(el);
+          }
+          el.innerHTML = '<strong>Diagnóstico:</strong> ' + msg;
+          if (level === 'error') el.style.borderColor = '#cc0000';
+          if (level === 'warn') el.style.borderColor = '#cc9900';
+        } catch(e){ console.warn('Could not render diagnostic banner', e); }
+      }
+
+      function runCheck(){
+        try {
+          if (!window.jQuery) { showDiag('jQuery no está cargado — DataTables no funcionará', 'error'); console.error('DIAG: jQuery missing'); return; }
+          var $ = window.jQuery;
+          if (!$.fn.DataTable) { showDiag('DataTables JS no está cargado (plugin faltante)', 'error'); console.error('DIAG: DataTables missing'); return; }
+
+          var $firstTable = $('.tabla').first();
+          if ($firstTable.length === 0) { showDiag('No se encontró ninguna tabla con la clase .tabla', 'warn'); console.warn('DIAG: no .tabla found'); return; }
+
+          // If DataTable instance exists, inspect the wrapper for controls
+          var dtInstance = null;
+          try { if ($.fn.DataTable.isDataTable($firstTable)) dtInstance = $firstTable.DataTable(); } catch(e){}
+
+          var $wrapper = $firstTable.closest('.dataTables_wrapper');
+          var hasLength = $wrapper.find('.dataTables_length').length > 0;
+          var hasFilter = $wrapper.find('.dataTables_filter').length > 0;
+          var hasPaginate = $wrapper.find('.dataTables_paginate').length > 0;
+
+          console.info('DIAG: table found:', { tableId: $firstTable.attr('id'), hasWrapper: $wrapper.length>0, hasLength: hasLength, hasFilter: hasFilter, hasPaginate: hasPaginate, dtInstance: !!dtInstance });
+
+          if (!$wrapper.length) {
+            showDiag('DataTables wrapper no encontrado — puede que DataTables no haya inicializado la tabla', 'warn');
+          } else if (!hasPaginate || !hasFilter) {
+            showDiag('Controles de DataTables faltantes (paginación/filtro). Mira consola para más info.', 'warn');
+          } else {
+            // All good — remove diag if present
+            var el = document.getElementById('diagnostic-banner'); if (el) el.parentNode.removeChild(el);
+            console.info('DIAG: DataTables controls present');
+          }
+        } catch(e){ console.error('DIAG: check failed', e); }
+      }
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(runCheck, 500); // slight delay to allow DataTable init
+      } else {
+        document.addEventListener('DOMContentLoaded', function(){ setTimeout(runCheck, 500); });
+      }
+    })();
+  </script>
+
+  <script>
     // Global JS error overlay to help surface runtime errors that stop event handlers
     (function(){
       function renderOverlay(msg){
