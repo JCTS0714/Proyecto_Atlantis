@@ -9,6 +9,8 @@
 	}
 
 $(document).ready(function() {
+	console.log('plantilla.js: $(document).ready ejecutado');
+	
 	// Global AJAX error logger: helps surface server response bodies for 500s/HTML errors
 	$(document).ajaxError(function(event, jqxhr, settings, thrownError) {
 		try {
@@ -19,40 +21,54 @@ $(document).ready(function() {
 		} catch(e) { console.warn('Error logging global AJAX error', e); }
 	});
 
-	$('.sidebar-menu').tree()
+	if (typeof $.fn.tree === 'function') {
+		$('.sidebar-menu').tree();
+	}
 
 	// Tabla de Prospectos (#example2) con opciones completas de paginación
+	console.log('plantilla.js: Buscando #example2, encontrado:', $('#example2').length);
 	if ($('#example2').length) {
-		$('#example2').DataTable({
-			"responsive": true,
-			"autoWidth": false,
-			"pageLength": 10,
-			"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-			"language": {
-				"sProcessing":     "Procesando...",
-				"sLengthMenu":     "Mostrar _MENU_ registros",
-				"sZeroRecords":    "No se encontraron resultados",
-				"sEmptyTable":     "Ningún dato disponible en esta tabla",
-				"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-				"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-				"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-				"sInfoPostFix":    "",
-				"sSearch":         "Buscar:",
-				"sUrl":            "",
-				"sInfoThousands":  ",",
-				"sLoadingRecords": "Cargando...",
-				"oPaginate": {
-					"sFirst":    "Primero",
-					"sLast":     "Último",
-					"sNext":     "Siguiente",
-					"sPrevious": "Anterior"
-				},
-				"oAria": {
-					"sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-					"sSortDescending": ": Activar para ordenar la columna de manera descendente"
-				}
+		// Verificar si ya está inicializado
+		if ($.fn.DataTable.isDataTable('#example2')) {
+			console.log('plantilla.js: #example2 ya está inicializado como DataTable');
+		} else {
+			console.log('plantilla.js: Inicializando #example2 como DataTable');
+			try {
+				$('#example2').DataTable({
+					"responsive": true,
+					"autoWidth": false,
+					"pageLength": 10,
+					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+					"language": {
+						"sProcessing":     "Procesando...",
+						"sLengthMenu":     "Mostrar _MENU_ registros",
+						"sZeroRecords":    "No se encontraron resultados",
+						"sEmptyTable":     "Ningún dato disponible en esta tabla",
+						"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+						"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+						"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+						"sInfoPostFix":    "",
+						"sSearch":         "Buscar:",
+						"sUrl":            "",
+						"sInfoThousands":  ",",
+						"sLoadingRecords": "Cargando...",
+						"oPaginate": {
+							"sFirst":    "Primero",
+							"sLast":     "Último",
+							"sNext":     "Siguiente",
+							"sPrevious": "Anterior"
+						},
+						"oAria": {
+							"sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+							"sSortDescending": ": Activar para ordenar la columna de manera descendente"
+						}
+					}
+				});
+				console.log('plantilla.js: #example2 inicializado correctamente');
+			} catch(e) {
+				console.error('plantilla.js: Error inicializando #example2:', e);
 			}
-		});
+		}
 	}
 
 // Centralizar inicialización para tablas de contacto si existen
