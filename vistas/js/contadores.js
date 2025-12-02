@@ -5,11 +5,15 @@ $(document).ready(function() {
   // ========================================
   // INICIALIZAR SELECT2 PARA COMERCIOS
   // ========================================
-  function initSelect2Comercio($select) {
+  function initSelect2Comercio($select, modalId) {
+    // Determinar el modal padre
+    var $dropdownParent = modalId ? $(modalId) : $select.closest('.modal');
+    
     $select.select2({
       placeholder: 'Buscar comercio por empresa...',
       allowClear: true,
       minimumInputLength: 1,
+      dropdownParent: $dropdownParent, // FIX: Evita problemas de z-index en modales
       ajax: {
         url: 'ajax/contadores.ajax.php',
         dataType: 'json',
@@ -29,8 +33,13 @@ $(document).ready(function() {
     });
   }
   
-  // Inicializar el primer select2 del modal crear
-  initSelect2Comercio($('#comerciosContainer .select2-comercio').first());
+  // Inicializar el primer select2 del modal crear (al abrir modal)
+  $('#modalAgregarContador').on('shown.bs.modal', function() {
+    var $firstSelect = $('#comerciosContainer .select2-comercio').first();
+    if (!$firstSelect.hasClass('select2-hidden-accessible')) {
+      initSelect2Comercio($firstSelect, '#modalAgregarContador');
+    }
+  });
   
   // ========================================
   // AGREGAR MÁS COMERCIOS (MODAL CREAR)
@@ -47,7 +56,7 @@ $(document).ready(function() {
       </div>
     `);
     $container.append($nuevoItem);
-    initSelect2Comercio($nuevoItem.find('.select2-comercio'));
+    initSelect2Comercio($nuevoItem.find('.select2-comercio'), '#modalAgregarContador');
     
     // Mostrar botón quitar en todos los items si hay más de 1
     actualizarBotonesQuitar($container);
@@ -86,7 +95,7 @@ $(document).ready(function() {
       </div>
     `);
     $container.append($nuevoItem);
-    initSelect2Comercio($nuevoItem.find('.select2-comercio-editar'));
+    initSelect2Comercio($nuevoItem.find('.select2-comercio-editar'), '#modalEditarContador');
     
     actualizarBotonesQuitarEditar($container);
   });
@@ -150,7 +159,7 @@ $(document).ready(function() {
         var primerCliente = data.clientes_asignados[0];
         var text1 = primerCliente.empresa + (primerCliente.nombre ? ' (' + primerCliente.nombre + ')' : '');
         $firstSelect.append(new Option(text1, primerCliente.id, true, true));
-        initSelect2Comercio($firstSelect);
+        initSelect2Comercio($firstSelect, '#modalEditarContador');
         
         // Agregar más si hay
         for (var i = 1; i < data.clientes_asignados.length; i++) {
@@ -168,13 +177,13 @@ $(document).ready(function() {
           $container.append($nuevoItem);
           var $newSelect = $nuevoItem.find('.select2-comercio-editar');
           $newSelect.append(new Option(textN, cliente.id, true, true));
-          initSelect2Comercio($newSelect);
+          initSelect2Comercio($newSelect, '#modalEditarContador');
         }
         
         actualizarBotonesQuitarEditar($container);
       } else {
         // Sin comercios asignados, solo inicializar vacío
-        initSelect2Comercio($firstSelect);
+        initSelect2Comercio($firstSelect, '#modalEditarContador');
       }
       
     }).fail(function() {
