@@ -7,12 +7,14 @@
     <h1>Contadores</h1>
   </section>
   <section class="content">
+    
+    <!-- Búsqueda Avanzada (fuera del box para evitar errores de render) -->
+    <?php include 'advanced_search.php'; ?>
+    
     <div class="box">
       <div class="box-header">
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarContador">Agregar Contador</button>
       </div>
-
-      <?php include 'advanced_search.php'; ?>
 
       <div class="box-body">
         <table class="table table-bordered table-striped" id="tablaContadores">

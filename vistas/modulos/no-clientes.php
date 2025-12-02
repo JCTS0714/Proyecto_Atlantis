@@ -13,6 +13,10 @@
 
   <!-- Main content -->
   <section class="content">
+    
+    <!-- Búsqueda Avanzada (fuera del box para evitar errores de render) -->
+    <?php include 'advanced_search.php'; ?>
+    
     <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Lista de No Clientes (Oportunidades Perdidas)</h3>
@@ -84,8 +88,6 @@
         </div>
         </div>
       </div>
-
-      <?php include 'advanced_search.php'; ?>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaNoClientes">

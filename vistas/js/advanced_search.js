@@ -1,73 +1,141 @@
-// Advanced Search UI handling and event emission
+/**
+ * Advanced Search UI handling and event emission
+ * Este archivo maneja la lógica de la búsqueda avanzada de forma segura
+ * Todos los bloques están envueltos en try-catch para evitar bloquear otras funcionalidades
+ */
 (function(window, $) {
-  if (!$) return;
+  'use strict';
+  
+  // Si jQuery no está disponible, salir silenciosamente
+  if (!$ || typeof $ !== 'function') {
+    console.warn('advanced_search.js: jQuery no disponible');
+    return;
+  }
 
-  $(function(){
-    var panel = $('#advanced-search-panel-inline');
-    // debug: confirm initialization
-    try { console.debug('advanced_search.js initialized. panel found:', panel.length > 0); } catch(e){}
-
-    // Toggle button: attach delegated handler and a direct handler to be robust
-    $(document).on('click', '#btn-toggle-advanced-search', function(e){
-      e.preventDefault();
-      try { console.debug('advanced search toggle clicked (delegated)'); } catch(e){}
-      if (!panel.length) return;
-      panel.slideToggle(200, function(){
-        if (panel.is(':visible')){
-          var $first = panel.find('input[type=text], input[type=date], select').first();
-          if ($first.length) $first.focus();
-          $('html, body').animate({ scrollTop: panel.offset().top - 70 }, 200);
-        }
-      });
-    });
-
-    // NOTE: do not bind a direct handler here — use the delegated handler above
-
-    // Close button (support both id and class selectors)
-    $(document).on('click', '#btn-close-advanced-search, .btn-close-advanced-search', function(e){
-      e.preventDefault();
-      try { console.debug('advanced search close clicked'); } catch(e){}
-      if (panel.length) panel.slideUp(150);
-    });
-
-    // Show/hide custom dates depending on periodo (scoped to the panel containing the control)
-    $(document).on('change', '#advanced-search-panel-inline [name=adv_periodo], #advanced-search-top [name=adv_periodo]', function(){
-      var $panel = $(this).closest('#advanced-search-panel-inline, #advanced-search-top');
-      if ($(this).val() === 'custom') $panel.find('.adv_custom_dates').show(); else $panel.find('.adv_custom_dates').hide();
-    });
-
-    // Submit handler for the inline form (build filters from the form that was submitted)
-    $(document).on('submit', '#form-advanced-search-inline, #form-advanced-search', function(e){
-      e.preventDefault();
-      var $form = $(this);
-      var filters = {
-        nombre: $form.find('[name=adv_nombre]').val() || '',
-        telefono: $form.find('[name=adv_telefono]').val() || '',
-        documento: $form.find('[name=adv_documento]').val() || '',
-        periodo: $form.find('[name=adv_periodo]').val() || '',
-        fecha_inicio: $form.find('[name=adv_fecha_inicio]').val() || '',
-        fecha_fin: $form.find('[name=adv_fecha_fin]').val() || ''
+  // Función helper para construir filtros desde un formulario
+  function buildFilters($form) {
+    if (!$form || !$form.length) return {};
+    
+    try {
+      return {
+        nombre: ($form.find('[name=adv_nombre]').val() || '').trim(),
+        telefono: ($form.find('[name=adv_telefono]').val() || '').trim(),
+        documento: ($form.find('[name=adv_documento]').val() || '').trim(),
+        periodo: ($form.find('[name=adv_periodo]').val() || '').trim(),
+        fecha_inicio: ($form.find('[name=adv_fecha_inicio]').val() || '').trim(),
+        fecha_fin: ($form.find('[name=adv_fecha_fin]').val() || '').trim()
       };
-      try { console.debug('advanced_search: submit detected on', $form.attr('id'), 'filters:', filters); } catch(e){}
+    } catch (e) {
+      console.warn('advanced_search: error building filters', e);
+      return {};
+    }
+  }
+
+  // Función para despachar evento de búsqueda
+  function dispatchSearchEvent(filters) {
+    try {
       var event = new CustomEvent('advancedSearch:apply', { detail: filters });
       window.dispatchEvent(event);
-      try { console.debug('advanced_search: event dispatched advancedSearch:apply'); } catch(e){}
-    });
+    } catch (e) {
+      console.warn('advanced_search: error dispatching event', e);
+    }
+  }
 
-    // Clear button (scoped)
-    $(document).on('click', '#advanced-search-panel-inline .adv-clear, #advanced-search-top .adv-clear', function(e){
+  // Inicialización cuando el DOM está listo
+  $(function() {
+    var $panel = $('#advanced-search-panel-inline');
+    var $toggleBtn = $('#btn-toggle-advanced-search');
+    
+    // Toggle del panel de búsqueda avanzada
+    $(document).on('click', '#btn-toggle-advanced-search', function(e) {
       e.preventDefault();
-      var $panel = $(this).closest('#advanced-search-panel-inline, #advanced-search-top');
-      $panel.find('[name=adv_nombre],[name=adv_telefono],[name=adv_documento],[name=adv_periodo],[name=adv_fecha_inicio],[name=adv_fecha_fin]').val('');
-      $panel.find('.adv_custom_dates').hide();
-      var event = new CustomEvent('advancedSearch:clear');
-      window.dispatchEvent(event);
+      try {
+        if ($panel.length) {
+          $panel.slideToggle(200, function() {
+            if ($panel.is(':visible')) {
+              $panel.find('input:first').focus();
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('advanced_search: error toggling panel', err);
+      }
     });
 
-    // Close panel on ESC
-    $(document).on('keydown', function(e){
-      if (e.key === 'Escape') {
-        if (panel.length) panel.slideUp(150);
+    // Cerrar panel
+    $(document).on('click', '.btn-close-advanced-search', function(e) {
+      e.preventDefault();
+      try {
+        if ($panel.length) $panel.slideUp(150);
+      } catch (err) {
+        console.warn('advanced_search: error closing panel', err);
+      }
+    });
+
+    // Mostrar/ocultar fechas personalizadas según periodo seleccionado
+    $(document).on('change', '[name=adv_periodo]', function() {
+      try {
+        var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container');
+        var $customDates = $container.find('.adv_custom_dates');
+        
+        if ($(this).val() === 'custom') {
+          $customDates.slideDown(150);
+        } else {
+          $customDates.slideUp(150);
+        }
+      } catch (err) {
+        console.warn('advanced_search: error toggling custom dates', err);
+      }
+    });
+
+    // Submit del formulario de búsqueda
+    $(document).on('submit', '#form-advanced-search-inline', function(e) {
+      e.preventDefault();
+      try {
+        var filters = buildFilters($(this));
+        dispatchSearchEvent(filters);
+      } catch (err) {
+        console.warn('advanced_search: error on submit', err);
+      }
+    });
+
+    // Click en botón Buscar (respaldo)
+    $(document).on('click', '.adv-apply', function(e) {
+      e.preventDefault();
+      try {
+        var $form = $(this).closest('form');
+        var filters = buildFilters($form);
+        dispatchSearchEvent(filters);
+      } catch (err) {
+        console.warn('advanced_search: error on apply click', err);
+      }
+    });
+
+    // Limpiar filtros
+    $(document).on('click', '.adv-clear', function(e) {
+      e.preventDefault();
+      try {
+        var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container');
+        $container.find('input[type=text], input[type=date]').val('');
+        $container.find('select').val('');
+        $container.find('.adv_custom_dates').hide();
+        
+        // Despachar evento de limpiar
+        var event = new CustomEvent('advancedSearch:clear');
+        window.dispatchEvent(event);
+      } catch (err) {
+        console.warn('advanced_search: error clearing filters', err);
+      }
+    });
+
+    // Cerrar con ESC
+    $(document).on('keydown', function(e) {
+      try {
+        if (e.key === 'Escape' && $panel.is(':visible')) {
+          $panel.slideUp(150);
+        }
+      } catch (err) {
+        // Ignorar errores de teclado
       }
     });
   });

@@ -13,6 +13,10 @@
 
   <!-- Main content -->
   <section class="content">
+    
+    <!-- Búsqueda Avanzada (fuera del box para evitar errores de render) -->
+    <?php include 'advanced_search.php'; ?>
+    
     <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Clientes en Zona de Espera</h3>
@@ -87,8 +91,6 @@
           </div>
         </div>
       </div>
-
-      <?php include 'advanced_search.php'; ?>
 
             <script>
             // Abrir modal de edición y enfocar motivo si la URL contiene ?open_motivo_id=ID
