@@ -182,7 +182,7 @@ class ModeloContador {
 
   /**
    * Buscar clientes por empresa (para Select2)
-   * Solo clientes con estado = 'cliente'
+   * Solo clientes con estado = 2 (cliente)
    * @param string $termino - Término de búsqueda
    * @return array
    */
@@ -195,7 +195,7 @@ class ModeloContador {
            WHERE empresa LIKE :termino 
              AND empresa IS NOT NULL 
              AND empresa != ''
-             AND estado = 'cliente'
+             AND estado = 2
            ORDER BY empresa ASC 
            LIMIT 20"
         );
@@ -207,7 +207,7 @@ class ModeloContador {
            FROM clientes 
            WHERE empresa IS NOT NULL 
              AND empresa != ''
-             AND estado = 'cliente'
+             AND estado = 2
            ORDER BY empresa ASC 
            LIMIT 50"
         );
