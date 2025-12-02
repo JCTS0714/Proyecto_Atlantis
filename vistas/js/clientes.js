@@ -273,8 +273,9 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
           cache: false,
           contentType: false,
           processData: false,
+          dataType: "json",
           success: function(respuesta) {
-            if (respuesta == "ok" || respuesta == 1) {
+            if (respuesta.status == "ok") {
               Swal.fire({
                 title: 'Eliminado',
                 text: 'El cliente ha sido eliminado correctamente.',
@@ -286,7 +287,7 @@ $(document).off("click", ".btnEliminarCliente").on("click", ".btnEliminarCliente
             } else {
               Swal.fire({
                 title: 'Error',
-                text: 'Error al eliminar el cliente: ' + respuesta,
+                text: respuesta.message || 'Error al eliminar el cliente',
                 icon: 'error'
               });
             }

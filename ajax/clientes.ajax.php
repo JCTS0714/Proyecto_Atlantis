@@ -34,24 +34,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && isset
         session_start();
     }
     
+    header('Content-Type: application/json');
+    
     $idCliente = $_POST["idCliente"];
     $ruta = $_POST["ruta"];
     
     if (!is_numeric($idCliente) || empty($idCliente)) {
-        echo "error";
+        echo json_encode(['status' => 'error', 'message' => 'ID inválido']);
         exit;
     }
     
     // Verificar permisos: solo Administrador puede eliminar
     if (isset($_SESSION["perfil"]) && $_SESSION["perfil"] == "Vendedor") {
-        echo "error: No tienes permisos para eliminar";
+        echo json_encode(['status' => 'error', 'message' => 'No tienes permisos para eliminar']);
         exit;
     }
     
     // Verificar si el cliente tiene oportunidades asociadas
     $tieneOportunidades = ModeloCliente::mdlVerificarOportunidades($idCliente);
     if ($tieneOportunidades) {
-        echo "error: No se puede eliminar porque tiene oportunidades asociadas";
+        echo json_encode(['status' => 'error', 'message' => 'No se puede eliminar porque tiene oportunidades asociadas']);
         exit;
     }
     
@@ -60,9 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && isset
     $respuesta = ModeloCliente::mdlEliminarCliente($tabla, $idCliente);
     
     if ($respuesta == "ok") {
-        echo "ok";
+        echo json_encode(['status' => 'ok']);
     } else {
-        echo "error";
+        echo json_encode(['status' => 'error', 'message' => 'Error al eliminar']);
     }
     exit;
 }

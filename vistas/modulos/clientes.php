@@ -480,7 +480,12 @@ document.getElementById('formAgregarClientePostventa').addEventListener('submit'
   
   var ruc = document.getElementById('nuevoRuc').value;
   if (ruc.length !== 11) {
-    alert('El RUC debe tener exactamente 11 dígitos');
+    Swal.fire({
+      icon: 'warning',
+      title: 'RUC inválido',
+      text: 'El RUC debe tener exactamente 11 dígitos',
+      confirmButtonColor: '#3c8dbc'
+    });
     return;
   }
   
@@ -495,17 +500,33 @@ document.getElementById('formAgregarClientePostventa').addEventListener('submit'
   .then(data => {
     console.log('Respuesta crear cliente:', data);
     if (data.status === 'success') {
-      alert('Cliente creado exitosamente');
-      $('#modalAgregarClientePostventa').modal('hide');
-      document.getElementById('formAgregarClientePostventa').reset();
-      location.reload();
+      Swal.fire({
+        icon: 'success',
+        title: '¡Cliente creado!',
+        text: 'El cliente se ha registrado exitosamente',
+        confirmButtonColor: '#3c8dbc'
+      }).then(() => {
+        $('#modalAgregarClientePostventa').modal('hide');
+        document.getElementById('formAgregarClientePostventa').reset();
+        location.reload();
+      });
     } else {
-      alert('Error: ' + (data.message || 'No se pudo crear el cliente'));
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: data.message || 'No se pudo crear el cliente',
+        confirmButtonColor: '#3c8dbc'
+      });
     }
   })
   .catch(error => {
     console.error('Error:', error);
-    alert('Error de conexión al servidor');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de conexión',
+      text: 'No se pudo conectar con el servidor',
+      confirmButtonColor: '#3c8dbc'
+    });
   });
 });
 </script>
