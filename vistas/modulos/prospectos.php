@@ -15,7 +15,7 @@
   <section class="content">
     
     <!-- Búsqueda Avanzada (fuera del box para evitar errores de render) -->
-    <?php include 'advanced_search.php'; ?>
+    <?php /* TEMPORALMENTE DESHABILITADO - include 'advanced_search.php'; */ ?>
     
     <div class="box">
       <div class="box-header with-border">
