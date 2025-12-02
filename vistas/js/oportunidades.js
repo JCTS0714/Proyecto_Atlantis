@@ -29,15 +29,8 @@ function loadOportunidades(filters) {
                 agregarTarjeta(oportunidad);
             });
 
-            // Aplicar filtros si están activos (compatibilidad retro)
-            if (window.filtrosActivos) {
-                window.filtrarOportunidades(
-                    window.filtrosActivos.estado || "",
-                    window.filtrosActivos.periodo || "",
-                    window.filtrosActivos.fechaInicio || "",
-                    window.filtrosActivos.fechaFin || ""
-                );
-            }
+            // NO aplicar filtros automáticamente al cargar - mostrar todas las tarjetas
+            // Los filtros solo se aplican cuando el usuario los activa manualmente
         }
     });
 }

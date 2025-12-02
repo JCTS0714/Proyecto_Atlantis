@@ -91,9 +91,12 @@
     // Submit del formulario de búsqueda
     $(document).on('submit', '#form-advanced-search-inline', function(e) {
       e.preventDefault();
+      console.log('advanced_search: form submit triggered');
       try {
         var filters = buildFilters($(this));
+        console.log('advanced_search: filters built', filters);
         dispatchSearchEvent(filters);
+        console.log('advanced_search: event dispatched');
       } catch (err) {
         console.warn('advanced_search: error on submit', err);
       }
@@ -102,10 +105,14 @@
     // Click en botón Buscar (respaldo)
     $(document).on('click', '.adv-apply', function(e) {
       e.preventDefault();
+      console.log('advanced_search: apply button clicked');
       try {
         var $form = $(this).closest('form');
+        console.log('advanced_search: form found', $form.length > 0);
         var filters = buildFilters($form);
+        console.log('advanced_search: filters built', filters);
         dispatchSearchEvent(filters);
+        console.log('advanced_search: event dispatched');
       } catch (err) {
         console.warn('advanced_search: error on apply click', err);
       }
