@@ -243,11 +243,11 @@ tablasContactos.forEach(function(tableId) {
 	// listen for apply/clear events
 	window.addEventListener('advancedSearch:apply', function(e){
 		var filters = (e && e.detail) ? e.detail : {};
-		try { console.debug('plantilla: advancedSearch:apply received', filters); } catch(e){}
+		console.log('plantilla: advancedSearch:apply received', filters);
 		// store global filters map
 		if (!window._advancedFilters) window._advancedFilters = {};
 
-		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
+		['tablaProspectos','tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
 			// If server-side table exists, use debugReplaceTableWithRaw to fetch filtered rows and show them client-side
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = filters;
@@ -350,8 +350,9 @@ if (window.PLANTILLA_DEV === true) {
 }
 
 	window.addEventListener('advancedSearch:clear', function(){
+		console.log('plantilla: advancedSearch:clear received');
 		// Clear column searches and redraw or reload server tables
-		['tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
+		['tablaProspectos','tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
 			if (window._serverTables && window._serverTables[id]) {
 				window._advancedFilters[id] = {};
 				try { window._serverTables[id].ajax.reload(null, false); } catch(e){ console.warn('reload failed', e); }
