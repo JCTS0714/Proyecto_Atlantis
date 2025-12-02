@@ -125,9 +125,8 @@
     ==========PLUGINS DE JAVASCRIP
     =====================================-->
   <!-- jQuery 3 -->
-  <!-- jQuery (CDN with local fallback) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJ+Y2gQv3Q4a2k2w3VZ6b/Ji5c5f5a6b7c8" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"><\/script>')</script>
+  <!-- jQuery (local to avoid SRI/CDN issues) -->
+  <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery/dist/jquery.min.js"></script>
 
   <!-- jQuery UI -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
@@ -147,9 +146,8 @@
   <!-- FastClick -->
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/fastclick/lib/fastclick.js"></script>
   <!-- AdminLTE App -->
-  <!-- AdminLTE (CDN with local fallback) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js" integrity="sha384-PLACEHOLDER" crossorigin="anonymous"></script>
-  <script>if(typeof $.fn.boxWidget === 'undefined'){document.write('<script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"><\\/script>');}</script>
+  <!-- AdminLTE (local to avoid SRI/CDN issues) -->
+  <script src="<?php echo BASE_URL; ?>/vistas/dist/js/adminlte.min.js"></script>
   <!-- AdminLTE for demo purposes -->
   <script src="<?php echo BASE_URL; ?>/vistas/dist/js/demo.js"></script>
 

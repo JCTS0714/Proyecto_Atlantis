@@ -49,7 +49,7 @@
 
 <!-- Compact toggle bar (visible) placed to mimic header area) -->
 <div id="advanced-search-bar" style="margin: 10px 15px;">
-  <a href="#" id="btn-toggle-advanced-search" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> <strong style="margin-left:6px;">Búsqueda Avanzada</strong></a>
+  <button type="button" id="btn-toggle-advanced-search" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> <strong style="margin-left:6px;">Búsqueda Avanzada</strong></button>
 </div>
 
 <!-- Inline panel that expands in-place when the toggle is clicked -->
