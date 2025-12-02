@@ -1,5 +1,5 @@
 function loadOportunidades(filters) {
-    var dataParams = { action: 'getOportunidades', filtrarUltimaSemana: true };
+    var dataParams = { action: 'getOportunidades' };
     if (filters && typeof filters === 'object') {
         // map our filter keys to GET params
         ['nombre','telefono','documento','periodo','fecha_inicio','fecha_fin'].forEach(function(k){

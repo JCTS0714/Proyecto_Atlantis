@@ -111,6 +111,7 @@
             <div class="form-group" style="margin:0;">
               <label for="filtro-periodo" style="display:block; font-weight:600; margin-bottom:4px;">Periodo</label>
               <select class="form-control" id="filtro-periodo" name="filtroPeriodo" style="min-width:140px;">
+                  <option value="">Todos</option>
                   <option value="diario">Diario</option>
                   <option value="semanal">Semanal</option>
                   <option value="mensual">Mensual</option>
@@ -173,10 +174,10 @@
 
       <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar periodo por defecto a 'mensual'
+        // Sin filtro por defecto - mostrar todas las oportunidades
         var filtroPeriodo = document.getElementById('filtro-periodo');
         if (filtroPeriodo) {
-          filtroPeriodo.value = 'mensual';
+          filtroPeriodo.value = '';
         }
 
         function showHidePersonalizado() {
@@ -198,7 +199,7 @@
         // Limpiar filtros
         document.getElementById('btn-limpiar-filtros-inline').addEventListener('click', function() {
           document.getElementById('filtro-estado').value = '';
-          document.getElementById('filtro-periodo').value = 'mensual';
+          document.getElementById('filtro-periodo').value = '';
           document.getElementById('fecha-inicio').value = '';
           document.getElementById('fecha-fin').value = '';
           showHidePersonalizado();
