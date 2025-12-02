@@ -47,12 +47,24 @@ if (!defined('APP_ERROR_HANDLER_INSTALLED')) {
 
     set_exception_handler(function($e) use ($logFile) {
         error_log("Uncaught Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", 3, $logFile);
-        if (!headers_sent()) http_response_code(500);
-        echo "Internal server error";
-        exit;
+        // Solo mostrar error si no se ha enviado contenido HTML completo
+        if (!headers_sent() && ob_get_level() === 0) {
+            http_response_code(500);
+            echo "Internal server error";
+        }
+        // No usar exit si la página ya terminó de renderizar
     });
 
     set_error_handler(function($severity, $message, $file, $line) use ($logFile) {
+        // Ignorar errores de tipo Notice, Deprecated y Strict (no son críticos)
+        $ignoredSeverities = [E_NOTICE, E_STRICT, E_DEPRECATED, E_USER_NOTICE, E_USER_DEPRECATED];
+        if (in_array($severity, $ignoredSeverities)) {
+            // Solo loguear sin lanzar excepción
+            $msg = "PHP Notice/Deprecated: {$message} in {$file} on line {$line}";
+            error_log($msg . "\n", 3, $logFile);
+            return true; // Continuar ejecución normal
+        }
+        
         $msg = "PHP Error: {$message} in {$file} on line {$line}";
         error_log($msg . "\n", 3, $logFile);
         throw new ErrorException($message, 0, $severity, $file, $line);
@@ -60,7 +72,8 @@ if (!defined('APP_ERROR_HANDLER_INSTALLED')) {
 
     register_shutdown_function(function() use ($logFile) {
         $err = error_get_last();
-        if ($err) {
+        // Solo loguear errores fatales reales (no notices ni warnings)
+        if ($err && in_array($err['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE])) {
             error_log("Shutdown Fatal: " . print_r($err, true) . "\n", 3, $logFile);
         }
     });
