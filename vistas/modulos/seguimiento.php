@@ -111,6 +111,7 @@
               <th data-column="col-acciones">Acciones</th>
             </tr>
           </thead>
+          <tbody>
           <?php
           // Aquí se cargarán los clientes en seguimiento (estado 1)
           $clientes = ControladorOportunidad::ctrMostrarClientes("estado", 1);

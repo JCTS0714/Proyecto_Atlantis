@@ -17,7 +17,7 @@
       </div>
 
       <div class="box-body">
-        <table class="table table-bordered table-striped" id="tablaContadores">
+        <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">
           <thead>
             <tr>
               <th>#</th>

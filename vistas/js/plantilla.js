@@ -74,9 +74,18 @@ $(document).ready(function() {
 // Centralizar inicialización para tablas de contacto si existen
 function initContactTable(tableId) {
 	if ($('#' + tableId).length) {
+		// Verificar si ya está inicializado
+		if ($.fn.DataTable.isDataTable('#' + tableId)) {
+			console.log('plantilla.js: #' + tableId + ' ya está inicializado como DataTable');
+			return;
+		}
+		console.log('plantilla.js: Inicializando #' + tableId + ' como DataTable');
+		
 		var $table = $('#' + tableId);
 		var ajaxUrl = $table.data('ajax') || null;
 		var dtOptions = {
+			"pageLength": 10,
+			"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
 			"language": {
 				"sProcessing":     "Procesando...",
 				"sLengthMenu":     "Mostrar _MENU_ registros",
@@ -161,6 +170,8 @@ initContactTable('tablaClientes');
 initContactTable('tablaSeguimiento');
 initContactTable('tablaNoClientes');
 initContactTable('tablaZonaEspera');
+initContactTable('tablaContadores');
+initContactTable('tablaVentas');
 
 }); // Fin de $(document).ready()
 
