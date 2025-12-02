@@ -13,20 +13,25 @@
     
     <div class="box">
       <div class="box-header">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarContador">Agregar Contador</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarContador">
+          <i class="fa fa-plus"></i> Agregar Contador
+        </button>
       </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">
           <thead>
             <tr>
-              <th>#</th>
-              <th>N°</th>
+              <th style="width: 40px;">#</th>
+              <th style="width: 50px;">N°</th>
               <th>Comercio(s)</th>
               <th>Nombre Contador</th>
+              <th>Nombre en Celular</th>
               <th>Teléfono</th>
+              <th>Link</th>
               <th>Usuario</th>
-              <th>Acciones</th>
+              <th>Contraseña</th>
+              <th style="width: 100px;">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -36,12 +41,27 @@
                 <td><?php echo htmlspecialchars($c['nro']); ?></td>
                 <td><?php echo htmlspecialchars($c['comercios_lista'] ?: $c['comercio'] ?: '-'); ?></td>
                 <td><?php echo htmlspecialchars($c['nom_contador']); ?></td>
+                <td><?php echo htmlspecialchars($c['titular_tlf']); ?></td>
                 <td><?php echo htmlspecialchars($c['telefono']); ?></td>
+                <td>
+                  <?php if (!empty($c['link'])): ?>
+                    <a href="<?php echo htmlspecialchars($c['link']); ?>" target="_blank" class="btn btn-xs btn-info">
+                      <i class="fa fa-external-link"></i> Ver
+                    </a>
+                  <?php else: ?>
+                    -
+                  <?php endif; ?>
+                </td>
                 <td><?php echo htmlspecialchars($c['usuario']); ?></td>
+                <td><?php echo htmlspecialchars($c['contrasena']); ?></td>
                 <td>
                   <div class="btn-group">
-                    <button class="btn btn-warning btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador"><i class="fa fa-pencil"></i></button>
-                    <a href="contadores?idContadorEliminar=<?php echo $c['id']; ?>" class="btn btn-danger" onclick="return confirm('¿Está seguro de eliminar este contador?');"><i class="fa fa-trash"></i></a>
+                    <button class="btn btn-warning btn-sm btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador">
+                      <i class="fa fa-pencil"></i>
+                    </button>
+                    <a href="contadores?idContadorEliminar=<?php echo $c['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este contador?');">
+                      <i class="fa fa-trash"></i>
+                    </a>
                   </div>
                 </td>
               </tr>
@@ -55,72 +75,87 @@
 
 <!-- Modal Agregar -->
 <div id="modalAgregarContador" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="post" id="formAgregarContador">
-        <div class="modal-header" style="background:#3c8dbc;color:white;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Agregar Contador</h4>
+      <form method="post" id="formAgregarContador" autocomplete="off">
+        <div class="modal-header" style="background: linear-gradient(135deg, #3c8dbc 0%, #2c6d9c 100%); color:white;">
+          <button type="button" class="close" data-dismiss="modal" style="color:white; opacity:1;">&times;</button>
+          <h4 class="modal-title"><i class="fa fa-calculator"></i> Agregar Contador</h4>
         </div>
         <div class="modal-body">
-          <!-- N° se genera automáticamente al crear (visible pero no editable) -->
-          <div class="form-group">
-            <label>N°</label>
-            <input id="nuevoNro" class="form-control" name="nuevoNro" readonly>
-          </div>
-          
-          <!-- Comercio(s) - Select2 múltiple con búsqueda -->
-          <div class="form-group">
-            <label>Comercio(s) <span class="text-muted">(buscar por empresa)</span></label>
-            <div id="comerciosContainer">
-              <div class="comercio-item" style="margin-bottom: 8px;">
-                <select class="form-control select2-comercio" name="nuevosComercios[]" style="width: calc(100% - 45px); display: inline-block;">
-                </select>
-                <button type="button" class="btn btn-danger btn-sm btn-quitar-comercio" style="display: none;" title="Quitar">
-                  <i class="fa fa-minus"></i>
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <!-- N° generado automáticamente -->
+              <div class="form-group">
+                <label><i class="fa fa-hashtag"></i> N°</label>
+                <input id="nuevoNro" class="form-control" name="nuevoNro" readonly style="background-color: #f5f5f5;">
+              </div>
+              
+              <!-- Comercio(s) - Select2 múltiple -->
+              <div class="form-group">
+                <label><i class="fa fa-building"></i> Comercio(s) <small class="text-muted">(buscar por empresa)</small></label>
+                <div id="comerciosContainer">
+                  <div class="comercio-item" style="margin-bottom: 8px;">
+                    <select class="form-control select2-comercio" name="nuevosComercios[]" style="width: calc(100% - 45px); display: inline-block;">
+                    </select>
+                    <button type="button" class="btn btn-danger btn-sm btn-quitar-comercio" style="display: none;" title="Quitar">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-success btn-xs" id="btnAgregarComercio" style="margin-top: 5px;">
+                  <i class="fa fa-plus"></i> Agregar otro comercio
                 </button>
               </div>
+              
+              <!-- Nombre Contador -->
+              <div class="form-group">
+                <label><i class="fa fa-user"></i> Nombre Contador</label>
+                <input class="form-control" name="nuevoNomContador" placeholder="Nombre completo del contador" autocomplete="off">
+              </div>
+              
+              <!-- Nombre grabado en el celular -->
+              <div class="form-group">
+                <label><i class="fa fa-address-book"></i> Nombre grabado en el celular</label>
+                <input class="form-control" name="nuevoTitularTlf" placeholder="Nombre como aparece en el celular" autocomplete="off">
+              </div>
             </div>
-            <button type="button" class="btn btn-success btn-sm" id="btnAgregarComercio" style="margin-top: 5px;">
-              <i class="fa fa-plus"></i> Agregar otro comercio
-            </button>
-          </div>
-          
-          <div class="form-group">
-            <label>Nombre Contador</label>
-            <input class="form-control" name="nuevoNomContador" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Titular Tlf</label>
-            <input class="form-control" name="nuevoTitularTlf" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input class="form-control" name="nuevoTelefono" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Teléfono Actual</label>
-            <input class="form-control" name="nuevoTelefonoActu" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Link</label>
-            <input class="form-control" name="nuevoLink" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Usuario</label>
-            <input class="form-control" name="nuevoUsuario" autocomplete="off" data-lpignore="true">
-          </div>
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input class="form-control" name="nuevoContrasena" type="text" autocomplete="new-password" data-lpignore="true">
+            
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <!-- Teléfono -->
+              <div class="form-group">
+                <label><i class="fa fa-phone"></i> Teléfono</label>
+                <input class="form-control" name="nuevoTelefono" placeholder="Número de teléfono" autocomplete="off">
+              </div>
+              
+              <!-- Link -->
+              <div class="form-group">
+                <label><i class="fa fa-link"></i> Link</label>
+                <input class="form-control" name="nuevoLink" placeholder="https://..." autocomplete="off">
+              </div>
+              
+              <!-- Usuario -->
+              <div class="form-group">
+                <label><i class="fa fa-user-circle"></i> Usuario</label>
+                <input class="form-control" name="nuevoUsuario" placeholder="Usuario de acceso" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+              
+              <!-- Contraseña -->
+              <div class="form-group">
+                <label><i class="fa fa-lock"></i> Contraseña</label>
+                <input class="form-control" name="nuevoContrasena" type="text" placeholder="Contraseña de acceso" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+            </div>
           </div>
           
           <!-- Campo oculto para IDs de comercios -->
           <input type="hidden" name="comercioIds" id="comercioIds">
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+        <div class="modal-footer" style="background-color: #f5f5f5;">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
         </div>
         <?php
           $crear = new ControladorContador();
@@ -133,73 +168,89 @@
 
 <!-- Modal Editar -->
 <div id="modalEditarContador" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="post" id="formEditarContador">
-        <div class="modal-header" style="background:#3c8dbc;color:white;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Editar Contador</h4>
+      <form method="post" id="formEditarContador" autocomplete="off">
+        <div class="modal-header" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%); color:white;">
+          <button type="button" class="close" data-dismiss="modal" style="color:white; opacity:1;">&times;</button>
+          <h4 class="modal-title"><i class="fa fa-edit"></i> Editar Contador</h4>
         </div>
         <div class="modal-body">
           <input type="hidden" id="idContador" name="idContador">
           
-          <div class="form-group">
-            <label>N°</label>
-            <input id="editarNro" class="form-control" name="editarNro" readonly>
-          </div>
-          
-          <!-- Comercio(s) - Select2 múltiple con búsqueda -->
-          <div class="form-group">
-            <label>Comercio(s) <span class="text-muted">(buscar por empresa)</span></label>
-            <div id="comerciosContainerEditar">
-              <div class="comercio-item" style="margin-bottom: 8px;">
-                <select class="form-control select2-comercio-editar" name="editarComercios[]" style="width: calc(100% - 45px); display: inline-block;">
-                </select>
-                <button type="button" class="btn btn-danger btn-sm btn-quitar-comercio-editar" style="display: none;" title="Quitar">
-                  <i class="fa fa-minus"></i>
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <!-- N° (solo lectura) -->
+              <div class="form-group">
+                <label><i class="fa fa-hashtag"></i> N°</label>
+                <input id="editarNro" class="form-control" name="editarNro" readonly style="background-color: #f5f5f5;">
+              </div>
+              
+              <!-- Comercio(s) -->
+              <div class="form-group">
+                <label><i class="fa fa-building"></i> Comercio(s) <small class="text-muted">(buscar por empresa)</small></label>
+                <div id="comerciosContainerEditar">
+                  <div class="comercio-item" style="margin-bottom: 8px;">
+                    <select class="form-control select2-comercio-editar" name="editarComercios[]" style="width: calc(100% - 45px); display: inline-block;">
+                    </select>
+                    <button type="button" class="btn btn-danger btn-sm btn-quitar-comercio-editar" style="display: none;" title="Quitar">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-success btn-xs" id="btnAgregarComercioEditar" style="margin-top: 5px;">
+                  <i class="fa fa-plus"></i> Agregar otro comercio
                 </button>
               </div>
+              
+              <!-- Nombre Contador -->
+              <div class="form-group">
+                <label><i class="fa fa-user"></i> Nombre Contador</label>
+                <input id="editarNomContador" class="form-control" name="editarNomContador" placeholder="Nombre completo del contador" autocomplete="off">
+              </div>
+              
+              <!-- Nombre grabado en el celular -->
+              <div class="form-group">
+                <label><i class="fa fa-address-book"></i> Nombre grabado en el celular</label>
+                <input id="editarTitularTlf" class="form-control" name="editarTitularTlf" placeholder="Nombre como aparece en el celular" autocomplete="off">
+              </div>
             </div>
-            <button type="button" class="btn btn-success btn-sm" id="btnAgregarComercioEditar" style="margin-top: 5px;">
-              <i class="fa fa-plus"></i> Agregar otro comercio
-            </button>
-          </div>
-          
-          <div class="form-group">
-            <label>Nombre Contador</label>
-            <input id="editarNomContador" class="form-control" name="editarNomContador" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Titular Tlf</label>
-            <input id="editarTitularTlf" class="form-control" name="editarTitularTlf" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input id="editarTelefono" class="form-control" name="editarTelefono" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Teléfono Actual</label>
-            <input id="editarTelefonoActu" class="form-control" name="editarTelefonoActu" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Link</label>
-            <input id="editarLink" class="form-control" name="editarLink" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Usuario</label>
-            <input id="editarUsuario" class="form-control" name="editarUsuario" autocomplete="off" data-lpignore="true">
-          </div>
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input id="editarContrasena" class="form-control" name="editarContrasena" type="text" autocomplete="new-password" data-lpignore="true">
+            
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <!-- Teléfono -->
+              <div class="form-group">
+                <label><i class="fa fa-phone"></i> Teléfono</label>
+                <input id="editarTelefono" class="form-control" name="editarTelefono" placeholder="Número de teléfono" autocomplete="off">
+              </div>
+              
+              <!-- Link -->
+              <div class="form-group">
+                <label><i class="fa fa-link"></i> Link</label>
+                <input id="editarLink" class="form-control" name="editarLink" placeholder="https://..." autocomplete="off">
+              </div>
+              
+              <!-- Usuario -->
+              <div class="form-group">
+                <label><i class="fa fa-user-circle"></i> Usuario</label>
+                <input id="editarUsuario" class="form-control" name="editarUsuario" placeholder="Usuario de acceso" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+              
+              <!-- Contraseña -->
+              <div class="form-group">
+                <label><i class="fa fa-lock"></i> Contraseña</label>
+                <input id="editarContrasena" class="form-control" name="editarContrasena" type="text" placeholder="Contraseña de acceso" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+            </div>
           </div>
           
           <!-- Campo oculto para IDs de comercios -->
           <input type="hidden" name="comercioIdsEditar" id="comercioIdsEditar">
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Editar</button>
+        <div class="modal-footer" style="background-color: #f5f5f5;">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="fa fa-save"></i> Actualizar</button>
         </div>
         <?php
           $editar = new ControladorContador();

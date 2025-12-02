@@ -61,24 +61,36 @@
                 <label>Ciudad</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-migracion" checked>
-                <label>Migración</label>
-              </div>
-              <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-referencia" checked>
-                <label>Referencia</label>
-              </div>
-              <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-fecha-contacto" checked>
-                <label>Fecha Contacto</label>
-              </div>
-              <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-empresa" checked>
                 <label>Empresa</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-fecha-creacion" checked>
-                <label>Fecha Creación</label>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-precio" checked>
+                <label>Precio</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-rubro" checked>
+                <label>Rubro</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-anio" checked>
+                <label>Año</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-mes" checked>
+                <label>Mes</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-link" checked>
+                <label>Link</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-usuario" checked>
+                <label>Usuario</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-contrasena" checked>
+                <label>Contraseña</label>
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-cambiar-estado" checked>
@@ -104,11 +116,14 @@
               <th data-column="col-telefono">Teléfono</th>
               <th data-column="col-correo">Observacion</th>
               <th data-column="col-ciudad">Ciudad</th>
-              <th data-column="col-migracion">Migración</th>
-              <th data-column="col-referencia">Referencia</th>
-              <th data-column="col-fecha-contacto">Fecha Contacto</th>
               <th data-column="col-empresa">Empresa</th>
-              <th data-column="col-fecha-creacion">Fecha Creación</th>
+              <th data-column="col-precio">Precio</th>
+              <th data-column="col-rubro">Rubro</th>
+              <th data-column="col-anio">Año</th>
+              <th data-column="col-mes">Mes</th>
+              <th data-column="col-link">Link</th>
+              <th data-column="col-usuario">Usuario</th>
+              <th data-column="col-contrasena">Contraseña</th>
               <th data-column="col-cambiar-estado">Cambiar Estado</th>
               <th data-column="col-acciones">Acciones</th>
             </tr>
@@ -117,7 +132,10 @@
           <?php
           // Mostrar clientes con estado 2 (clientes - oportunidades ganadas)
           $clientes = ControladorOportunidad::ctrMostrarClientes("estado", 2);
+          $mesesNombre = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
           foreach ($clientes as $key => $value) {
+              $mesNum = isset($value["mes"]) ? intval($value["mes"]) : 0;
+              $mesNombre = isset($mesesNombre[$mesNum]) ? $mesesNombre[$mesNum] : '';
               echo '<tr>';
               echo '<td data-column="col-numero">'.($key+1).'</td>';
               echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
@@ -126,11 +144,20 @@
               echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
               echo '<td data-column="col-correo">'.$value["correo"].'</td>';
               echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
-              echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
-              echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
-              echo '<td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>';
               echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
-              echo '<td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>';
+              echo '<td data-column="col-precio">'.($value["precio"] ?? '-').'</td>';
+              echo '<td data-column="col-rubro">'.($value["rubro"] ?? '-').'</td>';
+              echo '<td data-column="col-anio">'.($value["anio"] ?? '-').'</td>';
+              echo '<td data-column="col-mes">'.$mesNombre.'</td>';
+              echo '<td data-column="col-link">';
+              if (!empty($value["link"])) {
+                echo '<a href="'.htmlspecialchars($value["link"]).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
+              } else {
+                echo '-';
+              }
+              echo '</td>';
+              echo '<td data-column="col-usuario">'.($value["usuario"] ?? '-').'</td>';
+              echo '<td data-column="col-contrasena">'.($value["contrasena"] ?? '-').'</td>';
               // Select para cambiar estado
               echo '<td data-column="col-cambiar-estado">'
                    .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
