@@ -74,7 +74,7 @@ class ControladorCliente {
                             showCloseButton: true
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location = "'.$ruta.'";
+                                window.location = window.BASE_URL + "/'.$ruta.'";
                             }
                         });
                     </script>';
@@ -89,7 +89,7 @@ class ControladorCliente {
                             showCloseButton: true
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location = "'.$ruta.'";
+                                window.location = window.BASE_URL + "/'.$ruta.'";
                             }
                         });
                     </script>';
@@ -105,7 +105,7 @@ class ControladorCliente {
                         showCloseButton: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location = "'.$ruta.'";
+                            window.location = window.BASE_URL + "/'.$ruta.'";
                         }
                     });
                 </script>';
@@ -193,7 +193,7 @@ class ControladorCliente {
                             confirmButtonText: "Cerrar"
                         }).then((result) => {
                             if(result.isConfirmed){
-                                window.location = "'.$ruta.'";
+                                window.location = window.BASE_URL + "/'.$ruta.'";
                             }
                         });
                     </script>';
@@ -217,7 +217,7 @@ class ControladorCliente {
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location = "'.$ruta.'";
+                            window.location = window.BASE_URL + "/'.$ruta.'";
                         }
                     });
                 </script>';
@@ -286,7 +286,7 @@ class ControladorCliente {
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
                         if(result.isConfirmed){
-                            window.location = "'.$ruta.'";
+                            window.location = window.BASE_URL + "/'.$ruta.'";
                         }
                     });
                 </script>';
@@ -303,7 +303,7 @@ class ControladorCliente {
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
                         if(result.isConfirmed){
-                            window.location = "'.$ruta.'";
+                            window.location = window.BASE_URL + "/'.$ruta.'";
                         }
                     });
                 </script>';
