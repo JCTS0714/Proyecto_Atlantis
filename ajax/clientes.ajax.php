@@ -29,8 +29,10 @@ class AjaxClientes {
 // ENDPOINT PARA ELIMINAR CLIENTE (primero, antes de otros checks)
 // ========================================
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["idCliente"]) && isset($_POST["ruta"]) && !isset($_POST["activarId"])) {
-    session_start();
-    require_once "../modelos/clientes.modelo.php";
+    // Iniciar sesión solo si no está activa
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     
     $idCliente = $_POST["idCliente"];
     $ruta = $_POST["ruta"];
