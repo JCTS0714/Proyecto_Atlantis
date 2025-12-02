@@ -107,10 +107,7 @@ if ($q !== '') {
 
     header('Content-Type: application/json');
     echo json_encode($result);
-} else {
-    // Si no hay término de búsqueda, devolver array vacío
-    header('Content-Type: application/json');
-    echo json_encode([]);
+    exit;
 }
 
 // Nuevo endpoint para filtrar clientes
