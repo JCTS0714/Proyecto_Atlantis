@@ -181,7 +181,7 @@ if(isset($_POST["accion"]) && $_POST["accion"] == "actualizar_fecha") {
 }
 
 if(isset($_POST["accion"]) && $_POST["accion"] == "obtener_para_notificar") {
-    $usuario_id = intval($_POST['usuario_id']);
+    $usuario_id = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
     error_log("AJAX obtener_para_notificar para usuario_id: $usuario_id");
     if ($usuario_id <= 0) {
         error_log("Usuario ID inválido: $usuario_id");
