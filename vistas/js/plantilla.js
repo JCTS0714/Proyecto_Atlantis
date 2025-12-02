@@ -71,145 +71,69 @@ $(document).ready(function() {
 		}
 	}
 
-// Centralizar inicialización para tablas de contacto si existen
-function initContactTable(tableId) {
-	if ($('#' + tableId).length) {
-		// Verificar si ya está inicializado
-		if ($.fn.DataTable.isDataTable('#' + tableId)) {
-			console.log('plantilla.js: #' + tableId + ' ya está inicializado como DataTable');
-			return;
-		}
-		console.log('plantilla.js: Inicializando #' + tableId + ' como DataTable');
-		
-		var $table = $('#' + tableId);
-		var ajaxUrl = $table.data('ajax') || null;
-		var dtOptions = {
-			"pageLength": 10,
-			"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-			"language": {
-				"sProcessing":     "Procesando...",
-				"sLengthMenu":     "Mostrar _MENU_ registros",
-				"sZeroRecords":    "No se encontraron resultados",
-				"sEmptyTable":     "Ningún dato disponible en esta tabla",
-				"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-				"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-				"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-				"sInfoPostFix":    "",
-				"sSearch":         "Buscar:",
-				"sUrl":            "",
-				"sInfoThousands":  ",",
-				"sLoadingRecords": "Cargando...",
-				"oPaginate": {
-					"sFirst":    "Primero",
-					"sLast":     "Último",
-					"sNext":     "Siguiente",
-					"sPrevious": "Anterior"
-				},
-				"oAria": {
-					"sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-					"sSortDescending": ": Activar para ordenar la columna de manera descendente"
-				}
-			},
-			"responsive": true,
-			"autoWidth": false
-		};
+// ============================================
+// INICIALIZACIÓN SIMPLE DE TODAS LAS TABLAS
+// Replicando exactamente el patrón que funciona
+// ============================================
 
-		if (ajaxUrl) {
-			// server-side processing
-			dtOptions.serverSide = true;
-			dtOptions.processing = true;
-			dtOptions.ajax = {
-				url: ajaxUrl,
-				type: 'POST', // use POST to reliably send filters and avoid URL length issues
-				cache: false,
-						beforeSend: function(jqXhr, settings) {
-							try { console.debug('DataTable ajax beforeSend for', tableId, settings.url); } catch(e){}
-						},
-						data: function(d) {
-					// merge last known advanced filters for this table
-					var filters = window._advancedFilters && window._advancedFilters[tableId] ? window._advancedFilters[tableId] : {};
-							try {
-								var merged = $.extend({}, d, filters);
-								// Add debug flag so server can return diagnostic info
-								merged.adv_debug = 1;
-								if (window.console && window.console.debug) console.debug('DataTable ajax data for', tableId, { dtParams: d, filters: filters, merged: merged });
-								return merged;
-							} catch(e) {
-								console.warn('Error merging DataTable params', e);
-								return d;
-							}
-				}
-						,dataSrc: function(json) {
-							try { console.debug('DataTable ajax response for', tableId, json); } catch(e){}
-							// store last ajax response for debugging
-							if (!window._lastAjaxResponse) window._lastAjaxResponse = {};
-							window._lastAjaxResponse[tableId] = json;
-							if (!json) return [];
-							// If server returned DataTables error format, log it
-							if (json.error) console.error('DataTable server error:', json.error);
-							return json.data || [];
-						},
-						error: function(xhr, textStatus, errorThrown) {
-							console.error('DataTable AJAX error for', tableId, { status: xhr.status, statusText: xhr.statusText, responseText: xhr.responseText });
-						}
-					};
-		}
+var dtLanguage = {
+	"sProcessing":     "Procesando...",
+	"sLengthMenu":     "Mostrar _MENU_ registros",
+	"sZeroRecords":    "No se encontraron resultados",
+	"sEmptyTable":     "Ningún dato disponible en esta tabla",
+	"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+	"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+	"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+	"sInfoPostFix":    "",
+	"sSearch":         "Buscar:",
+	"sUrl":            "",
+	"sInfoThousands":  ",",
+	"sLoadingRecords": "Cargando...",
+	"oPaginate": {
+		"sFirst":    "Primero",
+		"sLast":     "Último",
+		"sNext":     "Siguiente",
+		"sPrevious": "Anterior"
+	},
+	"oAria": {
+		"sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+		"sSortDescending": ": Activar para ordenar la columna de manera descendente"
+	}
+};
 
-		// store instance
-		var table = $table.DataTable(dtOptions);
-		if (ajaxUrl) {
-			// keep a reference for later reloads
-			if (!window._serverTables) window._serverTables = {};
-			window._serverTables[tableId] = table;
+var dtOptions = {
+	"responsive": true,
+	"autoWidth": false,
+	"pageLength": 10,
+	"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+	"language": dtLanguage
+};
+
+// Lista de todas las tablas a inicializar
+var tablasContactos = [
+	'tablaProspectos',
+	'tablaClientes', 
+	'tablaSeguimiento',
+	'tablaNoClientes',
+	'tablaZonaEspera',
+	'tablaContadores',
+	'tablaVentas'
+];
+
+tablasContactos.forEach(function(tableId) {
+	var $tabla = $('#' + tableId);
+	if ($tabla.length > 0) {
+		if (!$.fn.DataTable.isDataTable('#' + tableId)) {
+			console.log('Inicializando DataTable: ' + tableId);
+			try {
+				$tabla.DataTable(dtOptions);
+				console.log(tableId + ' inicializado OK');
+			} catch(e) {
+				console.error('Error inicializando ' + tableId + ':', e);
+			}
 		}
 	}
-}
-
-// Inicializar tablas de contactos comunes
-console.log('=== INICIO INICIALIZACION TABLAS CONTACTOS ===');
-console.log('tablaSeguimiento existe:', $('#tablaSeguimiento').length);
-console.log('tablaNoClientes existe:', $('#tablaNoClientes').length);
-console.log('tablaZonaEspera existe:', $('#tablaZonaEspera').length);
-console.log('tablaContadores existe:', $('#tablaContadores').length);
-console.log('tablaVentas existe:', $('#tablaVentas').length);
-console.log('tablaClientes existe:', $('#tablaClientes').length);
-
-try {
-	initContactTable('tablaProspectos');
-	console.log('tablaProspectos inicializado OK');
-} catch(e) { console.error('ERROR tablaProspectos:', e); }
-
-try {
-	initContactTable('tablaClientes');
-	console.log('tablaClientes inicializado OK');
-} catch(e) { console.error('ERROR tablaClientes:', e); }
-
-try {
-	initContactTable('tablaSeguimiento');
-	console.log('tablaSeguimiento inicializado OK');
-} catch(e) { console.error('ERROR tablaSeguimiento:', e); }
-
-try {
-	initContactTable('tablaNoClientes');
-	console.log('tablaNoClientes inicializado OK');
-} catch(e) { console.error('ERROR tablaNoClientes:', e); }
-
-try {
-	initContactTable('tablaZonaEspera');
-	console.log('tablaZonaEspera inicializado OK');
-} catch(e) { console.error('ERROR tablaZonaEspera:', e); }
-
-try {
-	initContactTable('tablaContadores');
-	console.log('tablaContadores inicializado OK');
-} catch(e) { console.error('ERROR tablaContadores:', e); }
-
-try {
-	initContactTable('tablaVentas');
-	console.log('tablaVentas inicializado OK');
-} catch(e) { console.error('ERROR tablaVentas:', e); }
-
-console.log('=== FIN INICIALIZACION TABLAS CONTACTOS ===');
+});
 
 }); // Fin de $(document).ready()
 

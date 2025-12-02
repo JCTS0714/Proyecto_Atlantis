@@ -90,7 +90,7 @@
       </div>
 
       <div class="box-body">
-        <table class="table table-bordered table-striped dt-responsive tabla" id="tablaClientes" data-ajax="ajax/datatable-clientes.ajax.php">
+        <table class="table table-bordered table-striped dt-responsive tabla" id="tablaClientes">
           <thead>
             <tr>
               <th data-column="col-numero">#</th>
