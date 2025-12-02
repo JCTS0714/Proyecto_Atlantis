@@ -151,6 +151,9 @@ class ControladorCliente {
             }
 
             // Validaciones similares a ctrCrearCliente, pero permitiendo 'otros' tipo
+            // Obtener motivo de forma segura
+            $motivo = isset($_POST["editarMotivo"]) ? $_POST["editarMotivo"] : '';
+            
             if (
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"]) &&
                 in_array($tipo, $allowedTipos) &&
@@ -161,8 +164,7 @@ class ControladorCliente {
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&
                 (empty($_POST["editarReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["editarReferencia"])) &&
                 preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"]) &&
-                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"]) &&
-                (empty($_POST["editarMotivo"]) || is_string($_POST["editarMotivo"]))
+                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"])
             ) {
                 $tabla = "clientes";
                 $datos = array(
@@ -171,11 +173,11 @@ class ControladorCliente {
                     "tipo" => $_POST["editarTipo"],
                     "documento" => $_POST["editarDocumento"],
                     "telefono" => $_POST["editarTelefono"],
-                    "correo" => $_POST["editarCorreo"],
-                    "ciudad" => $_POST["editarCiudad"],
-                    "migracion" => $_POST["editarMigracion"],
-                    "referencia" => $_POST["editarReferencia"],
-                    "motivo" => $_POST["editarMotivo"],
+                    "correo" => $_POST["editarCorreo"] ?? '',
+                    "ciudad" => $_POST["editarCiudad"] ?? '',
+                    "migracion" => $_POST["editarMigracion"] ?? '',
+                    "referencia" => $_POST["editarReferencia"] ?? '',
+                    "motivo" => $motivo,
                     "fecha_contacto" => $_POST["editarFechaContacto"],
                     "empresa" => $_POST["editarEmpresa"],
                     "fecha_creacion" => $_POST["editarFechaCreacion"] ?? null

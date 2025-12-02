@@ -296,6 +296,8 @@
                 <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion">
               </div>
             </div>
+            <!-- Campo oculto para motivo -->
+            <input type="hidden" id="editarMotivo" name="editarMotivo" value="">
           </div>
         </div>
         <div class="modal-footer">
