@@ -1,7 +1,14 @@
 
+
 .DS_Store
 
 node_modules/*
 custom/*
 
 docs/index.md
+
+# Archivos de configuración local - NUNCA subir a producción
+.env
+config/local.php
+config/production.php
+logs/*.log
