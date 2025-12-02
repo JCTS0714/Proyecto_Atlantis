@@ -182,6 +182,7 @@ class ModeloContador {
 
   /**
    * Buscar clientes por empresa (para Select2)
+   * Solo clientes con estado = 'cliente'
    * @param string $termino - Término de búsqueda
    * @return array
    */
@@ -191,7 +192,10 @@ class ModeloContador {
         $stmt = Conexion::conectar()->prepare(
           "SELECT id, empresa, nombre 
            FROM clientes 
-           WHERE empresa LIKE :termino AND empresa IS NOT NULL AND empresa != ''
+           WHERE empresa LIKE :termino 
+             AND empresa IS NOT NULL 
+             AND empresa != ''
+             AND estado = 'cliente'
            ORDER BY empresa ASC 
            LIMIT 20"
         );
@@ -201,7 +205,9 @@ class ModeloContador {
         $stmt = Conexion::conectar()->prepare(
           "SELECT id, empresa, nombre 
            FROM clientes 
-           WHERE empresa IS NOT NULL AND empresa != ''
+           WHERE empresa IS NOT NULL 
+             AND empresa != ''
+             AND estado = 'cliente'
            ORDER BY empresa ASC 
            LIMIT 50"
         );
