@@ -31,59 +31,59 @@
             <h5>Mostrar/Ocultar Columnas</h5>
             <div class="column-toggle-list">
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-numero" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-numero" checked>
                 <label>#</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-nombre" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-nombre" checked>
                 <label>Nombre</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-tipo" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-tipo" checked>
                 <label>Tipo</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-documento" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-documento" checked>
                 <label>Documento</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-telefono" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-telefono" checked>
                 <label>Teléfono</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-correo" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-correo" checked>
                 <label>Observacion</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-ciudad" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-ciudad" checked>
                 <label>Ciudad</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-migracion" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-migracion" checked>
                 <label>Migración</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-referencia" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-referencia" checked>
                 <label>Referencia</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-fecha-contacto" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-fecha-contacto" checked>
                 <label>Fecha Contacto</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-empresa" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-empresa" checked>
                 <label>Empresa</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-fecha-creacion" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-fecha-creacion" checked>
                 <label>Fecha Creación</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-cambiar-estado" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-cambiar-estado" checked>
                 <label>Cambiar Estado</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="example2" data-column="col-acciones" checked>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaProspectos" data-column="col-acciones" checked>
                 <label>Acciones</label>
               </div>
             </div>
@@ -92,7 +92,7 @@
       </div>
 
       <div class="box-body">
-        <table class="table table-bordered table-striped dt-responsive tabla" id="example2">
+        <table class="table table-bordered table-striped dt-responsive tabla" id="tablaProspectos">
           <thead>
             <tr>
               <th data-column="col-numero">#</th>

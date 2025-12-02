@@ -79,7 +79,7 @@ function toggleColumnByName(table, columnName, isVisible) {
     } else {
       cell.style.setProperty('display', 'none', 'important');
     }
-    console.log('[ColumnToggle-v2] Celda toggled:', cell.textContent.substring(0, 20), '| Style:', cell.style.display);
+    // Log silenciado para evitar spam en consola
   });
 }
 

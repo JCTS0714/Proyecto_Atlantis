@@ -175,6 +175,11 @@ console.log('tablaVentas existe:', $('#tablaVentas').length);
 console.log('tablaClientes existe:', $('#tablaClientes').length);
 
 try {
+	initContactTable('tablaProspectos');
+	console.log('tablaProspectos inicializado OK');
+} catch(e) { console.error('ERROR tablaProspectos:', e); }
+
+try {
 	initContactTable('tablaClientes');
 	console.log('tablaClientes inicializado OK');
 } catch(e) { console.error('ERROR tablaClientes:', e); }
