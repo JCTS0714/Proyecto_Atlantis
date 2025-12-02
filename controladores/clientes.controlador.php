@@ -177,8 +177,8 @@ class ControladorCliente {
                     "referencia" => $_POST["editarReferencia"],
                     "motivo" => $_POST["editarMotivo"],
                     "fecha_contacto" => $_POST["editarFechaContacto"],
-                    "empresa" => $_POST["editarEmpresa"]
-                    //"fecha_creacion" => $_POST["editarFechaCreacion"]
+                    "empresa" => $_POST["editarEmpresa"],
+                    "fecha_creacion" => $_POST["editarFechaCreacion"] ?? null
                 );
 
                 $respuesta = ModeloCliente::mdlEditarCliente($tabla, $datos);

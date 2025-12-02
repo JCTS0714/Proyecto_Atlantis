@@ -10,6 +10,7 @@
         <div class="modal-body">
           <div class="box-body">
             <input type="hidden" id="idCliente" name="idCliente">
+            <input type="hidden" id="rutaCliente" name="ruta" value="">
 
             <!-- Campos editables -->
             <div class="form-group">

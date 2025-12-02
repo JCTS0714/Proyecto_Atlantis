@@ -64,8 +64,27 @@ $(document).off("click", ".btnEstadoCliente").on("click", ".btnEstadoCliente", f
 
 $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", function() {
   var idCliente = $(this).attr("idCliente");
+  var $btn = $(this);
   var datos = new FormData();
   datos.append("idCliente", idCliente);
+  
+  // Determinar la ruta actual desde el atributo data-ruta del botón o de la URL
+  var ruta = $btn.attr("data-ruta") || $btn.closest("[data-ruta]").attr("data-ruta") || "";
+  if (!ruta) {
+    // Inferir de la URL actual
+    var path = window.location.pathname;
+    if (path.indexOf("clientes") !== -1) {
+      ruta = "clientes";
+    } else if (path.indexOf("prospectos") !== -1) {
+      ruta = "prospectos";
+    } else if (path.indexOf("zona-espera") !== -1) {
+      ruta = "zona-espera";
+    } else if (path.indexOf("no-clientes") !== -1) {
+      ruta = "no-clientes";
+    } else if (path.indexOf("seguimiento") !== -1) {
+      ruta = "seguimiento";
+    }
+  }
 
   $.ajax({
     url: "ajax/clientes.ajax.php",
@@ -94,6 +113,9 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarFechaContacto").val(respuesta["fecha_contacto"]);
       $("#editarEmpresa").val(respuesta["empresa"]);
       $("#editarFechaCreacion").val(respuesta["fecha_creacion"]);
+      
+      // Establecer la ruta para el redirect después de editar
+      $("#rutaCliente").val(ruta);
 
       // Rellenar placeholders con texto respectivo
       $("#editarNombre").attr("placeholder", "Ingresar nombre");

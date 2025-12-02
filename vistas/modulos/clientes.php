@@ -170,7 +170,7 @@
               .'</td>';
               echo '<td data-column="col-acciones">
                       <div class="btn-group">
-                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalEditarCliente"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
                         <button class="btn btn-info btnRegistrarIncidencia" idCliente="'.$value["id"].'" nombreCliente="'.$value["nombre"].'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
                         if($_SESSION["perfil"] !== "Vendedor") {
                           echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="clientes"><i class="fa fa-trash"></i></button>';
@@ -193,7 +193,7 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE
 =========================================== -->
-<div id="modalEditarCliente" class="modal fade" role="dialog">
+<div id="modalActualizarClientes" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <form role="form" method="post" enctype="multipart/form-data">
@@ -204,6 +204,7 @@
         <div class="modal-body">
           <div class="box-body">
             <input type="hidden" id="idCliente" name="idCliente">
+            <input type="hidden" id="rutaCliente" name="ruta" value="clientes">
 
             <!-- Campos editables -->
             <div class="form-group">
