@@ -336,4 +336,48 @@ class ModeloCliente{
       return [];
     }
   }
+
+  /**
+   * MÉTODO PARA REGISTRAR CLIENTE POSTVENTA
+   * Incluye campos adicionales: precio, rubro, anio, mes, link, usuario, contrasena
+   */
+  static public function mdlRegistrarClientePostventa($datos) {
+    $sql = "INSERT INTO clientes (
+      empresa, nombre, telefono, ciudad, precio, tipo, documento, 
+      rubro, anio, mes, link, usuario, contrasena, estado, fecha_creacion
+    ) VALUES (
+      :empresa, :nombre, :telefono, :ciudad, :precio, :tipo, :documento,
+      :rubro, :anio, :mes, :link, :usuario, :contrasena, :estado, NOW()
+    )";
+    
+    $stmt = Conexion::conectar()->prepare($sql);
+    
+    $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
+    $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
+    $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
+    $stmt->bindParam(":ciudad", $datos["ciudad"], PDO::PARAM_STR);
+    $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
+    $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
+    $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR);
+    $stmt->bindParam(":rubro", $datos["rubro"], PDO::PARAM_STR);
+    $stmt->bindParam(":anio", $datos["anio"], PDO::PARAM_INT);
+    $stmt->bindParam(":mes", $datos["mes"], PDO::PARAM_INT);
+    $stmt->bindParam(":link", $datos["link"], PDO::PARAM_STR);
+    $stmt->bindParam(":usuario", $datos["usuario"], PDO::PARAM_STR);
+    $stmt->bindParam(":contrasena", $datos["contrasena"], PDO::PARAM_STR);
+    $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
+
+    try {
+      if ($stmt->execute()) {
+        return ["status" => "success", "id" => Conexion::conectar()->lastInsertId()];
+      } else {
+        $err = $stmt->errorInfo();
+        error_log("mdlRegistrarClientePostventa ERROR: " . json_encode($err));
+        return ["status" => "error", "message" => "Error al insertar en la base de datos"];
+      }
+    } catch (PDOException $e) {
+      error_log("mdlRegistrarClientePostventa EXCEPTION: " . $e->getMessage());
+      return ["status" => "error", "message" => $e->getMessage()];
+    }
+  }
 }

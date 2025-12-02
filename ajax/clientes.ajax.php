@@ -207,3 +207,57 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
     }
     exit;
 }
+
+// ========================================
+// ENDPOINT PARA CREAR CLIENTE POSTVENTA
+// ========================================
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === 'crearClientePostventa') {
+    header('Content-Type: application/json');
+    
+    // Validar campos requeridos
+    $camposRequeridos = ['nuevoComercio', 'nuevoContacto', 'nuevoCelular', 'nuevoPrecio', 'nuevoRuc', 'nuevoAnio', 'nuevoMes'];
+    foreach ($camposRequeridos as $campo) {
+        if (!isset($_POST[$campo]) || trim($_POST[$campo]) === '') {
+            echo json_encode(['status' => 'error', 'message' => "El campo $campo es requerido"]);
+            exit;
+        }
+    }
+    
+    // Validar RUC (11 dígitos)
+    $ruc = trim($_POST['nuevoRuc']);
+    if (!preg_match('/^\d{11}$/', $ruc)) {
+        echo json_encode(['status' => 'error', 'message' => 'El RUC debe tener exactamente 11 dígitos numéricos']);
+        exit;
+    }
+    
+    // Preparar datos para inserción
+    $datos = [
+        'empresa' => trim($_POST['nuevoComercio']),
+        'nombre' => trim($_POST['nuevoContacto']),
+        'telefono' => trim($_POST['nuevoCelular']),
+        'ciudad' => isset($_POST['nuevaCiudad']) ? trim($_POST['nuevaCiudad']) : '',
+        'precio' => floatval($_POST['nuevoPrecio']),
+        'tipo' => 'RUC', // Siempre RUC para postventa
+        'documento' => $ruc,
+        'rubro' => isset($_POST['nuevoRubro']) ? trim($_POST['nuevoRubro']) : '',
+        'anio' => intval($_POST['nuevoAnio']),
+        'mes' => intval($_POST['nuevoMes']),
+        'link' => isset($_POST['nuevoLink']) ? trim($_POST['nuevoLink']) : '',
+        'usuario' => isset($_POST['nuevoUsuario']) ? trim($_POST['nuevoUsuario']) : '',
+        'contrasena' => isset($_POST['nuevoContrasena']) ? trim($_POST['nuevoContrasena']) : '',
+        'estado' => 2 // Estado 2 = Cliente (postventa)
+    ];
+    
+    // Verificar si ya existe un cliente con el mismo RUC
+    $clienteExistente = ModeloCliente::mdlBuscarPorDocumento($ruc);
+    if (!empty($clienteExistente)) {
+        echo json_encode(['status' => 'error', 'message' => 'Ya existe un cliente con este RUC']);
+        exit;
+    }
+    
+    // Insertar cliente
+    $resultado = ModeloCliente::mdlRegistrarClientePostventa($datos);
+    
+    echo json_encode($resultado);
+    exit;
+}

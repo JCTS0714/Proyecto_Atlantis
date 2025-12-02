@@ -20,6 +20,10 @@
     <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Lista de Clientes (Oportunidades)</h3>
+        <!-- Botón Agregar Cliente Postventa -->
+        <button class="btn btn-success" data-toggle="modal" data-target="#modalAgregarClientePostventa" style="margin-left: 15px;">
+          <i class="fa fa-plus"></i> Agregar Cliente
+        </button>
         <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->
         <div class="column-toggle-container" style="margin-top:10px;">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -277,3 +281,204 @@
     </div>
   </div>
 </div>
+
+<!-- ===============================================
+     MODAL AGREGAR CLIENTE POSTVENTA
+=========================================== -->
+<div id="modalAgregarClientePostventa" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="formAgregarClientePostventa" role="form" method="post">
+        <div class="modal-header" style="background:#00a65a; color:white;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"><i class="fa fa-user-plus"></i> Agregar Cliente Postventa</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <!-- Comercio (empresa) -->
+              <div class="form-group">
+                <label for="nuevoComercio">Comercio <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                  <input type="text" class="form-control" id="nuevoComercio" name="nuevoComercio" placeholder="Nombre del comercio" required>
+                </div>
+              </div>
+
+              <!-- Contacto (nombre) -->
+              <div class="form-group">
+                <label for="nuevoContacto">Contacto <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                  <input type="text" class="form-control" id="nuevoContacto" name="nuevoContacto" placeholder="Nombre del contacto" required>
+                </div>
+              </div>
+
+              <!-- Celular (telefono) -->
+              <div class="form-group">
+                <label for="nuevoCelular">Celular <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
+                  <input type="text" class="form-control" id="nuevoCelular" name="nuevoCelular" placeholder="Número de celular" maxlength="15" required>
+                </div>
+              </div>
+
+              <!-- Ciudad -->
+              <div class="form-group">
+                <label for="nuevaCiudad">Ciudad</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                  <input type="text" class="form-control" id="nuevaCiudad" name="nuevaCiudad" placeholder="Ciudad">
+                </div>
+              </div>
+
+              <!-- Precio -->
+              <div class="form-group">
+                <label for="nuevoPrecio">Precio <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                  <input type="number" step="0.01" min="0" class="form-control" id="nuevoPrecio" name="nuevoPrecio" placeholder="0.00" required>
+                </div>
+              </div>
+
+              <!-- RUC (tipo preseleccionado + documento 11 dígitos) -->
+              <div class="form-group">
+                <label for="nuevoRuc">RUC <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-id-card"></i></span>
+                  <input type="hidden" id="nuevoTipo" name="nuevoTipo" value="RUC">
+                  <input type="text" class="form-control" id="nuevoRuc" name="nuevoRuc" placeholder="11 dígitos" maxlength="11" pattern="\d{11}" title="Debe contener exactamente 11 dígitos" required>
+                </div>
+                <small class="text-muted">Exactamente 11 dígitos numéricos</small>
+              </div>
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <!-- Rubro -->
+              <div class="form-group">
+                <label for="nuevoRubro">Rubro</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-industry"></i></span>
+                  <input type="text" class="form-control" id="nuevoRubro" name="nuevoRubro" placeholder="Rubro del negocio">
+                </div>
+              </div>
+
+              <!-- Año -->
+              <div class="form-group">
+                <label for="nuevoAnio">Año <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  <select class="form-control" id="nuevoAnio" name="nuevoAnio" required>
+                    <option value="">Seleccionar año</option>
+                    <?php 
+                    $anioActual = date('Y');
+                    for ($i = $anioActual; $i >= $anioActual - 5; $i--) {
+                      $selected = ($i == $anioActual) ? 'selected' : '';
+                      echo "<option value='$i' $selected>$i</option>";
+                    }
+                    ?>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Mes -->
+              <div class="form-group">
+                <label for="nuevoMes">Mes <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                  <select class="form-control" id="nuevoMes" name="nuevoMes" required>
+                    <option value="">Seleccionar mes</option>
+                    <?php
+                    $meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                    $mesActual = date('n');
+                    foreach ($meses as $num => $nombre) {
+                      $valor = $num + 1;
+                      $selected = ($valor == $mesActual) ? 'selected' : '';
+                      echo "<option value='$valor' $selected>$nombre</option>";
+                    }
+                    ?>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Link -->
+              <div class="form-group">
+                <label for="nuevoLink">Link</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-link"></i></span>
+                  <input type="url" class="form-control" id="nuevoLink" name="nuevoLink" placeholder="https://...">
+                </div>
+              </div>
+
+              <!-- Usuario (sin autocompletado) -->
+              <div class="form-group">
+                <label for="nuevoUsuario">Usuario</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user-circle"></i></span>
+                  <input type="text" class="form-control" id="nuevoUsuario" name="nuevoUsuario" placeholder="Usuario de acceso" autocomplete="off" data-lpignore="true" data-form-type="other">
+                </div>
+              </div>
+
+              <!-- Contraseña (sin autocompletado) -->
+              <div class="form-group">
+                <label for="nuevoContrasena">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                  <input type="text" class="form-control" id="nuevoContrasena" name="nuevoContrasena" placeholder="Contraseña de acceso" autocomplete="new-password" data-lpignore="true" data-form-type="other">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Validación RUC - solo números y exactamente 11 dígitos
+document.getElementById('nuevoRuc').addEventListener('input', function(e) {
+  this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
+});
+
+// AJAX para crear cliente postventa
+document.getElementById('formAgregarClientePostventa').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  var ruc = document.getElementById('nuevoRuc').value;
+  if (ruc.length !== 11) {
+    alert('El RUC debe tener exactamente 11 dígitos');
+    return;
+  }
+  
+  var formData = new FormData(this);
+  formData.append('action', 'crearClientePostventa');
+  
+  fetch('ajax/clientes.ajax.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Respuesta crear cliente:', data);
+    if (data.status === 'success') {
+      alert('Cliente creado exitosamente');
+      $('#modalAgregarClientePostventa').modal('hide');
+      document.getElementById('formAgregarClientePostventa').reset();
+      location.reload();
+    } else {
+      alert('Error: ' + (data.message || 'No se pudo crear el cliente'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error de conexión al servidor');
+  });
+});
+</script>
