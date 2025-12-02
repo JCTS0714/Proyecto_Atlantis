@@ -166,12 +166,45 @@ function initContactTable(tableId) {
 }
 
 // Inicializar tablas de contactos comunes
-initContactTable('tablaClientes');
-initContactTable('tablaSeguimiento');
-initContactTable('tablaNoClientes');
-initContactTable('tablaZonaEspera');
-initContactTable('tablaContadores');
-initContactTable('tablaVentas');
+console.log('=== INICIO INICIALIZACION TABLAS CONTACTOS ===');
+console.log('tablaSeguimiento existe:', $('#tablaSeguimiento').length);
+console.log('tablaNoClientes existe:', $('#tablaNoClientes').length);
+console.log('tablaZonaEspera existe:', $('#tablaZonaEspera').length);
+console.log('tablaContadores existe:', $('#tablaContadores').length);
+console.log('tablaVentas existe:', $('#tablaVentas').length);
+console.log('tablaClientes existe:', $('#tablaClientes').length);
+
+try {
+	initContactTable('tablaClientes');
+	console.log('tablaClientes inicializado OK');
+} catch(e) { console.error('ERROR tablaClientes:', e); }
+
+try {
+	initContactTable('tablaSeguimiento');
+	console.log('tablaSeguimiento inicializado OK');
+} catch(e) { console.error('ERROR tablaSeguimiento:', e); }
+
+try {
+	initContactTable('tablaNoClientes');
+	console.log('tablaNoClientes inicializado OK');
+} catch(e) { console.error('ERROR tablaNoClientes:', e); }
+
+try {
+	initContactTable('tablaZonaEspera');
+	console.log('tablaZonaEspera inicializado OK');
+} catch(e) { console.error('ERROR tablaZonaEspera:', e); }
+
+try {
+	initContactTable('tablaContadores');
+	console.log('tablaContadores inicializado OK');
+} catch(e) { console.error('ERROR tablaContadores:', e); }
+
+try {
+	initContactTable('tablaVentas');
+	console.log('tablaVentas inicializado OK');
+} catch(e) { console.error('ERROR tablaVentas:', e); }
+
+console.log('=== FIN INICIALIZACION TABLAS CONTACTOS ===');
 
 }); // Fin de $(document).ready()
 
