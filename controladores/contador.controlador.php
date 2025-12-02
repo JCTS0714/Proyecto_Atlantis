@@ -3,18 +3,41 @@
 class ControladorContador {
 
   static public function ctrMostrarContadores($item, $valor) {
-    $tabla = "contador";
+    $tabla = "contadores";
     $respuesta = ModeloContador::mdlMostrarContador($tabla, $item, $valor);
     return $respuesta;
   }
 
-  static public function ctrCrearContador() {
-    // Detectar envío por uno de los campos obligatorios (comercio)
-    if (isset($_POST['nuevoComercio'])) {
+  public function ctrCrearContador() {
+    // Detectar envío - ahora usa comercioIds en lugar de nuevoComercio
+    if (isset($_POST['nuevoNomContador']) || isset($_POST['comercioIds'])) {
+      
+      // Obtener comercio del primer cliente seleccionado (para compatibilidad con campo legacy)
+      $comercioLegacy = '';
+      $comercioIds = isset($_POST['comercioIds']) ? $_POST['comercioIds'] : '';
+      
+      if (!empty($comercioIds)) {
+        $idsArray = array_filter(explode(',', $comercioIds));
+        if (!empty($idsArray)) {
+          // Obtener nombre de empresa del primer cliente para el campo comercio legacy
+          try {
+            $stmt = Conexion::conectar()->prepare("SELECT empresa FROM clientes WHERE id = :id LIMIT 1");
+            $stmt->bindValue(':id', intval($idsArray[0]), PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+              $comercioLegacy = $row['empresa'];
+            }
+          } catch (Exception $e) {
+            error_log('ctrCrearContador: Error obteniendo empresa - ' . $e->getMessage());
+          }
+        }
+      }
+      
       $datos = [
         // nro será calculado automáticamente en el modelo
         'nro' => '',
-        'comercio' => $_POST['nuevoComercio'] ?? '',
+        'comercio' => $comercioLegacy,
         'nom_contador' => $_POST['nuevoNomContador'] ?? '',
         'titular_tlf' => $_POST['nuevoTitularTlf'] ?? '',
         'telefono' => $_POST['nuevoTelefono'] ?? '',
@@ -24,10 +47,26 @@ class ControladorContador {
         'contrasena' => $_POST['nuevoContrasena'] ?? ''
       ];
 
-      $tabla = 'contador';
+      $tabla = 'contadores';
       $respuesta = ModeloContador::mdlRegistrarContador($tabla, $datos);
 
       if ($respuesta == 'ok') {
+        // Obtener el ID del contador recién creado
+        try {
+          $stmt = Conexion::conectar()->prepare("SELECT MAX(id) as ultimo_id FROM contadores");
+          $stmt->execute();
+          $row = $stmt->fetch(PDO::FETCH_ASSOC);
+          $nuevoContadorId = $row ? intval($row['ultimo_id']) : 0;
+          
+          // Asignar comercios a la tabla pivote
+          if ($nuevoContadorId > 0 && !empty($comercioIds)) {
+            $idsArray = array_filter(explode(',', $comercioIds));
+            ModeloContador::mdlAsignarClientes($nuevoContadorId, $idsArray);
+          }
+        } catch (Exception $e) {
+          error_log('ctrCrearContador: Error asignando comercios - ' . $e->getMessage());
+        }
+        
         echo '<script>Swal.fire({icon:"success", title:"Contador creado", showConfirmButton:true}).then(()=>{window.location="contadores";});</script>';
       } else {
         echo '<script>Swal.fire({icon:"error", title:"Error al crear", showConfirmButton:true});</script>';
@@ -35,11 +74,34 @@ class ControladorContador {
     }
   }
 
-  static public function ctrEditarContador() {
-    if (isset($_POST['idContador'])) {
+  public function ctrEditarContador() {
+    if (isset($_POST['idContador']) && isset($_POST['editarNomContador'])) {
+      $contadorId = intval($_POST['idContador']);
+      
+      // Obtener comercio del primer cliente seleccionado (para compatibilidad con campo legacy)
+      $comercioLegacy = '';
+      $comercioIds = isset($_POST['comercioIdsEditar']) ? $_POST['comercioIdsEditar'] : '';
+      
+      if (!empty($comercioIds)) {
+        $idsArray = array_filter(explode(',', $comercioIds));
+        if (!empty($idsArray)) {
+          try {
+            $stmt = Conexion::conectar()->prepare("SELECT empresa FROM clientes WHERE id = :id LIMIT 1");
+            $stmt->bindValue(':id', intval($idsArray[0]), PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+              $comercioLegacy = $row['empresa'];
+            }
+          } catch (Exception $e) {
+            error_log('ctrEditarContador: Error obteniendo empresa - ' . $e->getMessage());
+          }
+        }
+      }
+      
       $datos = [
-        'id' => $_POST['idContador'],
-        'comercio' => $_POST['editarComercio'] ?? '',
+        'id' => $contadorId,
+        'comercio' => $comercioLegacy,
         'nom_contador' => $_POST['editarNomContador'] ?? '',
         'titular_tlf' => $_POST['editarTitularTlf'] ?? '',
         'telefono' => $_POST['editarTelefono'] ?? '',
@@ -49,9 +111,19 @@ class ControladorContador {
         'contrasena' => $_POST['editarContrasena'] ?? ''
       ];
 
-      $tabla = 'contador';
+      $tabla = 'contadores';
       $respuesta = ModeloContador::mdlEditarContador($tabla, $datos);
+      
       if ($respuesta == 'ok') {
+        // Actualizar comercios en la tabla pivote
+        if (!empty($comercioIds)) {
+          $idsArray = array_filter(explode(',', $comercioIds));
+          ModeloContador::mdlAsignarClientes($contadorId, $idsArray);
+        } else {
+          // Si no hay comercios, limpiar asignaciones
+          ModeloContador::mdlAsignarClientes($contadorId, []);
+        }
+        
         echo '<script>Swal.fire({icon:"success", title:"Contador actualizado", showConfirmButton:true}).then(()=>{window.location="contadores";});</script>';
       } else {
         echo '<script>Swal.fire({icon:"error", title:"Error al actualizar", showConfirmButton:true});</script>';
@@ -59,10 +131,10 @@ class ControladorContador {
     }
   }
 
-  static public function ctrEliminarContador() {
+  public function ctrEliminarContador() {
     if (isset($_GET['idContadorEliminar'])) {
       $id = intval($_GET['idContadorEliminar']);
-      $tabla = 'contador';
+      $tabla = 'contadores';
       $respuesta = ModeloContador::mdlEliminarContador($tabla, $id);
       if ($respuesta == 'ok') {
         echo '<script>Swal.fire({icon:"success", title:"Contador eliminado", showConfirmButton:true}).then(()=>{window.location="contadores";});</script>';
