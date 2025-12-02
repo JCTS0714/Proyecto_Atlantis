@@ -20,7 +20,7 @@
       $valor = $_SESSION["id"];
       
       // Obtener datos de usuario de BD
-      $usuario = ModeloUsuarios::MdlMostrarUsuarios($tabla, $item, $valor);
+      $usuario = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
 
       // Validar token de sesión único (protección contra acceso múltiple)
       if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {

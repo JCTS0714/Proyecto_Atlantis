@@ -10,7 +10,7 @@ $usuario = $_GET['usuario'];
 $tabla = "usuarios";
 
 // Obtener datos del usuario
-$datosUsuario = ModeloUsuarios::MdlMostrarUsuarios($tabla, "usuario", $usuario);
+$datosUsuario = ModeloUsuarios::mdlMostrarUsuarios($tabla, "usuario", $usuario);
 
 if (!$datosUsuario) {
     echo "Usuario no encontrado.";
