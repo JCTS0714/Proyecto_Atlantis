@@ -36,11 +36,9 @@
       if ($(this).val() === 'custom') $panel.find('.adv_custom_dates').show(); else $panel.find('.adv_custom_dates').hide();
     });
 
-    // Submit handler for the inline form (build filters from the form that was submitted)
-    $(document).on('submit', '#form-advanced-search-inline, #form-advanced-search', function(e){
-      e.preventDefault();
-      var $form = $(this);
-      var filters = {
+    // Helper function to build filters from a form
+    function buildFiltersFromForm($form) {
+      return {
         nombre: $form.find('[name=adv_nombre]').val() || '',
         telefono: $form.find('[name=adv_telefono]').val() || '',
         documento: $form.find('[name=adv_documento]').val() || '',
@@ -48,6 +46,23 @@
         fecha_inicio: $form.find('[name=adv_fecha_inicio]').val() || '',
         fecha_fin: $form.find('[name=adv_fecha_fin]').val() || ''
       };
+    }
+
+    // Click handler for Buscar button (type="button")
+    $(document).on('click', '.adv-apply', function(e){
+      e.preventDefault();
+      var $form = $(this).closest('form');
+      var filters = buildFiltersFromForm($form);
+      console.log('advanced_search: Buscar clicked, filters:', filters);
+      var event = new CustomEvent('advancedSearch:apply', { detail: filters });
+      window.dispatchEvent(event);
+    });
+
+    // Submit handler for the inline form (backup in case form is submitted via Enter key)
+    $(document).on('submit', '#form-advanced-search-inline, #form-advanced-search', function(e){
+      e.preventDefault();
+      var $form = $(this);
+      var filters = buildFiltersFromForm($form);
       try { console.debug('advanced_search: submit detected on', $form.attr('id'), 'filters:', filters); } catch(e){}
       var event = new CustomEvent('advancedSearch:apply', { detail: filters });
       window.dispatchEvent(event);

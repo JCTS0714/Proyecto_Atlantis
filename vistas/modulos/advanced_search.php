@@ -39,8 +39,8 @@
       </div>
 
         <div class="pull-right" style="margin-left:8px;">
-        <button type="button" class="btn btn-primary adv-clear">Limpiar</button>
-        <button type="submit" class="btn btn-primary adv-apply" onclick="return window.__advancedSearchApply && window.__advancedSearchApply(this);">Buscar</button>
+        <button type="button" class="btn btn-default adv-clear">Limpiar</button>
+        <button type="button" class="btn btn-primary adv-apply">Buscar</button>
         <button type="button" class="btn btn-default btn-close-advanced-search">Cerrar</button>
       </div>
     </form>
@@ -92,7 +92,7 @@
 
         <div class="pull-right" style="margin-left:8px;">
           <button type="button" class="btn btn-default adv-clear">Limpiar</button>
-          <button type="submit" class="btn btn-primary adv-apply" onclick="return window.__advancedSearchApply && window.__advancedSearchApply(this);">Buscar</button>
+          <button type="button" class="btn btn-primary adv-apply">Buscar</button>
           <button type="button" class="btn btn-default btn-close-advanced-search">Cerrar</button>
         </div>
       </form>

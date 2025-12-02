@@ -1,7 +1,13 @@
 
+
 .DS_Store
 
 node_modules/*
 custom/*
 
 docs/index.md
+
+# Archivos de configuración local (no subir credenciales)
+.env
+config/local.php
+logs/*.log
