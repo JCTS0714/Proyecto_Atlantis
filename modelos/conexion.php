@@ -1,5 +1,13 @@
 <?php
+/**
+ * Clase de conexión a base de datos con patrón Singleton
+ * Evita múltiples conexiones innecesarias por request
+ */
 class Conexion{
+
+    // Instancia única de la conexión (Singleton)
+    static private $conexion = null;
+    static private $envLoaded = false;
 
     static private function loadEnvFile($path){
         if (!file_exists($path)) return;
@@ -20,13 +28,21 @@ class Conexion{
     }
 
     static public function conectar(){
-        // Intentar cargar un archivo .env en la carpeta Ventas o en la raíz del proyecto
-        $envLocal = dirname(__FILE__) . '/../.env';
-        $envRoot = dirname(__FILE__, 2) . '/.env';
-        if (file_exists($envLocal)) {
-            self::loadEnvFile($envLocal);
-        } else if (file_exists($envRoot)) {
-            self::loadEnvFile($envRoot);
+        // Si ya existe una conexión activa, reutilizarla (Singleton)
+        if (self::$conexion !== null) {
+            return self::$conexion;
+        }
+
+        // Cargar variables de entorno solo una vez
+        if (!self::$envLoaded) {
+            $envLocal = dirname(__FILE__) . '/../.env';
+            $envRoot = dirname(__FILE__, 2) . '/.env';
+            if (file_exists($envLocal)) {
+                self::loadEnvFile($envLocal);
+            } else if (file_exists($envRoot)) {
+                self::loadEnvFile($envRoot);
+            }
+            self::$envLoaded = true;
         }
 
         $host = getenv('DB_HOST') ?: 'localhost';
@@ -43,17 +59,17 @@ class Conexion{
         ];
 
         try {
-            $link = new PDO($dsn, $user, $pass, $options);
+            self::$conexion = new PDO($dsn, $user, $pass, $options);
             // Forzar zona horaria de sesión a America/Lima (offset -05:00) para que NOW() y funciones de tiempo usen Lima
             try {
-                $link->exec("SET time_zone = '-05:00'");
+                self::$conexion->exec("SET time_zone = '-05:00'");
             } catch (Exception $e) {
                 // No detener la conexión si la sesión no puede cambiar la zona; registrar para diagnóstico
                 error_log('No se pudo establecer time_zone en la conexión MySQL: ' . $e->getMessage());
             }
-            return $link;
+            return self::$conexion;
         } catch (PDOException $e) {
-            // Log detallado en archivo `Ventas/logs` para diagnóstico en producción
+            // Log detallado en archivo `logs` para diagnóstico en producción
             $logDir = __DIR__ . '/../logs';
             if (!is_dir($logDir)) {
                 @mkdir($logDir, 0755, true);
@@ -63,5 +79,13 @@ class Conexion{
             // Re-lanzar para comportamiento actual (capturado más arriba por el controlador)
             throw $e;
         }
+    }
+
+    /**
+     * Cerrar la conexión y resetear el singleton
+     * Útil para tests o cuando se necesita reconectar
+     */
+    static public function cerrar(){
+        self::$conexion = null;
     }
 }

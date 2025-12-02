@@ -9,11 +9,11 @@
 
         <form method="post" class="login-form">
             <div class="form-group has-feedback">
-                <input type="text" class="form-control" placeholder="Usuario" name="ingUsuario" requerid>
+                <input type="text" class="form-control" placeholder="Usuario" name="ingUsuario" required>
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
             </div>
             <div class="form-group has-feedback">
-                <input type="password" class="form-control" placeholder="Contraseña" name="ingPassword" requerid>
+                <input type="password" class="form-control" placeholder="Contraseña" name="ingPassword" required>
                 <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
             <div class="row">

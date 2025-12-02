@@ -2,9 +2,9 @@
 <!-- Logo -->
      <a href="#" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><img src="vistas/img/plantilla/LOGO-ATLANTIS.png" alt="ATL" style="width: 35px; height: 35px;"></span>
+      <span class="logo-mini"><img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/LOGO-ATLANTIS.png" alt="ATL" style="width: 35px; height: 35px;"></span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><img src="vistas/img/plantilla/grupo-atlantis-20231202171034.png" class="img-responsive" style="width: 150px; height: 50px; margin: 0 auto;" alt="Logo"></span>
+      <span class="logo-lg"><img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/grupo-atlantis-20231202171034.png" class="img-responsive" style="width: 150px; height: 50px; margin: 0 auto;" alt="Logo"></span>
     </a>
 
     <!--==========
@@ -44,11 +44,11 @@
                         if($_SESSION["foto"] != "")
                         {
 
-                            echo '<img src="'.$_SESSION["foto"].'" class="user-image">';
+                            echo '<img src="'.BASE_URL.'/'.$_SESSION["foto"].'" class="user-image">';
                         }
                         else
                         {
-                            echo '<img src="vistas/img/usuarios/default/perfil.png" class="user-image">';
+                            echo '<img src="'.BASE_URL.'/vistas/img/usuarios/default/perfil.png" class="user-image">';
 
                         }
                         ?>

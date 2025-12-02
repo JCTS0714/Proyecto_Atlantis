@@ -78,7 +78,7 @@ class ControladorUsuarios {
 
             } else {
                 // Mostrar mensaje claro cuando la cuenta está desactivada
-                echo '<br><div class="alert alert-danger">El usuario está inactivo. Esta cuenta esta descativada</div>';
+                echo '<br><div class="alert alert-danger">El usuario está inactivo. Esta cuenta está desactivada</div>';
             }
         } else {
             error_log("Login error: Contraseña incorrecta para usuario=" . $ingUsuario);

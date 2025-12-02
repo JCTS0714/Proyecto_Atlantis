@@ -20,18 +20,23 @@ class ControladorCliente {
         if (isset($_POST["nuevoNombre"])) {
             $tipo = $_POST["nuevoTipo"];
             $documento = $_POST["nuevoDocumento"];
-            $documentoValido = false;
-
-            if ($tipo === "DNI" && preg_match('/^[0-9]{8}$/', $documento)) {
-                $documentoValido = true;
-            } elseif ($tipo === "RUC" && preg_match('/^[0-9]{11}$/', $documento)) {
-                $documentoValido = true;
+            
+            // Tipos permitidos: DNI, RUC, otros (consistente con edición)
+            $allowedTipos = ["DNI", "RUC", "otros"];
+            
+            // Validar documento según tipo; para 'otros' permitimos cualquier valor
+            $documentoValido = true;
+            if ($tipo === "DNI") {
+                $documentoValido = preg_match('/^[0-9]{8}$/', $documento) === 1;
+            } elseif ($tipo === "RUC") {
+                $documentoValido = preg_match('/^[0-9]{11}$/', $documento) === 1;
             }
+            // Para 'otros' no validamos formato específico
 
             // Ajustar validaciones para permitir espacios y caracteres comunes en nombre y empresa
             if (
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["nuevoNombre"]) &&
-                in_array($tipo, ["DNI", "RUC"]) &&
+                in_array($tipo, $allowedTipos) &&
                 $documentoValido &&
                 isset($_POST["nuevoCorreo"]) &&
                 preg_match('/^[0-9]{9}$/', $_POST["nuevoTelefono"]) &&

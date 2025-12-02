@@ -42,11 +42,6 @@ class ModeloCliente{
 
       return $stmt->fetchAll(); /**Nos retorna toda las filas de la tabla */
     }
-    
-    $stmt -> close();
-
-    $stmt=null;
-
   }
 
   /** ============================
@@ -153,8 +148,6 @@ class ModeloCliente{
       error_log("mdlRegistrarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
-    $stmt->closeCursor();
-    $stmt = null;
   }
 
   /* MÉTODO PARA EDITAR CLIENTE */
@@ -187,8 +180,6 @@ class ModeloCliente{
       error_log("mdlEditarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
-    $stmt->closeCursor();
-    $stmt = null;
   }
 
   /* MÉTODO PARA ELIMINAR CLIENTE */
@@ -208,8 +199,6 @@ class ModeloCliente{
       error_log("mdlEliminarCliente EXCEPTION: " . $e->getMessage());
       return "error";
     }
-    $stmt->closeCursor();
-    $stmt = null;
   }
 
   /* MÉTODO PARA VERIFICAR SI UN CLIENTE TIENE OPORTUNIDADES */
