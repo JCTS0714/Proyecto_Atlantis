@@ -51,8 +51,7 @@
     <!--=================================
     PLUGINS DE CSS
   =====================================-->
-    <!-- Bootstrap 3.3.7 (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-rH1Y6t6Y5Y7yZQ6qv6K6Jf2z5k2Q5bF6R7Z4m1Q6s5Y3Z6j4K" crossorigin="anonymous">
+    <!-- Bootstrap 3.3.7 (local) -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/font-awesome/css/font-awesome.min.css">
@@ -83,14 +82,11 @@
     <!--=================================
     CAMBIAMOS LA HOJA DE ESTILO DE AdminLTE a solo.cc
   =====================================-->
+    <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
     <!-- AdminLTE Skins. Choose a skin from the css/skins
         folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/skins/_all-skins.min.css">
-
-    <!-- AdminLTE CSS (CDN with local fallback) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/AdminLTE.min.css" integrity="sha384-PLACEHOLDER" crossorigin="anonymous">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/dist/css/AdminLTE.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
