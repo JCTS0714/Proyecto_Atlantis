@@ -172,7 +172,7 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE EN NO CLIENTES
 =========================================== -->
-<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
+<?php include 'partials/modal_editar_cliente.php'; ?>
 
 <!-- Incluir script específico para No Clientes -->
 <script src="vistas/js/clientes.js"></script>

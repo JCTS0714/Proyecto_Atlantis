@@ -205,5 +205,5 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE EN ZONA DE ESPERA
 =========================================== -->
-<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
-<?php include 'modulos/partials/modal_info_cliente.php'; ?>
+<?php include 'partials/modal_editar_cliente.php'; ?>
+<?php include 'partials/modal_info_cliente.php'; ?>

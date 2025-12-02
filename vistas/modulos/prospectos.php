@@ -277,7 +277,7 @@
   </div>
 </div>
 
-<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
+<?php include 'partials/modal_editar_cliente.php'; ?>
 <script src="vistas/js/clientes.js"></script>
 <script src="vistas/js/prospectos_tipo_validacion.js"></script>
 

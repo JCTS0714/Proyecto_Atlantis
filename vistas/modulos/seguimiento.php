@@ -156,7 +156,7 @@
 <!-- ===============================================
      MODAL EDITAR CLIENTE EN SEGUIMIENTO
 =========================================== -->
-<?php include 'modulos/partials/modal_editar_cliente.php'; ?>
+<?php include 'partials/modal_editar_cliente.php'; ?>
 
 <script src="vistas/js/clientes.js"></script>
 
