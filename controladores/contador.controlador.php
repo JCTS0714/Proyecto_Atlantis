@@ -3,7 +3,7 @@
 class ControladorContador {
 
   static public function ctrMostrarContadores($item, $valor) {
-    $tabla = "contadores";
+    $tabla = "contador";
     $respuesta = ModeloContador::mdlMostrarContador($tabla, $item, $valor);
     return $respuesta;
   }
@@ -47,13 +47,13 @@ class ControladorContador {
         'contrasena' => $_POST['nuevoContrasena'] ?? ''
       ];
 
-      $tabla = 'contadores';
+      $tabla = 'contador';
       $respuesta = ModeloContador::mdlRegistrarContador($tabla, $datos);
 
       if ($respuesta == 'ok') {
         // Obtener el ID del contador recién creado
         try {
-          $stmt = Conexion::conectar()->prepare("SELECT MAX(id) as ultimo_id FROM contadores");
+          $stmt = Conexion::conectar()->prepare("SELECT MAX(id) as ultimo_id FROM contador");
           $stmt->execute();
           $row = $stmt->fetch(PDO::FETCH_ASSOC);
           $nuevoContadorId = $row ? intval($row['ultimo_id']) : 0;
@@ -111,7 +111,7 @@ class ControladorContador {
         'contrasena' => $_POST['editarContrasena'] ?? ''
       ];
 
-      $tabla = 'contadores';
+      $tabla = 'contador';
       $respuesta = ModeloContador::mdlEditarContador($tabla, $datos);
       
       if ($respuesta == 'ok') {
@@ -134,7 +134,7 @@ class ControladorContador {
   public function ctrEliminarContador() {
     if (isset($_GET['idContadorEliminar'])) {
       $id = intval($_GET['idContadorEliminar']);
-      $tabla = 'contadores';
+      $tabla = 'contador';
       $respuesta = ModeloContador::mdlEliminarContador($tabla, $id);
       if ($respuesta == 'ok') {
         echo '<script>Swal.fire({icon:"success", title:"Contador eliminado", showConfirmButton:true}).then(()=>{window.location="contadores";});</script>';

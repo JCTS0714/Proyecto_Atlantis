@@ -229,7 +229,7 @@ class ModeloContador {
         "SELECT ct.*, 
                 GROUP_CONCAT(c.empresa SEPARATOR ', ') as comercios_lista,
                 GROUP_CONCAT(c.id SEPARATOR ',') as comercios_ids
-         FROM contadores ct
+         FROM contador ct
          LEFT JOIN contadores_clientes cc ON ct.id = cc.contador_id
          LEFT JOIN clientes c ON cc.cliente_id = c.id
          GROUP BY ct.id

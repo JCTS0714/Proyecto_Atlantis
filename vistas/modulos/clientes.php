@@ -134,7 +134,7 @@
           $clientes = ControladorOportunidad::ctrMostrarClientes("estado", 2);
           $mesesNombre = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
           foreach ($clientes as $key => $value) {
-              $mesNum = isset($value["mes"]) ? intval($value["mes"]) : 0;
+              $mesNum = isset($value["post_mes"]) ? intval($value["post_mes"]) : 0;
               $mesNombre = isset($mesesNombre[$mesNum]) ? $mesesNombre[$mesNum] : '';
               echo '<tr>';
               echo '<td data-column="col-numero">'.($key+1).'</td>';
@@ -145,19 +145,19 @@
               echo '<td data-column="col-correo">'.$value["correo"].'</td>';
               echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
               echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
-              echo '<td data-column="col-precio">'.($value["precio"] ?? '-').'</td>';
-              echo '<td data-column="col-rubro">'.($value["rubro"] ?? '-').'</td>';
-              echo '<td data-column="col-anio">'.($value["anio"] ?? '-').'</td>';
+              echo '<td data-column="col-precio">'.($value["post_precio"] ?? '-').'</td>';
+              echo '<td data-column="col-rubro">'.($value["post_rubro"] ?? '-').'</td>';
+              echo '<td data-column="col-anio">'.($value["post_ano"] ?? '-').'</td>';
               echo '<td data-column="col-mes">'.$mesNombre.'</td>';
               echo '<td data-column="col-link">';
-              if (!empty($value["link"])) {
-                echo '<a href="'.htmlspecialchars($value["link"]).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
+              if (!empty($value["post_link"])) {
+                echo '<a href="'.htmlspecialchars($value["post_link"]).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
               } else {
                 echo '-';
               }
               echo '</td>';
-              echo '<td data-column="col-usuario">'.($value["usuario"] ?? '-').'</td>';
-              echo '<td data-column="col-contrasena">'.($value["contrasena"] ?? '-').'</td>';
+              echo '<td data-column="col-usuario">'.($value["post_usuario"] ?? '-').'</td>';
+              echo '<td data-column="col-contrasena">'.($value["post_contrasena"] ?? '-').'</td>';
               // Select para cambiar estado
               echo '<td data-column="col-cambiar-estado">'
                    .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
@@ -173,7 +173,7 @@
                         <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalEditarCliente"><i class="fa fa-pencil"></i></button>
                         <button class="btn btn-info btnRegistrarIncidencia" idCliente="'.$value["id"].'" nombreCliente="'.$value["nombre"].'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
                         if($_SESSION["perfil"] !== "Vendedor") {
-                          echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'"><i class="fa fa-trash"></i></button>';
+                          echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="clientes"><i class="fa fa-trash"></i></button>';
                         }
               echo '      </div>
                     </td>';

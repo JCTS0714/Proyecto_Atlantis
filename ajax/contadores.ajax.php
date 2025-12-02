@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Obtener por id
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idContador']) && !isset($_POST['action'])) {
   $id = intval($_POST['idContador']);
-  $datos = ModeloContador::mdlMostrarContador('contadores', 'id', $id);
+  $datos = ModeloContador::mdlMostrarContador('contador', 'id', $id);
   
   // También obtener los clientes asignados
   $clientesAsignados = ModeloContador::mdlObtenerClientesContador($id);
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idContador']) && !iss
 
 // Búsqueda simple para select/autocomplete (opcional)
 if ($q !== '') {
-  $clientes = ModeloContador::mdlMostrarContador('contadores', null, null);
+  $clientes = ModeloContador::mdlMostrarContador('contador', null, null);
   header('Content-Type: application/json');
   echo json_encode($clientes);
   exit;
@@ -104,7 +104,7 @@ if ($q !== '') {
 if (isset($_GET['next_nro'])) {
   try {
     $db = Conexion::conectar();
-    $stmt = $db->prepare("SELECT COALESCE(MAX(CAST(nro AS UNSIGNED)),0) AS maxn FROM contadores");
+    $stmt = $db->prepare("SELECT COALESCE(MAX(CAST(nro AS UNSIGNED)),0) AS maxn FROM contador");
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $next = ($row && $row['maxn']) ? intval($row['maxn']) + 1 : 1;

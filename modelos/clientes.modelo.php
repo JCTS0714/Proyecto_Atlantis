@@ -343,11 +343,11 @@ class ModeloCliente{
    */
   static public function mdlRegistrarClientePostventa($datos) {
     $sql = "INSERT INTO clientes (
-      empresa, nombre, telefono, ciudad, precio, tipo, documento, 
-      rubro, anio, mes, link, usuario, contrasena, estado, fecha_creacion
+      empresa, nombre, telefono, ciudad, tipo, documento, fecha_contacto,
+      post_precio, post_rubro, post_ano, post_mes, post_link, post_usuario, post_contrasena, estado
     ) VALUES (
-      :empresa, :nombre, :telefono, :ciudad, :precio, :tipo, :documento,
-      :rubro, :anio, :mes, :link, :usuario, :contrasena, :estado, NOW()
+      :empresa, :nombre, :telefono, :ciudad, :tipo, :documento, CURDATE(),
+      :post_precio, :post_rubro, :post_ano, :post_mes, :post_link, :post_usuario, :post_contrasena, :estado
     )";
     
     $stmt = Conexion::conectar()->prepare($sql);
@@ -356,15 +356,15 @@ class ModeloCliente{
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":telefono", $datos["telefono"], PDO::PARAM_STR);
     $stmt->bindParam(":ciudad", $datos["ciudad"], PDO::PARAM_STR);
-    $stmt->bindParam(":precio", $datos["precio"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
     $stmt->bindParam(":documento", $datos["documento"], PDO::PARAM_STR);
-    $stmt->bindParam(":rubro", $datos["rubro"], PDO::PARAM_STR);
-    $stmt->bindParam(":anio", $datos["anio"], PDO::PARAM_INT);
-    $stmt->bindParam(":mes", $datos["mes"], PDO::PARAM_INT);
-    $stmt->bindParam(":link", $datos["link"], PDO::PARAM_STR);
-    $stmt->bindParam(":usuario", $datos["usuario"], PDO::PARAM_STR);
-    $stmt->bindParam(":contrasena", $datos["contrasena"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_precio", $datos["post_precio"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_rubro", $datos["post_rubro"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_ano", $datos["post_ano"], PDO::PARAM_INT);
+    $stmt->bindParam(":post_mes", $datos["post_mes"], PDO::PARAM_INT);
+    $stmt->bindParam(":post_link", $datos["post_link"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_usuario", $datos["post_usuario"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_contrasena", $datos["post_contrasena"], PDO::PARAM_STR);
     $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
 
     try {

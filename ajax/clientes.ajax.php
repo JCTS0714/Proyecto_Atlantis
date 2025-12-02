@@ -230,21 +230,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
         exit;
     }
     
-    // Preparar datos para inserción
+    // Preparar datos para inserción (campos post_* según BD)
     $datos = [
         'empresa' => trim($_POST['nuevoComercio']),
         'nombre' => trim($_POST['nuevoContacto']),
         'telefono' => trim($_POST['nuevoCelular']),
         'ciudad' => isset($_POST['nuevaCiudad']) ? trim($_POST['nuevaCiudad']) : '',
-        'precio' => floatval($_POST['nuevoPrecio']),
         'tipo' => 'RUC', // Siempre RUC para postventa
         'documento' => $ruc,
-        'rubro' => isset($_POST['nuevoRubro']) ? trim($_POST['nuevoRubro']) : '',
-        'anio' => intval($_POST['nuevoAnio']),
-        'mes' => intval($_POST['nuevoMes']),
-        'link' => isset($_POST['nuevoLink']) ? trim($_POST['nuevoLink']) : '',
-        'usuario' => isset($_POST['nuevoUsuario']) ? trim($_POST['nuevoUsuario']) : '',
-        'contrasena' => isset($_POST['nuevoContrasena']) ? trim($_POST['nuevoContrasena']) : '',
+        'post_precio' => floatval($_POST['nuevoPrecio']),
+        'post_rubro' => isset($_POST['nuevoRubro']) ? trim($_POST['nuevoRubro']) : '',
+        'post_ano' => intval($_POST['nuevoAnio']),
+        'post_mes' => intval($_POST['nuevoMes']),
+        'post_link' => isset($_POST['nuevoLink']) ? trim($_POST['nuevoLink']) : '',
+        'post_usuario' => isset($_POST['nuevoUsuario']) ? trim($_POST['nuevoUsuario']) : '',
+        'post_contrasena' => isset($_POST['nuevoContrasena']) ? trim($_POST['nuevoContrasena']) : '',
         'estado' => 2 // Estado 2 = Cliente (postventa)
     ];
     
