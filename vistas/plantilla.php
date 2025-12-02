@@ -243,6 +243,16 @@
       ?>
   <!-- ./wrapper -->
 
+  <!-- Diagnóstico: verificar carga de jQuery y DataTables -->
+  <script>
+  console.log('=== DIAGNÓSTICO DE CARGA ===');
+  console.log('jQuery cargado:', typeof jQuery !== 'undefined');
+  console.log('$ cargado:', typeof $ !== 'undefined');
+  if (typeof $ !== 'undefined') {
+    console.log('$.fn.DataTable cargado:', typeof $.fn.DataTable !== 'undefined');
+  }
+  </script>
+
   <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
