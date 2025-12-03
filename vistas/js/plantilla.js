@@ -297,7 +297,8 @@ if (window.PLANTILLA_DEV === true) {
 			adv_periodo: filters.periodo || '',
 			adv_fecha_inicio: filters.fecha_inicio || '',
 			adv_fecha_fin: filters.fecha_fin || '',
-			adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion'
+			adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion',
+			adv_servidor: filters.servidor || ''
 		};
 
 		console.debug('debugReplaceTableWithRaw: sending POST to', url, postData);
@@ -337,6 +338,11 @@ if (window.PLANTILLA_DEV === true) {
 					});
 				} else {
 					$tbody.append('<tr><td colspan="14" style="text-align:center;">No hay datos (resp.data vacío)</td></tr>');
+				}
+
+				// Re-aplicar preferencias de columnas después del redibujado
+				if (typeof reapplyColumnPreferencesAfterDraw === 'function') {
+					reapplyColumnPreferencesAfterDraw(tableId);
 				}
 
 			} catch(e){ console.error('debugReplaceTableWithRaw failed', e); }

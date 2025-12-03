@@ -225,7 +225,7 @@ class ControladorUsuarios {
             "password" => $encriptar,
             "perfil" => $_POST["editarPerfil"],
             "foto" => $ruta,
-            "estado" => $_POST["editarEstado"]
+            "estado" => isset($_POST["editarEstado"]) ? $_POST["editarEstado"] : 1
         );
 
         $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);

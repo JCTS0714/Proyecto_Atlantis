@@ -12,21 +12,46 @@ function startColumnToggle() {
   }
 
   checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener('change', function() {
-      const columnName = this.dataset.column;
-      const tableId = this.dataset.table;
-      const isVisible = this.checked;
+    // Evitar duplicar event listeners
+    if (!checkbox.dataset.listenerAdded) {
+      checkbox.addEventListener('change', function() {
+        const columnName = this.dataset.column;
+        const tableId = this.dataset.table;
+        const isVisible = this.checked;
 
-      const table = document.getElementById(tableId);
-      if (table) {
-        toggleColumnByName(table, columnName, isVisible);
-        saveColumnPreference(tableId, columnName, isVisible);
-      }
-    });
+        const table = document.getElementById(tableId);
+        if (table) {
+          toggleColumnByName(table, columnName, isVisible);
+          saveColumnPreference(tableId, columnName, isVisible);
+        }
+      });
+      checkbox.dataset.listenerAdded = 'true';
+    }
   });
 
   loadColumnPreferences();
   return true;
+}
+
+// Re-aplicar preferencias de columnas después de que DataTables redibuje la tabla
+function reapplyColumnPreferencesAfterDraw(tableId) {
+  setTimeout(function() {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const prefsStr = localStorage.getItem('columnPrefs_' + tableId);
+    if (prefsStr) {
+      const prefs = JSON.parse(prefsStr);
+      Object.keys(prefs).forEach(function(columnName) {
+        toggleColumnByName(table, columnName, prefs[columnName]);
+        // Actualizar checkbox también
+        const checkbox = document.querySelector(`.column-toggle-checkbox[data-table="${tableId}"][data-column="${columnName}"]`);
+        if (checkbox) {
+          checkbox.checked = prefs[columnName];
+        }
+      });
+    }
+  }, 100);
 }
 
 // Intentar inicializar inmediatamente
