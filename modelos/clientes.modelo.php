@@ -152,7 +152,27 @@ class ModeloCliente{
 
   /* MÉTODO PARA EDITAR CLIENTE */
   static public function mdlEditarCliente($tabla,$datos){
-    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET nombre = :nombre, tipo = :tipo, documento = :documento, telefono = :telefono, correo = :correo, ciudad = :ciudad, migracion = :migracion, referencia = :referencia, fecha_contacto = :fecha_contacto, empresa = :empresa, motivo = :motivo, fecha_creacion = :fecha_creacion WHERE id = :id");
+    $stmt = Conexion::conectar()->prepare("UPDATE clientes SET 
+      nombre = :nombre, 
+      tipo = :tipo, 
+      documento = :documento, 
+      telefono = :telefono, 
+      correo = :correo, 
+      ciudad = :ciudad, 
+      migracion = :migracion, 
+      referencia = :referencia, 
+      fecha_contacto = :fecha_contacto, 
+      empresa = :empresa, 
+      motivo = :motivo, 
+      fecha_creacion = :fecha_creacion,
+      post_precio = :post_precio,
+      post_rubro = :post_rubro,
+      post_ano = :post_ano,
+      post_mes = :post_mes,
+      post_link = :post_link,
+      post_usuario = :post_usuario,
+      post_contrasena = :post_contrasena
+      WHERE id = :id");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
     $stmt->bindParam(":tipo", $datos["tipo"], PDO::PARAM_STR);
@@ -166,6 +186,13 @@ class ModeloCliente{
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
     $stmt->bindParam(":motivo", $datos["motivo"], PDO::PARAM_STR);
     $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_precio", $datos["post_precio"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_rubro", $datos["post_rubro"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_ano", $datos["post_ano"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_mes", $datos["post_mes"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_link", $datos["post_link"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_usuario", $datos["post_usuario"], PDO::PARAM_STR);
+    $stmt->bindParam(":post_contrasena", $datos["post_contrasena"], PDO::PARAM_STR);
     $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 
     try {

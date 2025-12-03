@@ -34,39 +34,31 @@
             <div class="column-toggle-list">
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-numero" checked>
-                <label>#</label>
+                <label>N°</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-nombre" checked>
-                <label>Nombre</label>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-comercio" checked>
+                <label>Comercio</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-tipo" checked>
-                <label>Tipo</label>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-contacto" checked>
+                <label>Contacto</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-documento" checked>
-                <label>Documento</label>
-              </div>
-              <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-telefono" checked>
-                <label>Teléfono</label>
-              </div>
-              <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-correo" checked>
-                <label>Observacion</label>
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-celular" checked>
+                <label>Celular</label>
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-ciudad" checked>
                 <label>Ciudad</label>
               </div>
               <div class="column-toggle-item">
-                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-empresa" checked>
-                <label>Empresa</label>
-              </div>
-              <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-precio" checked>
                 <label>Precio</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-ruc" checked>
+                <label>RUC</label>
               </div>
               <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-rubro" checked>
@@ -109,15 +101,13 @@
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaClientes">
           <thead>
             <tr>
-              <th data-column="col-numero">#</th>
-              <th data-column="col-nombre">Nombre</th>
-              <th data-column="col-tipo">Tipo</th>
-              <th data-column="col-documento">Documento</th>
-              <th data-column="col-telefono">Teléfono</th>
-              <th data-column="col-correo">Observacion</th>
+              <th data-column="col-numero">N°</th>
+              <th data-column="col-comercio">Comercio</th>
+              <th data-column="col-contacto">Contacto</th>
+              <th data-column="col-celular">Celular</th>
               <th data-column="col-ciudad">Ciudad</th>
-              <th data-column="col-empresa">Empresa</th>
               <th data-column="col-precio">Precio</th>
+              <th data-column="col-ruc">RUC</th>
               <th data-column="col-rubro">Rubro</th>
               <th data-column="col-anio">Año</th>
               <th data-column="col-mes">Mes</th>
@@ -132,26 +122,29 @@
           <?php
           // Mostrar clientes con estado 2 (clientes - oportunidades ganadas)
           $clientes = ControladorOportunidad::ctrMostrarClientes("estado", 2);
-          $mesesNombre = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+          $mesesNombreArr = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
           foreach ($clientes as $key => $value) {
               $mesNum = isset($value["post_mes"]) ? intval($value["post_mes"]) : 0;
-              $mesNombre = isset($mesesNombre[$mesNum]) ? $mesesNombre[$mesNum] : '';
+              $mesNombreVal = isset($mesesNombreArr[$mesNum]) ? $mesesNombreArr[$mesNum] : '';
               echo '<tr>';
               echo '<td data-column="col-numero">'.($key+1).'</td>';
-              echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
-              echo '<td data-column="col-tipo">'.$value["tipo"].'</td>';
-              echo '<td data-column="col-documento">'.$value["documento"].'</td>';
-              echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
-              echo '<td data-column="col-correo">'.$value["correo"].'</td>';
+              echo '<td data-column="col-comercio">'.$value["empresa"].'</td>';
+              echo '<td data-column="col-contacto">'.$value["nombre"].'</td>';
+              echo '<td data-column="col-celular">'.$value["telefono"].'</td>';
               echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
-              echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
               echo '<td data-column="col-precio">'.($value["post_precio"] ?? '-').'</td>';
+              echo '<td data-column="col-ruc">'.$value["documento"].'</td>';
               echo '<td data-column="col-rubro">'.($value["post_rubro"] ?? '-').'</td>';
               echo '<td data-column="col-anio">'.($value["post_ano"] ?? '-').'</td>';
-              echo '<td data-column="col-mes">'.$mesNombre.'</td>';
+              echo '<td data-column="col-mes">'.$mesNombreVal.'</td>';
               echo '<td data-column="col-link">';
               if (!empty($value["post_link"])) {
-                echo '<a href="'.htmlspecialchars($value["post_link"]).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
+                $linkUrl = $value["post_link"];
+                // Agregar https:// si no tiene protocolo
+                if (!preg_match('/^https?:\/\//i', $linkUrl)) {
+                  $linkUrl = 'https://' . $linkUrl;
+                }
+                echo '<a href="'.htmlspecialchars($linkUrl).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
               } else {
                 echo '-';
               }
@@ -194,115 +187,163 @@
      MODAL EDITAR CLIENTE
 =========================================== -->
 <div id="modalActualizarClientes" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#3c8dbc; color:white;">
+        <div class="modal-header" style="background:#f39c12; color:white;">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Editar Cliente</h4>
+          <h4 class="modal-title"><i class="fa fa-pencil"></i> Editar Cliente</h4>
         </div>
         <div class="modal-body">
-          <div class="box-body">
-            <input type="hidden" id="idCliente" name="idCliente">
-            <input type="hidden" id="rutaCliente" name="ruta" value="clientes">
+          <input type="hidden" id="idCliente" name="idCliente">
+          <input type="hidden" id="rutaCliente" name="ruta" value="clientes">
+          <input type="hidden" id="editarTipo" name="editarTipo" value="RUC">
+          
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <!-- Comercio (empresa) -->
+              <div class="form-group">
+                <label for="editarEmpresa">Comercio <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                  <input type="text" class="form-control" id="editarEmpresa" name="editarEmpresa" placeholder="Nombre del comercio" required>
+                </div>
+              </div>
 
-            <!-- Campos editables -->
-            <div class="form-group">
-              <label for="editarNombre">Nombre <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control input-lg" id="editarNombre" name="editarNombre" required>
+              <!-- Contacto (nombre) -->
+              <div class="form-group">
+                <label for="editarNombre">Contacto <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                  <input type="text" class="form-control" id="editarNombre" name="editarNombre" placeholder="Nombre del contacto" required>
+                </div>
+              </div>
+
+              <!-- Celular (telefono) -->
+              <div class="form-group">
+                <label for="editarTelefono">Celular <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
+                  <input type="text" class="form-control" id="editarTelefono" name="editarTelefono" placeholder="Número de celular" maxlength="15" required>
+                </div>
+              </div>
+
+              <!-- Ciudad -->
+              <div class="form-group">
+                <label for="editarCiudad">Ciudad</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                  <input type="text" class="form-control" id="editarCiudad" name="editarCiudad" placeholder="Ciudad">
+                </div>
+              </div>
+
+              <!-- Precio -->
+              <div class="form-group">
+                <label for="editarPrecio">Precio <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-money"></i></span>
+                  <input type="number" step="0.01" min="0" class="form-control" id="editarPrecio" name="editarPrecio" placeholder="0.00" required>
+                </div>
+              </div>
+
+              <!-- RUC -->
+              <div class="form-group">
+                <label for="editarDocumento">RUC <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-id-card"></i></span>
+                  <input type="text" class="form-control" id="editarDocumento" name="editarDocumento" placeholder="11 dígitos" maxlength="11" required>
+                </div>
+                <small class="text-muted">Exactamente 11 dígitos numéricos</small>
               </div>
             </div>
-            <div class="form-group">
-              <label for="editarTipo">Tipo <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-users"></i></span>
-                <select class="form-control input-lg" id="editarTipo" name="editarTipo" required>
-                  <option value="">Seleccionar tipo</option>
-                  <option value="DNI">DNI</option>
-                  <option value="RUC">RUC</option>
-                  <option value="otros">otros</option>
-                </select>
+
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <!-- Rubro -->
+              <div class="form-group">
+                <label for="editarRubro">Rubro</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-industry"></i></span>
+                  <input type="text" class="form-control" id="editarRubro" name="editarRubro" placeholder="Rubro del negocio">
+                </div>
+              </div>
+
+              <!-- Año -->
+              <div class="form-group">
+                <label for="editarAnio">Año <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  <select class="form-control" id="editarAnio" name="editarAnio" required>
+                    <option value="">Seleccionar año</option>
+                    <?php 
+                    $anioActual = date('Y');
+                    for ($i = $anioActual; $i >= $anioActual - 5; $i--) {
+                      echo "<option value='$i'>$i</option>";
+                    }
+                    ?>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Mes -->
+              <div class="form-group">
+                <label for="editarMes">Mes <span style="color:red">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                  <select class="form-control" id="editarMes" name="editarMes" required>
+                    <option value="">Seleccionar mes</option>
+                    <?php
+                    $mesesEdit = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                    foreach ($mesesEdit as $num => $nombreMes) {
+                      $valorMes = $num + 1;
+                      echo "<option value='$valorMes'>$nombreMes</option>";
+                    }
+                    ?>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Link -->
+              <div class="form-group">
+                <label for="editarLink">Link</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-link"></i></span>
+                  <input type="text" class="form-control" id="editarLink" name="editarLink" placeholder="ejemplo.dominio.com" pattern="^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/.*)?$|^$" title="Ingrese un dominio válido (ej: ejemplo.com o https://ejemplo.com)">
+                </div>
+              </div>
+
+              <!-- Usuario -->
+              <div class="form-group">
+                <label for="editarUsuario">Usuario</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user-circle"></i></span>
+                  <input type="text" class="form-control" id="editarUsuario" name="editarUsuario" placeholder="Usuario de acceso" autocomplete="off">
+                </div>
+              </div>
+
+              <!-- Contraseña -->
+              <div class="form-group">
+                <label for="editarContrasena">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                  <input type="text" class="form-control" id="editarContrasena" name="editarContrasena" placeholder="Contraseña de acceso" autocomplete="new-password">
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label for="editarDocumento">Documento <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-address-card"></i></span>
-                <input type="text" class="form-control input-lg" id="editarDocumento" name="editarDocumento" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarTelefono">Teléfono <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-                <input type="text" class="form-control input-lg" id="editarTelefono" name="editarTelefono" maxlength="15" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCorreo">Observacion</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCorreo" name="editarCorreo">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarCiudad">Ciudad</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-home"></i></span>
-                <input type="text" class="form-control input-lg" id="editarCiudad" name="editarCiudad">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarMigracion">Migración</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-globe"></i></span>
-                <input type="text" class="form-control input-lg" id="editarMigracion" name="editarMigracion">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarReferencia">Referencia</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                <select class="form-control input-lg" id="editarReferencia" name="editarReferencia">
-                  <option value="">Seleccionar referencia</option>
-                  <option value="TIK TOK">TIK TOK</option>
-                  <option value="FACEBOOK">FACEBOOK</option>
-                  <option value="INSTAGRAM">INSTAGRAM</option>
-                  <option value="whatsapp">whatsapp</option>
-                  <option value="otros">otros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarFechaContacto">Fecha de Contacto <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaContacto" name="editarFechaContacto" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="editarEmpresa">Empresa <span style="color:red">*</span></label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-building"></i></span>
-                <input type="text" class="form-control input-lg" id="editarEmpresa" name="editarEmpresa" required>
-              </div>
-            </div>
-            <div class="form-group" style="display:none;">
-              <label for="editarFechaCreacion">Fecha de Creación</label>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="date" class="form-control input-lg" id="editarFechaCreacion" name="editarFechaCreacion">
-              </div>
-            </div>
-            <!-- Campo oculto para motivo -->
-            <input type="hidden" id="editarMotivo" name="editarMotivo" value="">
           </div>
+          
+          <!-- Campos ocultos que se mantienen del sistema anterior -->
+          <input type="hidden" id="editarCorreo" name="editarCorreo" value="">
+          <input type="hidden" id="editarMigracion" name="editarMigracion" value="">
+          <input type="hidden" id="editarReferencia" name="editarReferencia" value="">
+          <input type="hidden" id="editarFechaContacto" name="editarFechaContacto" value="">
+          <input type="hidden" id="editarFechaCreacion" name="editarFechaCreacion" value="">
+          <input type="hidden" id="editarMotivo" name="editarMotivo" value="">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-          <button type="submit" class="btn btn-primary">Editar Cliente</button>
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="fa fa-save"></i> Guardar Cambios</button>
         </div>
         <?php
           ControladorCliente::ctrEditarCliente();
@@ -438,7 +479,7 @@
                 <label for="nuevoLink">Link</label>
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-link"></i></span>
-                  <input type="url" class="form-control" id="nuevoLink" name="nuevoLink" placeholder="https://...">
+                  <input type="text" class="form-control" id="nuevoLink" name="nuevoLink" placeholder="ejemplo.dominio.com" pattern="^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/.*)?$" title="Ingrese un dominio válido (ej: ejemplo.com o https://ejemplo.com)">
                 </div>
               </div>
 

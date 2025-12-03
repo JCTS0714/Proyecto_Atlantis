@@ -16,6 +16,50 @@
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarContador">
           <i class="fa fa-plus"></i> Agregar Contador
         </button>
+        
+        <!-- Botón Mostrar/Ocultar Columnas -->
+        <div class="column-toggle-container" style="margin-top:10px;">
+          <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
+            <i class="fa fa-columns"></i> Mostrar/Ocultar Columnas
+          </button>
+          <div class="column-toggle-panel hidden">
+            <h5>Mostrar/Ocultar Columnas</h5>
+            <div class="column-toggle-list">
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-numero" checked>
+                <label>N°</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-comercios" checked>
+                <label>Comercio(s)</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-nombre" checked>
+                <label>Nombre Contador</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-nombre-celular" checked>
+                <label>Nombre en Celular</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-telefono" checked>
+                <label>Teléfono</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-link" checked>
+                <label>Link</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-usuario" checked>
+                <label>Usuario</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-contrasena" checked>
+                <label>Contraseña</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="box-body">
@@ -23,14 +67,14 @@
           <thead>
             <tr>
               <th style="width: 40px;">#</th>
-              <th style="width: 50px;">N°</th>
-              <th>Comercio(s)</th>
-              <th>Nombre Contador</th>
-              <th>Nombre en Celular</th>
-              <th>Teléfono</th>
-              <th>Link</th>
-              <th>Usuario</th>
-              <th>Contraseña</th>
+              <th style="width: 50px;" data-column="col-numero">N°</th>
+              <th data-column="col-comercios">Comercio(s)</th>
+              <th data-column="col-nombre">Nombre Contador</th>
+              <th data-column="col-nombre-celular">Nombre en Celular</th>
+              <th data-column="col-telefono">Teléfono</th>
+              <th data-column="col-link">Link</th>
+              <th data-column="col-usuario">Usuario</th>
+              <th data-column="col-contrasena">Contraseña</th>
               <th style="width: 100px;">Acciones</th>
             </tr>
           </thead>
@@ -38,22 +82,27 @@
             <?php foreach ($contadores as $key => $c): ?>
               <tr>
                 <td><?php echo $key + 1; ?></td>
-                <td><?php echo htmlspecialchars($c['nro']); ?></td>
-                <td><?php echo htmlspecialchars($c['comercios_lista'] ?: $c['comercio'] ?: '-'); ?></td>
-                <td><?php echo htmlspecialchars($c['nom_contador']); ?></td>
-                <td><?php echo htmlspecialchars($c['titular_tlf']); ?></td>
-                <td><?php echo htmlspecialchars($c['telefono']); ?></td>
-                <td>
-                  <?php if (!empty($c['link'])): ?>
-                    <a href="<?php echo htmlspecialchars($c['link']); ?>" target="_blank" class="btn btn-xs btn-info">
+                <td data-column="col-numero"><?php echo htmlspecialchars($c['nro']); ?></td>
+                <td data-column="col-comercios"><?php echo htmlspecialchars($c['comercios_lista'] ?: $c['comercio'] ?: '-'); ?></td>
+                <td data-column="col-nombre"><?php echo htmlspecialchars($c['nom_contador']); ?></td>
+                <td data-column="col-nombre-celular"><?php echo htmlspecialchars($c['titular_tlf']); ?></td>
+                <td data-column="col-telefono"><?php echo htmlspecialchars($c['telefono']); ?></td>
+                <td data-column="col-link">
+                  <?php if (!empty($c['link'])): 
+                    $linkUrl = $c['link'];
+                    if (!preg_match('/^https?:\/\//i', $linkUrl)) {
+                      $linkUrl = 'https://' . $linkUrl;
+                    }
+                  ?>
+                    <a href="<?php echo htmlspecialchars($linkUrl); ?>" target="_blank" class="btn btn-xs btn-info">
                       <i class="fa fa-external-link"></i> Ver
                     </a>
                   <?php else: ?>
                     -
                   <?php endif; ?>
                 </td>
-                <td><?php echo htmlspecialchars($c['usuario']); ?></td>
-                <td><?php echo htmlspecialchars($c['contrasena']); ?></td>
+                <td data-column="col-usuario"><?php echo htmlspecialchars($c['usuario']); ?></td>
+                <td data-column="col-contrasena"><?php echo htmlspecialchars($c['contrasena']); ?></td>
                 <td>
                   <div class="btn-group">
                     <button class="btn btn-warning btn-sm btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador">

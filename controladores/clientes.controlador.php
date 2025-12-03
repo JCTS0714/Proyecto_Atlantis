@@ -180,7 +180,14 @@ class ControladorCliente {
                     "motivo" => $motivo,
                     "fecha_contacto" => $_POST["editarFechaContacto"],
                     "empresa" => $_POST["editarEmpresa"],
-                    "fecha_creacion" => $_POST["editarFechaCreacion"] ?? null
+                    "fecha_creacion" => $_POST["editarFechaCreacion"] ?? null,
+                    "post_precio" => $_POST["editarPrecio"] ?? '',
+                    "post_rubro" => $_POST["editarRubro"] ?? '',
+                    "post_ano" => $_POST["editarAnio"] ?? '',
+                    "post_mes" => $_POST["editarMes"] ?? '',
+                    "post_link" => $_POST["editarLink"] ?? '',
+                    "post_usuario" => $_POST["editarUsuario"] ?? '',
+                    "post_contrasena" => $_POST["editarContrasena"] ?? ''
                 );
 
                 $respuesta = ModeloCliente::mdlEditarCliente($tabla, $datos);

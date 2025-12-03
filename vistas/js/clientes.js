@@ -100,34 +100,32 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
         return;
       }
 
+      // Campos básicos
       $("#idCliente").val(respuesta["id"]);
       $("#editarNombre").val(respuesta["nombre"]);
-      $("#editarTipo").val(respuesta["tipo"] || "");
+      $("#editarTipo").val(respuesta["tipo"] || "RUC");
       $("#editarDocumento").val(respuesta["documento"]);
       $("#editarTelefono").val(respuesta["telefono"]);
-      $("#editarCorreo").val(respuesta["correo"]);
-      $("#editarMotivo").val(respuesta["motivo"] || '');
+      $("#editarCorreo").val(respuesta["correo"] || "");
+      $("#editarMotivo").val(respuesta["motivo"] || "");
       $("#editarCiudad").val(respuesta["ciudad"]);
-      $("#editarMigracion").val(respuesta["migracion"]);
-      $("#editarReferencia").val(respuesta["referencia"]);
-      $("#editarFechaContacto").val(respuesta["fecha_contacto"]);
+      $("#editarMigracion").val(respuesta["migracion"] || "");
+      $("#editarReferencia").val(respuesta["referencia"] || "");
+      $("#editarFechaContacto").val(respuesta["fecha_contacto"] || "");
       $("#editarEmpresa").val(respuesta["empresa"]);
-      $("#editarFechaCreacion").val(respuesta["fecha_creacion"]);
+      $("#editarFechaCreacion").val(respuesta["fecha_creacion"] || "");
+      
+      // Campos de postventa (nuevos)
+      $("#editarPrecio").val(respuesta["post_precio"] || "");
+      $("#editarRubro").val(respuesta["post_rubro"] || "");
+      $("#editarAnio").val(respuesta["post_ano"] || "");
+      $("#editarMes").val(respuesta["post_mes"] || "");
+      $("#editarLink").val(respuesta["post_link"] || "");
+      $("#editarUsuario").val(respuesta["post_usuario"] || "");
+      $("#editarContrasena").val(respuesta["post_contrasena"] || "");
       
       // Establecer la ruta para el redirect después de editar
       $("#rutaCliente").val(ruta);
-
-      // Rellenar placeholders con texto respectivo
-      $("#editarNombre").attr("placeholder", "Ingresar nombre");
-      $("#editarTipo").attr("placeholder", "Seleccionar tipo");
-      $("#editarDocumento").attr("placeholder", "Ingresar documento");
-      $("#editarTelefono").attr("placeholder", "Ingresar teléfono");
-      $("#editarCorreo").attr("placeholder", "Ingresar Observacion");
-      $("#editarCiudad").attr("placeholder", "Ingresar ciudad");
-      $("#editarMigracion").attr("placeholder", "Ingresar migración");
-      $("#editarReferencia").attr("placeholder", "Ingresar referencia");
-      $("#editarFechaContacto").attr("placeholder", "Ingresar fecha de contacto");
-      $("#editarEmpresa").attr("placeholder", "Ingresar empresa");
 
       $("#modalActualizarClientes").modal("show");
     },
