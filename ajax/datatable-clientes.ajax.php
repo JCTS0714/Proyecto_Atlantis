@@ -191,23 +191,29 @@ foreach ($rows as $k => $r) {
   $mesNum = isset($r['post_mes']) ? intval($r['post_mes']) : 0;
   $mesNombre = isset($mesesNombre[$mesNum]) ? $mesesNombre[$mesNum] : '';
 
+  // Formatear fechas
+  $fechaCreacion = !empty($r['fecha_creacion']) ? date('d/m/Y', strtotime($r['fecha_creacion'])) : '-';
+  $fechaContacto = !empty($r['fecha_contacto']) ? date('d/m/Y', strtotime($r['fecha_contacto'])) : '-';
+
   $response['data'][] = [
-    $start + $k + 1,                                    // N°
-    htmlspecialchars($r['empresa'] ?? ''),              // Comercio
-    htmlspecialchars($r['nombre'] ?? ''),               // Contacto
-    htmlspecialchars($r['telefono'] ?? ''),             // Celular
-    htmlspecialchars($r['ciudad'] ?? ''),               // Ciudad
-    htmlspecialchars($r['post_precio'] ?? '-'),         // Precio
-    htmlspecialchars($r['documento'] ?? ''),            // RUC
-    htmlspecialchars($r['post_rubro'] ?? '-'),          // Rubro
-    htmlspecialchars($r['post_ano'] ?? '-'),            // Año
-    $mesNombre,                                         // Mes
-    $linkHtml,                                          // Link
-    htmlspecialchars($r['post_usuario'] ?? '-'),        // Usuario
-    htmlspecialchars($r['post_contrasena'] ?? '-'),     // Contraseña
-    htmlspecialchars($r['servidor'] ?? '-'),            // Servidor
-    $selectEstado,                                      // Cambiar Estado
-    $actions                                            // Acciones
+    $start + $k + 1,                                    // N° (col 0)
+    htmlspecialchars($r['empresa'] ?? ''),              // Comercio (col 1)
+    htmlspecialchars($r['nombre'] ?? ''),               // Contacto (col 2)
+    htmlspecialchars($r['telefono'] ?? ''),             // Celular (col 3)
+    htmlspecialchars($r['ciudad'] ?? ''),               // Ciudad (col 4)
+    htmlspecialchars($r['post_precio'] ?? '-'),         // Precio (col 5)
+    htmlspecialchars($r['documento'] ?? ''),            // RUC (col 6)
+    htmlspecialchars($r['post_rubro'] ?? '-'),          // Rubro (col 7)
+    htmlspecialchars($r['post_ano'] ?? '-'),            // Año (col 8)
+    $mesNombre,                                         // Mes (col 9)
+    $linkHtml,                                          // Link (col 10)
+    htmlspecialchars($r['post_usuario'] ?? '-'),        // Usuario (col 11)
+    htmlspecialchars($r['post_contrasena'] ?? '-'),     // Contraseña (col 12)
+    htmlspecialchars($r['servidor'] ?? '-'),            // Servidor (col 13)
+    $fechaCreacion,                                     // F. Creación (col 14) - oculta
+    $fechaContacto,                                     // F. Contacto (col 15) - oculta
+    $selectEstado,                                      // Cambiar Estado (col 16)
+    $actions                                            // Acciones (col 17)
   ];
 }
 

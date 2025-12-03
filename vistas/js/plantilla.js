@@ -318,12 +318,16 @@ window.fetchAndReplaceTable = function(tableId, filters){
 			if (Array.isArray(resp.data) && resp.data.length>0) {
 				resp.data.forEach(function(row){
 					var tr = '<tr>';
-					row.forEach(function(col){ tr += '<td>'+ (col === null ? '' : col) +'</td>'; });
+					row.forEach(function(col, idx){ 
+						// Columnas 14 y 15 son fechas ocultas por defecto
+						var style = (idx === 14 || idx === 15) ? ' style="display:none;"' : '';
+						tr += '<td'+ style +'>'+ (col === null ? '' : col) +'</td>'; 
+					});
 					tr += '</tr>';
 					$tbody.append(tr);
 				});
 			} else {
-				$tbody.append('<tr><td colspan="14" style="text-align:center;">No se encontraron resultados</td></tr>');
+				$tbody.append('<tr><td colspan="18" style="text-align:center;">No se encontraron resultados</td></tr>');
 			}
 
 			// Re-aplicar preferencias de columnas después del redibujado
