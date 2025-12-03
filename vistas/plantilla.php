@@ -54,6 +54,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title> GRUPO | ATLANTIS</title>
+    <!-- Favicon - Icono de la pestaña del navegador -->
+    <link rel="icon" type="image/png" href="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png">
+    <link rel="shortcut icon" type="image/png" href="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png">
+    <link rel="apple-touch-icon" href="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!--=================================
