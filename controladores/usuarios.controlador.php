@@ -21,7 +21,7 @@ class ControladorUsuarios {
 
         if ($ingUsuario === '' || $ingPassword === '') {
             $_SESSION["login_error"] = "Formato de usuario o contraseña inválido";
-            header("Location: " . BASE_URL . "/login");
+            header("Location: " . rtrim(BASE_URL, '/') . "/login");
             exit;
         }
 
@@ -32,7 +32,7 @@ class ControladorUsuarios {
         $respuesta = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
         if (!$respuesta || !is_array($respuesta)) {
             $_SESSION["login_error"] = "Usuario no encontrado en la base de datos";
-            header("Location: " . BASE_URL . "/login");
+            header("Location: " . rtrim(BASE_URL, '/') . "/login");
             exit;
         }
 
@@ -83,22 +83,32 @@ class ControladorUsuarios {
                 ModeloUsuarios::mdlActualizarCampoUsuario($tabla, "sesion_expira", $fechaExpira, "id", $respuesta["id"]);
 
                 session_set_cookie_params(30 * 24 * 60 * 60);
-                error_log("Login success: usuario=" . $ingUsuario . " | id=" . $respuesta["id"]);
+                error_log("Login success: usuario=" . $ingUsuario . " | id=" . $respuesta["id"] . " | BASE_URL=" . BASE_URL);
                 
-                // Redirect usando header PHP (funciona porque se procesa antes del HTML)
-                header("Location: " . BASE_URL . "/inicio");
+                // Construir URL de redirección de forma segura
+                $redirectUrl = rtrim(BASE_URL, '/') . '/inicio';
+                error_log("Redirecting to: " . $redirectUrl);
+                
+                // Verificar que no se hayan enviado headers
+                if (headers_sent($file, $line)) {
+                    error_log("Headers already sent in $file on line $line");
+                    echo '<script>window.location.href = "' . $redirectUrl . '";</script>';
+                    exit;
+                }
+                
+                header("Location: " . $redirectUrl);
                 exit;
 
             } else {
                 // Usuario inactivo
                 $_SESSION["login_error"] = "El usuario está inactivo. Esta cuenta está desactivada";
-                header("Location: " . BASE_URL . "/login");
+                header("Location: " . rtrim(BASE_URL, '/') . "/login");
                 exit;
             }
         } else {
             error_log("Login error: Contraseña incorrecta para usuario=" . $ingUsuario);
             $_SESSION["login_error"] = "Usuario o contraseña incorrectos";
-            header("Location: " . BASE_URL . "/login");
+            header("Location: " . rtrim(BASE_URL, '/') . "/login");
             exit;
         }
     }
