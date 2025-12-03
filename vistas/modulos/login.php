@@ -169,10 +169,7 @@
 .login-logo-img {
     max-width: 180px;
     height: auto;
-    filter: drop-shadow(0 2px 15px rgba(0, 0, 0, 0.4));
-    /* mix-blend-mode hace que el fondo negro se vuelva transparente */
-    mix-blend-mode: screen;
-    border-radius: 8px;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
 }
 
 /* Texto de bienvenida */
