@@ -4,7 +4,15 @@ class ControladorUsuarios {
 
     // Ingreso (login)
     public function ctrIngresoUsuario() {
-        if (!isset($_POST["ingUsuario"])) return;
+        // Si no hay datos de login, mostrar mensaje de error de sesión si existe
+        if (!isset($_POST["ingUsuario"])) {
+            // Mostrar mensaje de error almacenado en sesión (si existe)
+            if (isset($_SESSION["login_error"])) {
+                echo '<br><div class="alert alert-danger">' . htmlspecialchars($_SESSION["login_error"]) . '</div>';
+                unset($_SESSION["login_error"]);
+            }
+            return;
+        }
 
         $ingUsuario = isset($_POST["ingUsuario"]) ? trim($_POST["ingUsuario"]) : '';
         $ingPassword = isset($_POST["ingPassword"]) ? $_POST["ingPassword"] : '';
@@ -12,8 +20,9 @@ class ControladorUsuarios {
         error_log("ctrIngresoUsuario: intento de login para usuario={$ingUsuario} | pwd_len=" . strlen($ingPassword));
 
         if ($ingUsuario === '' || $ingPassword === '') {
-            echo '<br><div class="alert alert-danger">Formato de usuario o contraseña inválido</div>';
-            return;
+            $_SESSION["login_error"] = "Formato de usuario o contraseña inválido";
+            header("Location: " . BASE_URL . "/login");
+            exit;
         }
 
         $tabla = "usuarios";
@@ -22,8 +31,9 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
         if (!$respuesta || !is_array($respuesta)) {
-            echo '<br><div class="alert alert-danger">Usuario no encontrado en la base de datos</div>';
-            return;
+            $_SESSION["login_error"] = "Usuario no encontrado en la base de datos";
+            header("Location: " . BASE_URL . "/login");
+            exit;
         }
 
         $passwordVerified = false;
@@ -74,15 +84,22 @@ class ControladorUsuarios {
 
                 session_set_cookie_params(30 * 24 * 60 * 60);
                 error_log("Login success: usuario=" . $ingUsuario . " | id=" . $respuesta["id"]);
-                    echo '<script>window.location = "'.BASE_URL.'/inicio";</script>';
+                
+                // Redirect usando header PHP (funciona porque se procesa antes del HTML)
+                header("Location: " . BASE_URL . "/inicio");
+                exit;
 
             } else {
-                // Mostrar mensaje claro cuando la cuenta está desactivada
-                echo '<br><div class="alert alert-danger">El usuario está inactivo. Esta cuenta está desactivada</div>';
+                // Usuario inactivo
+                $_SESSION["login_error"] = "El usuario está inactivo. Esta cuenta está desactivada";
+                header("Location: " . BASE_URL . "/login");
+                exit;
             }
         } else {
             error_log("Login error: Contraseña incorrecta para usuario=" . $ingUsuario);
-            echo '<br><div class="alert alert-danger">Usuario o contraseña incorrectos</div>';
+            $_SESSION["login_error"] = "Usuario o contraseña incorrectos";
+            header("Location: " . BASE_URL . "/login");
+            exit;
         }
     }
 

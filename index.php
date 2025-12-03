@@ -106,7 +106,16 @@ require_once "modelos/evento.modelo.php";
 require_once "modelos/calendario.modelo.php";
 require_once "modelos/contador.modelo.php";
 
-
+/**
+ * PROCESAR LOGIN ANTES DE LA PLANTILLA
+ * Esto permite usar header() para redirección ya que no se ha enviado HTML
+ */
+if (isset($_POST["ingUsuario"]) && isset($_POST["ingPassword"])) {
+    $login = new ControladorUsuarios();
+    $login->ctrIngresoUsuario();
+    // Si el login fue exitoso, el controlador hace exit después de redirect
+    // Si llegamos aquí, hubo error y continuamos mostrando el formulario
+}
 
 /**CREAMOS EL OBJETO $PLANTILLA QUE HACE INSTANCIA DE LA CLASE ControladoPlantilla Y ACCEDEMOS A SU MÉTODO */
 
