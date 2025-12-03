@@ -6,6 +6,56 @@
  */
 ?>
 <!-- Advanced Search Panel - Barra compacta visible -->
+<style>
+  /* Estilos para búsqueda avanzada */
+  .adv-search-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+    display: block;
+    text-align: left;
+  }
+  .adv-search-label i {
+    margin-right: 5px;
+    color: #3c8dbc;
+  }
+  .adv-form-group {
+    margin-bottom: 0;
+    padding: 8px 12px;
+  }
+  .adv-search-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -12px;
+  }
+  .adv-search-col {
+    flex: 1;
+    min-width: 200px;
+    padding: 0;
+  }
+  .adv-tipo-fecha-group {
+    display: inline-flex;
+    gap: 0;
+  }
+  .adv-tipo-fecha-group .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .adv-buttons-group {
+    display: flex;
+    gap: 8px;
+  }
+  .adv-buttons-group .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  @media (max-width: 768px) {
+    .adv-search-col {
+      flex: 0 0 100%;
+    }
+  }
+</style>
 <div id="advanced-search-container" class="advanced-search-wrapper" style="margin-bottom: 15px;">
   <div id="advanced-search-bar">
     <button type="button" id="btn-toggle-advanced-search" class="btn btn-success btn-sm">
@@ -16,31 +66,31 @@
   <!-- Panel expandible de búsqueda avanzada -->
   <div id="advanced-search-panel-inline" style="display:none; margin-top: 10px;">
     <div class="box box-solid" style="border-left:4px solid #00a65a; margin-bottom: 0;">
-      <div class="box-body" style="background:#fff; padding: 20px;">
-        <form id="form-advanced-search-inline" class="form-horizontal" role="form">
+      <div class="box-body" style="background:#fff; padding: 15px 10px;">
+        <form id="form-advanced-search-inline" role="form">
           
           <!-- Primera fila: Campos de texto -->
-          <div class="row">
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-user" style="margin-right: 5px; color: #3c8dbc;"></i>Nombre
+          <div class="adv-search-row">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-user"></i>Nombre
                 </label>
                 <input type="text" name="adv_nombre" class="form-control input-sm adv-nombre" placeholder="Buscar por nombre...">
               </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-phone" style="margin-right: 5px; color: #3c8dbc;"></i>Teléfono
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-phone"></i>Teléfono
                 </label>
                 <input type="text" name="adv_telefono" class="form-control input-sm adv-telefono" placeholder="Buscar por teléfono...">
               </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-id-card" style="margin-right: 5px; color: #3c8dbc;"></i>DNI/RUC
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-id-card"></i>DNI/RUC
                 </label>
                 <input type="text" name="adv_documento" class="form-control input-sm adv-documento" placeholder="Buscar por documento...">
               </div>
@@ -48,28 +98,28 @@
           </div>
 
           <!-- Segunda fila: Filtro de periodo y tipo de fecha -->
-          <div class="row">
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-calendar" style="margin-right: 5px; color: #3c8dbc;"></i>Filtrar por fecha de:
+          <div class="adv-search-row" style="margin-top: 10px;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar"></i>Filtrar por fecha de:
                 </label>
-                <div class="btn-group btn-group-sm" data-toggle="buttons" style="width: 100%;">
-                  <label class="btn btn-default active" style="width: 50%;">
+                <div class="adv-tipo-fecha-group btn-group btn-group-sm" data-toggle="buttons">
+                  <label class="btn btn-default active">
                     <input type="radio" name="adv_tipo_fecha" value="fecha_creacion" checked> 
                     <i class="fa fa-plus-circle"></i> Creación
                   </label>
-                  <label class="btn btn-default" style="width: 50%;">
+                  <label class="btn btn-default">
                     <input type="radio" name="adv_tipo_fecha" value="fecha_contacto"> 
                     <i class="fa fa-phone-square"></i> Contacto
                   </label>
                 </div>
               </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-clock-o" style="margin-right: 5px; color: #3c8dbc;"></i>Periodo
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-clock-o"></i>Periodo
                 </label>
                 <select name="adv_periodo" class="form-control input-sm adv-periodo">
                   <option value="">Todos los periodos</option>
@@ -84,19 +134,17 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-4 col-sm-12">
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  &nbsp;
-                </label>
-                <div class="btn-group" style="width: 100%;">
-                  <button type="submit" class="btn btn-primary btn-sm adv-apply" style="width: 40%;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">&nbsp;</label>
+                <div class="adv-buttons-group">
+                  <button type="submit" class="btn btn-primary btn-sm adv-apply">
                     <i class="fa fa-search"></i> Buscar
                   </button>
-                  <button type="button" class="btn btn-warning btn-sm adv-clear" style="width: 35%;">
+                  <button type="button" class="btn btn-warning btn-sm adv-clear">
                     <i class="fa fa-eraser"></i> Limpiar
                   </button>
-                  <button type="button" class="btn btn-default btn-sm btn-close-advanced-search" style="width: 25%;">
+                  <button type="button" class="btn btn-default btn-sm btn-close-advanced-search">
                     <i class="fa fa-times"></i> Cerrar
                   </button>
                 </div>
@@ -105,30 +153,30 @@
           </div>
 
           <!-- Tercera fila: Fechas personalizadas (ocultas por defecto) -->
-          <div class="row adv_custom_dates" style="display:none; background: #f9f9f9; padding: 15px; border-radius: 4px; margin-top: 10px;">
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-calendar-check-o" style="margin-right: 5px; color: #00a65a;"></i>Fecha Inicio
+          <div class="adv-search-row adv_custom_dates" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Fecha Inicio
                 </label>
                 <input type="date" name="adv_fecha_inicio" class="form-control input-sm adv-fecha-inicio">
               </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="control-label" style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-calendar-times-o" style="margin-right: 5px; color: #dd4b39;"></i>Fecha Fin
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Fecha Fin
                 </label>
                 <input type="date" name="adv_fecha_fin" class="form-control input-sm adv-fecha-fin">
               </div>
             </div>
-            <div class="col-md-4 col-sm-12">
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="control-label" style="font-size: 12px; color: #777; margin-bottom: 5px; display: block;">
-                  <i class="fa fa-info-circle" style="margin-right: 5px;"></i>Información
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label" style="color: #777;">
+                  <i class="fa fa-info-circle"></i>Información
                 </label>
-                <p class="text-muted" style="font-size: 11px; margin: 0; padding-top: 5px;">
-                  Seleccione el rango de fechas para filtrar los registros según la fecha elegida arriba.
+                <p class="text-muted" style="font-size: 11px; margin: 0;">
+                  Seleccione el rango de fechas para filtrar.
                 </p>
               </div>
             </div>
