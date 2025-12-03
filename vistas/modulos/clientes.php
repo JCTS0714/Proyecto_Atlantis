@@ -183,16 +183,6 @@
           </tbody>
         </table>
       </div>
-      
-      <!-- Tarjeta de Conteo de Registros -->
-      <?php 
-        $conteoEstado = 2; // Estado cliente
-        $conteoTitulo = 'Registros de Clientes';
-        $conteoColor = 'green';
-        $conteoIcono = 'fa-users';
-        include 'partials/tarjeta_conteo_registros.php'; 
-      ?>
-      
     </div>
   </section>
 </div>

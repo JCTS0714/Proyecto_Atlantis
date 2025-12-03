@@ -165,16 +165,6 @@
           </tbody>
         </table>
       </div>
-      
-      <!-- Tarjeta de Conteo de Registros -->
-      <?php 
-        $conteoEstado = 3; // Estado no cliente
-        $conteoTitulo = 'Registros de No Clientes';
-        $conteoColor = 'red';
-        $conteoIcono = 'fa-user-times';
-        include 'partials/tarjeta_conteo_registros.php'; 
-      ?>
-      
     </div>
   </section>
 </div>
