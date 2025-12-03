@@ -82,7 +82,7 @@ class ControladorUsuarios {
                 ModeloUsuarios::mdlActualizarCampoUsuario($tabla, "sesion_token", $sesion_token, "id", $respuesta["id"]);
                 ModeloUsuarios::mdlActualizarCampoUsuario($tabla, "sesion_expira", $fechaExpira, "id", $respuesta["id"]);
 
-                session_set_cookie_params(30 * 24 * 60 * 60);
+                // Cookie params ya configurados en index.php antes de session_start()
                 error_log("Login success: usuario=" . $ingUsuario . " | id=" . $respuesta["id"] . " | BASE_URL=" . BASE_URL);
                 
                 // Construir URL de redirección de forma segura
