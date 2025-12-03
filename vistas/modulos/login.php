@@ -256,7 +256,7 @@ body.login-page {
         </div>
         
         <!-- Atlantis con fuente personalizada -->
-        <div class="atlantis-title">Atlantis</div>
+        <div class="atlantis-title">Grupo Atlantis</div>
         
         <p class="welcome-text">Bienvenido al sistema CRM</p>
         
