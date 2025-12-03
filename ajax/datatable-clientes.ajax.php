@@ -20,6 +20,8 @@ $filters['documento'] = isset($_REQUEST['documento']) ? trim($_REQUEST['document
 $filters['periodo'] = isset($_REQUEST['periodo']) ? trim($_REQUEST['periodo']) : (isset($_REQUEST['adv_periodo']) ? trim($_REQUEST['adv_periodo']) : '');
 $filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fecha_inicio']) : (isset($_REQUEST['adv_fecha_inicio']) ? trim($_REQUEST['adv_fecha_inicio']) : '');
 $filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : (isset($_REQUEST['adv_fecha_fin']) ? trim($_REQUEST['adv_fecha_fin']) : '');
+// Nuevo: tipo de fecha (fecha_creacion o fecha_contacto)
+$filters['tipo_fecha'] = isset($_REQUEST['tipo_fecha']) ? trim($_REQUEST['tipo_fecha']) : (isset($_REQUEST['adv_tipo_fecha']) ? trim($_REQUEST['adv_tipo_fecha']) : 'fecha_creacion');
 
 // Debug mode flag (client can request with adv_debug=1)
 $debugMode = isset($_REQUEST['adv_debug']) && intval($_REQUEST['adv_debug']) === 1;
@@ -39,19 +41,30 @@ if ($filters['nombre'] !== '') { $where[] = "c.nombre LIKE :nombre"; $params[':n
 if ($filters['documento'] !== '') { $where[] = "c.documento LIKE :documento"; $params[':documento'] = '%' . $filters['documento'] . '%'; }
 if ($filters['telefono'] !== '') { $where[] = "c.telefono LIKE :telefono"; $params[':telefono'] = '%' . $filters['telefono'] . '%'; }
 
+// Determinar el campo de fecha a usar (fecha_creacion o fecha_contacto)
+$campoFecha = ($filters['tipo_fecha'] === 'fecha_contacto') ? 'c.fecha_contacto' : 'c.fecha_creacion';
+
 // Date filtering based on periodo or explicit fechas
 if ($filters['periodo'] === 'today') {
-  $where[] = "DATE(c.fecha_creacion) = CURDATE()";
+  $where[] = "DATE($campoFecha) = CURDATE()";
+} elseif ($filters['periodo'] === 'yesterday') {
+  $where[] = "DATE($campoFecha) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)";
 } elseif ($filters['periodo'] === 'this_week') {
-  $where[] = "YEARWEEK(c.fecha_creacion, 1) = YEARWEEK(CURDATE(), 1)";
+  $where[] = "YEARWEEK($campoFecha, 1) = YEARWEEK(CURDATE(), 1)";
+} elseif ($filters['periodo'] === 'last_week') {
+  $where[] = "YEARWEEK($campoFecha, 1) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 1 WEEK), 1)";
 } elseif ($filters['periodo'] === 'this_month') {
-  $where[] = "YEAR(c.fecha_creacion) = YEAR(CURDATE()) AND MONTH(c.fecha_creacion) = MONTH(CURDATE())";
+  $where[] = "YEAR($campoFecha) = YEAR(CURDATE()) AND MONTH($campoFecha) = MONTH(CURDATE())";
+} elseif ($filters['periodo'] === 'last_month') {
+  $where[] = "YEAR($campoFecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AND MONTH($campoFecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))";
+} elseif ($filters['periodo'] === 'this_year') {
+  $where[] = "YEAR($campoFecha) = YEAR(CURDATE())";
 } elseif ($filters['periodo'] === 'custom' && $filters['fecha_inicio'] !== '' && $filters['fecha_fin'] !== '') {
-  $where[] = "c.fecha_creacion BETWEEN :fi AND :ff";
+  $where[] = "DATE($campoFecha) BETWEEN :fi AND :ff";
   $params[':fi'] = $filters['fecha_inicio'];
   $params[':ff'] = $filters['fecha_fin'];
 } elseif ($filters['fecha_inicio'] !== '' && $filters['fecha_fin'] !== '') {
-  $where[] = "c.fecha_creacion BETWEEN :fi AND :ff";
+  $where[] = "DATE($campoFecha) BETWEEN :fi AND :ff";
   $params[':fi'] = $filters['fecha_inicio'];
   $params[':ff'] = $filters['fecha_fin'];
 }

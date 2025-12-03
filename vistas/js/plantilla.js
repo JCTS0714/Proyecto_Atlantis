@@ -296,7 +296,8 @@ if (window.PLANTILLA_DEV === true) {
 			adv_documento: filters.documento || '',
 			adv_periodo: filters.periodo || '',
 			adv_fecha_inicio: filters.fecha_inicio || '',
-			adv_fecha_fin: filters.fecha_fin || ''
+			adv_fecha_fin: filters.fecha_fin || '',
+			adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion'
 		};
 
 		console.debug('debugReplaceTableWithRaw: sending POST to', url, postData);

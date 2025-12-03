@@ -17,13 +17,17 @@
     if (!$form || !$form.length) return {};
     
     try {
+      // Obtener el tipo de fecha seleccionado (radio button)
+      var tipoFecha = $form.find('[name=adv_tipo_fecha]:checked').val() || 'fecha_creacion';
+      
       return {
         nombre: ($form.find('[name=adv_nombre]').val() || '').trim(),
         telefono: ($form.find('[name=adv_telefono]').val() || '').trim(),
         documento: ($form.find('[name=adv_documento]').val() || '').trim(),
         periodo: ($form.find('[name=adv_periodo]').val() || '').trim(),
         fecha_inicio: ($form.find('[name=adv_fecha_inicio]').val() || '').trim(),
-        fecha_fin: ($form.find('[name=adv_fecha_fin]').val() || '').trim()
+        fecha_fin: ($form.find('[name=adv_fecha_fin]').val() || '').trim(),
+        tipo_fecha: tipoFecha
       };
     } catch (e) {
       console.warn('advanced_search: error building filters', e);
@@ -126,6 +130,12 @@
         $container.find('input[type=text], input[type=date]').val('');
         $container.find('select').val('');
         $container.find('.adv_custom_dates').hide();
+        
+        // Resetear radio buttons al valor por defecto (fecha_creacion)
+        $container.find('[name=adv_tipo_fecha]').prop('checked', false);
+        $container.find('[name=adv_tipo_fecha][value=fecha_creacion]').prop('checked', true);
+        $container.find('[name=adv_tipo_fecha]').closest('.btn').removeClass('active');
+        $container.find('[name=adv_tipo_fecha][value=fecha_creacion]').closest('.btn').addClass('active');
         
         // Despachar evento de limpiar
         var event = new CustomEvent('advancedSearch:clear');
