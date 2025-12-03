@@ -209,7 +209,7 @@
     text-align: center;
     margin-top: 10px;
     margin-bottom: 25px;
-    font-size: 42px;
+    font-size: 31px;
     letter-spacing: 4px;
     text-shadow: 0 4px 20px rgba(30, 136, 229, 0.5);
 }
