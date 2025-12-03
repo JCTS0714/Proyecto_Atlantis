@@ -37,7 +37,12 @@ $table = 'clientes';
 $where = [];
 $params = [];
 
-if ($filters['nombre'] !== '') { $where[] = "c.nombre LIKE :nombre"; $params[':nombre'] = '%' . $filters['nombre'] . '%'; }
+// Nombre busca en nombre (Contacto) y empresa (Comercio)
+if ($filters['nombre'] !== '') { 
+  $where[] = "(c.nombre LIKE :nombre OR c.empresa LIKE :nombre2)"; 
+  $params[':nombre'] = '%' . $filters['nombre'] . '%'; 
+  $params[':nombre2'] = '%' . $filters['nombre'] . '%'; 
+}
 if ($filters['documento'] !== '') { $where[] = "c.documento LIKE :documento"; $params[':documento'] = '%' . $filters['documento'] . '%'; }
 if ($filters['telefono'] !== '') { $where[] = "c.telefono LIKE :telefono"; $params[':telefono'] = '%' . $filters['telefono'] . '%'; }
 
@@ -149,9 +154,12 @@ if ($debugMode) {
 }
 
 // Format data rows to match table columns order used in clientes.php
+// Orden: N°, Comercio, Contacto, Celular, Ciudad, Precio, RUC, Rubro, Año, Mes, Link, Usuario, Contraseña, Cambiar Estado, Acciones
+$mesesNombre = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
 foreach ($rows as $k => $r) {
   $actions = '<div class="btn-group">';
-  $actions .= '<button class="btn btn-warning btnEditarCliente" idCliente="'.htmlspecialchars($r['id']).'" data-toggle="modal" data-target="#modalEditarCliente"><i class="fa fa-pencil"></i></button>';
+  $actions .= '<button class="btn btn-warning btnEditarCliente" idCliente="'.htmlspecialchars($r['id']).'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>';
   $actions .= '<button class="btn btn-info btnRegistrarIncidencia" idCliente="'.htmlspecialchars($r['id']).'" nombreCliente="'.htmlspecialchars($r['nombre']).'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
   if (isset($_SESSION['perfil']) && $_SESSION['perfil'] !== 'Vendedor') {
     $actions .= '<button class="btn btn-danger btnEliminarCliente" idCliente="'.htmlspecialchars($r['id']).'"><i class="fa fa-trash"></i></button>';
@@ -166,21 +174,36 @@ foreach ($rows as $k => $r) {
     .'<option value="4"'.($r['estado'] == 4 ? ' selected' : '').'>En Espera</option>'
     .'</select>';
 
+  // Preparar el link con protocolo si no lo tiene
+  $linkUrl = $r['post_link'] ?? '';
+  $linkHtml = '-';
+  if (!empty($linkUrl)) {
+    if (!preg_match('/^https?:\/\//i', $linkUrl)) {
+      $linkUrl = 'https://' . $linkUrl;
+    }
+    $linkHtml = '<a href="'.htmlspecialchars($linkUrl).'" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-external-link"></i></a>';
+  }
+
+  // Obtener nombre del mes
+  $mesNum = isset($r['post_mes']) ? intval($r['post_mes']) : 0;
+  $mesNombre = isset($mesesNombre[$mesNum]) ? $mesesNombre[$mesNum] : '';
+
   $response['data'][] = [
-    $start + $k + 1,
-    $r['nombre'],
-    $r['tipo'],
-    $r['documento'],
-    $r['telefono'],
-    $r['correo'],
-    $r['ciudad'],
-    $r['migracion'],
-    $r['referencia'],
-    $r['fecha_contacto'],
-    $r['empresa'],
-    $r['fecha_creacion'],
-    $selectEstado,
-    $actions
+    $start + $k + 1,                                    // N°
+    htmlspecialchars($r['empresa'] ?? ''),              // Comercio
+    htmlspecialchars($r['nombre'] ?? ''),               // Contacto
+    htmlspecialchars($r['telefono'] ?? ''),             // Celular
+    htmlspecialchars($r['ciudad'] ?? ''),               // Ciudad
+    htmlspecialchars($r['post_precio'] ?? '-'),         // Precio
+    htmlspecialchars($r['documento'] ?? ''),            // RUC
+    htmlspecialchars($r['post_rubro'] ?? '-'),          // Rubro
+    htmlspecialchars($r['post_ano'] ?? '-'),            // Año
+    $mesNombre,                                         // Mes
+    $linkHtml,                                          // Link
+    htmlspecialchars($r['post_usuario'] ?? '-'),        // Usuario
+    htmlspecialchars($r['post_contrasena'] ?? '-'),     // Contraseña
+    $selectEstado,                                      // Cambiar Estado
+    $actions                                            // Acciones
   ];
 }
 
