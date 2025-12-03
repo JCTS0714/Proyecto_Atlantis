@@ -167,9 +167,12 @@
 }
 
 .login-logo-img {
-    max-width: 140px;
+    max-width: 180px;
     height: auto;
     filter: drop-shadow(0 2px 15px rgba(0, 0, 0, 0.4));
+    /* mix-blend-mode hace que el fondo negro se vuelva transparente */
+    mix-blend-mode: screen;
+    border-radius: 8px;
 }
 
 /* Texto de bienvenida */
@@ -210,7 +213,7 @@ body.login-page {
     <div class="login-card">
         <!-- Logo -->
         <div class="login-logo-container">
-            <img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/LOGO-ATLANTIS.png" alt="Atlantis CRM" class="login-logo-img" onerror="this.style.display='none'">
+            <img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png" alt="Atlantis CRM" class="login-logo-img" onerror="this.src='<?php echo BASE_URL; ?>/vistas/img/plantilla/LOGO-ATLANTIS.png'">
         </div>
         
         <h2>Login</h2>
