@@ -3,6 +3,26 @@
 /* ========================================
    ESTILOS DEL LOGIN - GRUPO ATLANTIS
 ======================================== */
+
+/* Fuente personalizada Amiamie Round */
+@font-face {
+    font-family: 'Amiamie Round';
+    src: url('<?php echo BASE_URL; ?>/vistas/Fuente/amiamie-round/webfonts/Amiamie-RegularRound.woff2') format('woff2'),
+         url('<?php echo BASE_URL; ?>/vistas/Fuente/amiamie-round/webfonts/Amiamie-RegularRound.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Amiamie Round';
+    src: url('<?php echo BASE_URL; ?>/vistas/Fuente/amiamie-round/webfonts/Amiamie-BlackRound.woff2') format('woff2'),
+         url('<?php echo BASE_URL; ?>/vistas/Fuente/amiamie-round/webfonts/Amiamie-BlackRound.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 .login-page-wrapper {
     min-height: 100vh;
     display: flex;
@@ -41,17 +61,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
     z-index: 10;
     position: relative;
-}
-
-.login-card h2 {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 35px;
-    font-size: 32px;
-    font-weight: 300;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Grupos de input */
@@ -180,6 +189,31 @@
     font-size: 14px;
 }
 
+/* Texto "Login" encima del logo */
+.login-title-top {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Texto "Atlantis" con fuente personalizada */
+.atlantis-title {
+    font-family: 'Amiamie Round', sans-serif;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    font-size: 42px;
+    letter-spacing: 4px;
+    text-shadow: 0 4px 20px rgba(30, 136, 229, 0.5);
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .login-card {
@@ -188,9 +222,14 @@
         border-radius: 20px;
     }
     
-    .login-card h2 {
+    .login-title-top {
         font-size: 26px;
         letter-spacing: 2px;
+    }
+    
+    .atlantis-title {
+        font-size: 32px;
+        letter-spacing: 3px;
     }
     
     .input-group-login input {
@@ -208,12 +247,17 @@ body.login-page {
 <div class="login-page-wrapper">
     <!-- Tarjeta de Login -->
     <div class="login-card">
+        <!-- Login encima del logo -->
+        <h2 class="login-title-top">Login</h2>
+        
         <!-- Logo -->
         <div class="login-logo-container">
             <img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png" alt="Atlantis CRM" class="login-logo-img" onerror="this.src='<?php echo BASE_URL; ?>/vistas/img/plantilla/LOGO-ATLANTIS.png'">
         </div>
         
-        <h2>Login</h2>
+        <!-- Atlantis con fuente personalizada -->
+        <div class="atlantis-title">Atlantis</div>
+        
         <p class="welcome-text">Bienvenido al sistema CRM</p>
         
         <?php
