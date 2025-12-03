@@ -182,7 +182,7 @@
               <!-- Link -->
               <div class="form-group">
                 <label><i class="fa fa-link"></i> Link</label>
-                <input class="form-control" name="nuevoLink" placeholder="https://..." autocomplete="off">
+                <input type="text" class="form-control" name="nuevoLink" placeholder="ejemplo.dominio.com" autocomplete="off" pattern="^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/.*)?$|^$" title="Ingrese un dominio válido (ej: ejemplo.com o https://ejemplo.com)">
               </div>
               
               <!-- Usuario -->
@@ -277,7 +277,7 @@
               <!-- Link -->
               <div class="form-group">
                 <label><i class="fa fa-link"></i> Link</label>
-                <input id="editarLink" class="form-control" name="editarLink" placeholder="https://..." autocomplete="off">
+                <input type="text" id="editarLink" class="form-control" name="editarLink" placeholder="ejemplo.dominio.com" autocomplete="off" pattern="^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/.*)?$|^$" title="Ingrese un dominio válido (ej: ejemplo.com o https://ejemplo.com)">
               </div>
               
               <!-- Usuario -->
