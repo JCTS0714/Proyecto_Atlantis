@@ -1,0 +1,325 @@
+/**
+ * TOOLTIPS PERSONALIZADOS - ATLANTIS CRM
+ * Sistema de tooltips con estilos mejorados
+ * @version 1.0
+ * @date 2025-12-03
+ */
+
+/* ========================================
+   TOOLTIP BASE STYLES
+======================================== */
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+/* Contenido del tooltip */
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  background: linear-gradient(135deg, #333 0%, #222 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  line-height: 1.4;
+  max-width: 250px;
+  text-align: center;
+}
+
+/* Flecha del tooltip */
+[data-tooltip]::before {
+  content: '';
+  border: 6px solid transparent;
+}
+
+/* Mostrar en hover */
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ========================================
+   POSICIONES
+======================================== */
+
+/* TOP (default) */
+[data-tooltip]:not([data-tooltip-pos])::after,
+[data-tooltip][data-tooltip-pos="top"]::after {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+}
+
+[data-tooltip]:not([data-tooltip-pos]):hover::after,
+[data-tooltip][data-tooltip-pos="top"]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tooltip]:not([data-tooltip-pos])::before,
+[data-tooltip][data-tooltip-pos="top"]::before {
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #333;
+}
+
+/* BOTTOM */
+[data-tooltip][data-tooltip-pos="bottom"]::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+[data-tooltip][data-tooltip-pos="bottom"]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tooltip][data-tooltip-pos="bottom"]::before {
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #333;
+}
+
+/* LEFT */
+[data-tooltip][data-tooltip-pos="left"]::after {
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(5px);
+}
+
+[data-tooltip][data-tooltip-pos="left"]:hover::after {
+  transform: translateY(-50%) translateX(0);
+}
+
+[data-tooltip][data-tooltip-pos="left"]::before {
+  right: calc(100% + 2px);
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #333;
+}
+
+/* RIGHT */
+[data-tooltip][data-tooltip-pos="right"]::after {
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-5px);
+}
+
+[data-tooltip][data-tooltip-pos="right"]:hover::after {
+  transform: translateY(-50%) translateX(0);
+}
+
+[data-tooltip][data-tooltip-pos="right"]::before {
+  left: calc(100% + 2px);
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #333;
+}
+
+/* ========================================
+   VARIANTES DE COLOR
+======================================== */
+
+/* Info (azul) */
+[data-tooltip-type="info"]::after {
+  background: linear-gradient(135deg, #3c8dbc 0%, #2c6d9c 100%);
+}
+
+[data-tooltip-type="info"][data-tooltip-pos="top"]::before,
+[data-tooltip-type="info"]:not([data-tooltip-pos])::before {
+  border-top-color: #3c8dbc;
+}
+
+[data-tooltip-type="info"][data-tooltip-pos="bottom"]::before {
+  border-bottom-color: #3c8dbc;
+}
+
+/* Success (verde) */
+[data-tooltip-type="success"]::after {
+  background: linear-gradient(135deg, #00a65a 0%, #008d4c 100%);
+}
+
+[data-tooltip-type="success"][data-tooltip-pos="top"]::before,
+[data-tooltip-type="success"]:not([data-tooltip-pos])::before {
+  border-top-color: #00a65a;
+}
+
+/* Warning (naranja) */
+[data-tooltip-type="warning"]::after {
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+}
+
+[data-tooltip-type="warning"][data-tooltip-pos="top"]::before,
+[data-tooltip-type="warning"]:not([data-tooltip-pos])::before {
+  border-top-color: #f39c12;
+}
+
+/* Danger (rojo) */
+[data-tooltip-type="danger"]::after {
+  background: linear-gradient(135deg, #dd4b39 0%, #c0392b 100%);
+}
+
+[data-tooltip-type="danger"][data-tooltip-pos="top"]::before,
+[data-tooltip-type="danger"]:not([data-tooltip-pos])::before {
+  border-top-color: #dd4b39;
+}
+
+/* ========================================
+   TOOLTIPS PARA BOTONES COMUNES
+======================================== */
+
+/* Agregar tooltips automáticos a botones de acción */
+.btn-group .btn[title],
+.btn[title] {
+  position: relative;
+}
+
+/* Override Bootstrap tooltips */
+.tooltip {
+  font-family: inherit;
+}
+
+.tooltip-inner {
+  background: linear-gradient(135deg, #333 0%, #222 100%);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: #333;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: #333;
+}
+
+.tooltip.left .tooltip-arrow {
+  border-left-color: #333;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: #333;
+}
+
+/* ========================================
+   TOOLTIPS DARK MODE
+======================================== */
+[data-theme="dark"] [data-tooltip]::after {
+  background: linear-gradient(135deg, #5dade2 0%, #3498db 100%);
+  color: #1a1a2e;
+}
+
+[data-theme="dark"] [data-tooltip]:not([data-tooltip-pos])::before,
+[data-theme="dark"] [data-tooltip][data-tooltip-pos="top"]::before {
+  border-top-color: #5dade2;
+}
+
+[data-theme="dark"] [data-tooltip][data-tooltip-pos="bottom"]::before {
+  border-bottom-color: #5dade2;
+}
+
+[data-theme="dark"] .tooltip-inner {
+  background: linear-gradient(135deg, #5dade2 0%, #3498db 100%);
+  color: #1a1a2e;
+}
+
+/* ========================================
+   HELP TOOLTIPS (iconos de ayuda)
+======================================== */
+.help-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: #e0e0e0;
+  color: #666;
+  border-radius: 50%;
+  font-size: 10px;
+  margin-left: 5px;
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.help-tooltip:hover {
+  background: #3c8dbc;
+  color: white;
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .help-tooltip {
+  background: #2a3550;
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .help-tooltip:hover {
+  background: #5dade2;
+  color: #1a1a2e;
+}
+
+/* ========================================
+   TOOLTIP CON CONTENIDO HTML
+======================================== */
+.tooltip-html {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-html .tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: white;
+  border-radius: 8px;
+  padding: 12px 15px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #eee;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10000;
+}
+
+.tooltip-html:hover .tooltip-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-html .tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: white;
+}
+
+[data-theme="dark"] .tooltip-html .tooltip-content {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .tooltip-html .tooltip-content::after {
+  border-top-color: var(--card-bg);
+}

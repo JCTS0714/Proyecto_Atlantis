@@ -86,6 +86,11 @@
     
     <!-- Responsive Tables CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/responsive-tables.css">
+    
+    <!-- Mejoras de Diseño v1.0 -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/theme-toggle.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/animations.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/tooltips.css">
 
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
@@ -171,6 +176,9 @@
   
   <!-- Responsive Tables Script -->
   <script src="<?php echo BASE_URL; ?>/vistas/js/responsive-tables.js"></script>
+  
+  <!-- Theme Toggle (Modo Oscuro/Claro) -->
+  <script src="<?php echo BASE_URL; ?>/vistas/js/theme-toggle.js"></script>
 
   </head>
   <?php

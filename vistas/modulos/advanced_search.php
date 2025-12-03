@@ -7,31 +7,36 @@
 ?>
 <!-- Advanced Search Panel - Barra compacta visible -->
 <style>
-  /* Estilos para búsqueda avanzada */
+  /* Estilos para búsqueda avanzada - Compacto */
   .adv-search-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #555;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: block;
     text-align: left;
   }
   .adv-search-label i {
-    margin-right: 5px;
+    margin-right: 4px;
     color: #3c8dbc;
   }
   .adv-form-group {
     margin-bottom: 0;
-    padding: 8px 12px;
+    padding: 4px 8px;
+  }
+  .adv-form-group .form-control {
+    height: 28px;
+    padding: 3px 8px;
+    font-size: 12px;
   }
   .adv-search-row {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 -12px;
+    margin: 0 -8px;
   }
   .adv-search-col {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px;
     padding: 0;
   }
   .adv-tipo-fecha-group {
@@ -39,16 +44,21 @@
     gap: 0;
   }
   .adv-tipo-fecha-group .btn {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 4px 8px;
+    font-size: 11px;
   }
   .adv-buttons-group {
     display: flex;
-    gap: 8px;
+    gap: 5px;
   }
   .adv-buttons-group .btn {
     flex: 0 0 auto;
     white-space: nowrap;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+  #advanced-search-panel-inline .box-body {
+    padding: 8px 10px !important;
   }
   @media (max-width: 768px) {
     .adv-search-col {
@@ -93,6 +103,22 @@
                   <i class="fa fa-id-card"></i>DNI/RUC
                 </label>
                 <input type="text" name="adv_documento" class="form-control input-sm adv-documento" placeholder="Buscar por documento...">
+              </div>
+            </div>
+            <!-- Filtro de servidor (solo visible en clientes y contadores) -->
+            <div class="adv-search-col adv-servidor-filter" style="display:none;">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-server"></i>Servidor
+                </label>
+                <select name="adv_servidor" class="form-control input-sm adv-servidor">
+                  <option value="">Todos los servidores</option>
+                  <option value="LORITO">LORITO</option>
+                  <option value="ATLANTIS FAST">ATLANTIS FAST</option>
+                  <option value="ATLANTIS POS">ATLANTIS POS</option>
+                  <option value="ATLANTIS ONLINE">ATLANTIS ONLINE</option>
+                  <option value="ATLANTIS VIP">ATLANTIS VIP</option>
+                </select>
               </div>
             </div>
           </div>

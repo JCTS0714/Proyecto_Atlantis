@@ -27,7 +27,8 @@
         periodo: ($form.find('[name=adv_periodo]').val() || '').trim(),
         fecha_inicio: ($form.find('[name=adv_fecha_inicio]').val() || '').trim(),
         fecha_fin: ($form.find('[name=adv_fecha_fin]').val() || '').trim(),
-        tipo_fecha: tipoFecha
+        tipo_fecha: tipoFecha,
+        servidor: ($form.find('[name=adv_servidor]').val() || '').trim()
       };
     } catch (e) {
       console.warn('advanced_search: error building filters', e);
@@ -49,6 +50,16 @@
   $(function() {
     var $panel = $('#advanced-search-panel-inline');
     var $toggleBtn = $('#btn-toggle-advanced-search');
+    
+    // Mostrar filtro de servidor solo en páginas de clientes y contadores
+    try {
+      var currentPath = window.location.pathname.toLowerCase();
+      if (currentPath.indexOf('clientes') !== -1 || currentPath.indexOf('contadores') !== -1) {
+        $('.adv-servidor-filter').show();
+      }
+    } catch (err) {
+      console.warn('advanced_search: error checking servidor filter visibility', err);
+    }
     
     // Toggle del panel de búsqueda avanzada
     $(document).on('click', '#btn-toggle-advanced-search', function(e) {

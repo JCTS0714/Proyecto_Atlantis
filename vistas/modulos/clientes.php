@@ -89,6 +89,14 @@
                 <label>Servidor</label>
               </div>
               <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-fecha-creacion">
+                <label>F. Creación</label>
+              </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-fecha-contacto">
+                <label>F. Contacto</label>
+              </div>
+              <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-cambiar-estado" checked>
                 <label>Cambiar Estado</label>
               </div>
@@ -119,6 +127,8 @@
               <th data-column="col-usuario">Usuario</th>
               <th data-column="col-contrasena">Contraseña</th>
               <th data-column="col-servidor">Servidor</th>
+              <th data-column="col-fecha-creacion" style="display:none;">F. Creación</th>
+              <th data-column="col-fecha-contacto" style="display:none;">F. Contacto</th>
               <th data-column="col-cambiar-estado">Cambiar Estado</th>
               <th data-column="col-acciones">Acciones</th>
             </tr>
@@ -157,6 +167,11 @@
               echo '<td data-column="col-usuario">'.($value["post_usuario"] ?? '-').'</td>';
               echo '<td data-column="col-contrasena">'.($value["post_contrasena"] ?? '-').'</td>';
               echo '<td data-column="col-servidor">'.($value["servidor"] ?? '-').'</td>';
+              // Columnas de fecha (ocultas por defecto)
+              $fechaCreacion = !empty($value["fecha_creacion"]) ? date('d/m/Y', strtotime($value["fecha_creacion"])) : '-';
+              $fechaContacto = !empty($value["fecha_contacto"]) ? date('d/m/Y', strtotime($value["fecha_contacto"])) : '-';
+              echo '<td data-column="col-fecha-creacion" style="display:none;">'.$fechaCreacion.'</td>';
+              echo '<td data-column="col-fecha-contacto" style="display:none;">'.$fechaContacto.'</td>';
               // Select para cambiar estado
               echo '<td data-column="col-cambiar-estado">'
                    .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
@@ -169,10 +184,10 @@
               .'</td>';
               echo '<td data-column="col-acciones">
                       <div class="btn-group">
-                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>
-                        <button class="btn btn-info btnRegistrarIncidencia" idCliente="'.$value["id"].'" nombreCliente="'.$value["nombre"].'"><i class="fa fa-exclamation-triangle"></i> Incidencia</button>';
+                        <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes" data-tooltip="Editar cliente" data-tooltip-pos="top"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-info btnRegistrarIncidencia" idCliente="'.$value["id"].'" nombreCliente="'.$value["nombre"].'" data-tooltip="Registrar incidencia" data-tooltip-pos="top"><i class="fa fa-exclamation-triangle"></i></button>';
                         if($_SESSION["perfil"] !== "Vendedor") {
-                          echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="clientes"><i class="fa fa-trash"></i></button>';
+                          echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="clientes" data-tooltip="Eliminar cliente" data-tooltip-pos="top" data-tooltip-type="danger"><i class="fa fa-trash"></i></button>';
                         }
               echo '      </div>
                     </td>';

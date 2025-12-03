@@ -1,5 +1,7 @@
 
 
+
+
 .DS_Store
 
 node_modules/*
@@ -12,3 +14,8 @@ docs/index.md
 config/local.php
 config/production.php
 logs/*.log
+
+# Fotos de usuarios - Ignorar todas excepto la imagen por defecto
+vistas/img/usuarios/*
+!vistas/img/usuarios/default/
+!vistas/img/usuarios/default/perfil.png

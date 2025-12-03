@@ -111,10 +111,10 @@
                 <td data-column="col-servidor"><?php echo htmlspecialchars($c['servidor'] ?? ''); ?></td>
                 <td>
                   <div class="btn-group">
-                    <button class="btn btn-warning btn-sm btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador">
+                    <button class="btn btn-warning btn-sm btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador" data-tooltip="Editar contador" data-tooltip-pos="top">
                       <i class="fa fa-pencil"></i>
                     </button>
-                    <a href="contadores?idContadorEliminar=<?php echo $c['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este contador?');">
+                    <a href="contadores?idContadorEliminar=<?php echo $c['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este contador?');" data-tooltip="Eliminar contador" data-tooltip-pos="top" data-tooltip-type="danger">
                       <i class="fa fa-trash"></i>
                     </a>
                   </div>

@@ -22,6 +22,8 @@ $filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fe
 $filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : (isset($_REQUEST['adv_fecha_fin']) ? trim($_REQUEST['adv_fecha_fin']) : '');
 // Nuevo: tipo de fecha (fecha_creacion o fecha_contacto)
 $filters['tipo_fecha'] = isset($_REQUEST['tipo_fecha']) ? trim($_REQUEST['tipo_fecha']) : (isset($_REQUEST['adv_tipo_fecha']) ? trim($_REQUEST['adv_tipo_fecha']) : 'fecha_creacion');
+// Filtro por servidor
+$filters['servidor'] = isset($_REQUEST['servidor']) ? trim($_REQUEST['servidor']) : (isset($_REQUEST['adv_servidor']) ? trim($_REQUEST['adv_servidor']) : '');
 
 // Debug mode flag (client can request with adv_debug=1)
 $debugMode = isset($_REQUEST['adv_debug']) && intval($_REQUEST['adv_debug']) === 1;
@@ -45,6 +47,7 @@ if ($filters['nombre'] !== '') {
 }
 if ($filters['documento'] !== '') { $where[] = "c.documento LIKE :documento"; $params[':documento'] = '%' . $filters['documento'] . '%'; }
 if ($filters['telefono'] !== '') { $where[] = "c.telefono LIKE :telefono"; $params[':telefono'] = '%' . $filters['telefono'] . '%'; }
+if ($filters['servidor'] !== '') { $where[] = "c.servidor = :servidor"; $params[':servidor'] = $filters['servidor']; }
 
 // Determinar el campo de fecha a usar (fecha_creacion o fecha_contacto)
 $campoFecha = ($filters['tipo_fecha'] === 'fecha_contacto') ? 'c.fecha_contacto' : 'c.fecha_creacion';

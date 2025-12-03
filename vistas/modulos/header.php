@@ -21,6 +21,12 @@
     ===============-->
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
+                <!-- Theme Toggle Button -->
+                <li class="theme-toggle-header">
+                    <a href="#" id="btnThemeToggle" onclick="ThemeToggle.toggleTheme(); return false;" title="Cambiar tema">
+                        <i class="fa fa-moon-o" id="themeIcon"></i>
+                    </a>
+                </li>
                 <!-- Notification Bell -->
                 <li class="dropdown notifications-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="dropdown-notificaciones-toggle" aria-expanded="false" aria-haspopup="true" role="button">
