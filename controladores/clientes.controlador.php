@@ -142,29 +142,38 @@ class ControladorCliente {
             // Aceptar tipos: DNI, RUC, otros
             $allowedTipos = ["DNI", "RUC", "otros"];
 
-            // Validar documento según tipo; para 'otros' permitimos cualquier valor (o vacío)
+            // Validar documento - más flexible para edición de registros antiguos
+            // Permitir documentos vacíos o con formatos variables
             $documentoValido = true;
-            if ($tipo === "DNI") {
-                $documentoValido = preg_match('/^[0-9]{8}$/', $documento) === 1;
-            } elseif ($tipo === "RUC") {
-                $documentoValido = preg_match('/^[0-9]{11}$/', $documento) === 1;
+            if (!empty($documento)) {
+                if ($tipo === "DNI") {
+                    // Permitir entre 7 y 10 dígitos para flexibilidad
+                    $documentoValido = preg_match('/^[0-9]{7,10}$/', $documento) === 1;
+                } elseif ($tipo === "RUC") {
+                    // Permitir entre 8 y 15 dígitos para flexibilidad
+                    $documentoValido = preg_match('/^[0-9]{8,15}$/', $documento) === 1;
+                }
+                // Para 'otros' siempre es válido
             }
 
-            // Validaciones similares a ctrCrearCliente, pero permitiendo 'otros' tipo
+            // Validaciones para edición - más flexibles para registros antiguos
             // Obtener motivo de forma segura
             $motivo = isset($_POST["editarMotivo"]) ? $_POST["editarMotivo"] : '';
             
+            // Validar teléfono: permitir formatos variables (entre 7 y 15 dígitos)
+            $telefonoValido = preg_match('/^[0-9]{7,15}$/', $_POST["editarTelefono"]);
+            
             if (
-                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"]) &&
+                (empty($_POST["editarNombre"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"])) &&
                 in_array($tipo, $allowedTipos) &&
                 $documentoValido &&
                 isset($_POST["editarCorreo"]) &&
-                preg_match('/^[0-9]{9}$/', $_POST["editarTelefono"]) &&
+                $telefonoValido &&
                 (empty($_POST["editarCiudad"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarCiudad"])) &&
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&
                 (empty($_POST["editarReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["editarReferencia"])) &&
                 (empty($_POST["editarFechaContacto"]) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"])) &&
-                preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"])
+                (empty($_POST["editarEmpresa"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"]))
             ) {
                 $tabla = "clientes";
                 $datos = array(
