@@ -204,7 +204,7 @@
 /* Texto "Atlantis" con fuente personalizada */
 .atlantis-title {
     font-family: 'Amiamie Round', sans-serif;
-    font-weight: 900;
+    font-weight: 400;
     color: #fff;
     text-align: center;
     margin-top: 10px;
