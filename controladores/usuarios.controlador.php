@@ -8,7 +8,7 @@ class ControladorUsuarios {
         if (!isset($_POST["ingUsuario"])) {
             // Mostrar mensaje de error almacenado en sesión (si existe)
             if (isset($_SESSION["login_error"])) {
-                echo '<br><div class="alert alert-danger">' . htmlspecialchars($_SESSION["login_error"]) . '</div>';
+                echo '<div class="login-error"><i class="fa fa-exclamation-circle"></i> ' . htmlspecialchars($_SESSION["login_error"]) . '</div>';
                 unset($_SESSION["login_error"]);
             }
             return;
