@@ -247,21 +247,105 @@ tablasContactos.forEach(function(tableId) {
 		// store global filters map
 		if (!window._advancedFilters) window._advancedFilters = {};
 
+		// Tablas que necesitan búsqueda server-side (tienen filtro de servidor)
+		var serverSideTables = ['tablaClientes', 'tablaContadores'];
+
 		['tablaProspectos','tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
-			// If server-side table exists, use debugReplaceTableWithRaw to fetch filtered rows and show them client-side
-			if (window._serverTables && window._serverTables[id]) {
+			// Si es una tabla que necesita server-side (por filtro de servidor), usar AJAX
+			if (serverSideTables.indexOf(id) !== -1 && (filters.servidor || filters.nombre || filters.telefono || filters.documento || filters.periodo)) {
 				window._advancedFilters[id] = filters;
 				try {
-					console.debug('plantilla: using debugReplaceTableWithRaw for', id);
-					// Replace table with raw rows and reinit client-side DataTable
-					debugReplaceTableWithRaw(id, filters);
-				} catch(err) { console.warn('debugReplaceTableWithRaw failed', err); }
+					console.debug('plantilla: using fetchAndReplaceTable for', id);
+					fetchAndReplaceTable(id, filters);
+				} catch(err) { console.warn('fetchAndReplaceTable failed', err); }
+			} else if (window._serverTables && window._serverTables[id]) {
+				window._advancedFilters[id] = filters;
+				try {
+					console.debug('plantilla: using fetchAndReplaceTable for', id);
+					fetchAndReplaceTable(id, filters);
+				} catch(err) { console.warn('fetchAndReplaceTable failed', err); }
 			} else {
 				console.debug('plantilla: server table not found for', id, 'falling back to client filter');
 				applyFiltersToTable(id, filters);
 			}
 		});
 	});
+
+// Función para hacer fetch AJAX y reemplazar tabla (siempre disponible para tablas con filtro servidor)
+window.fetchAndReplaceTable = function(tableId, filters){
+	filters = filters || (window._advancedFilters && window._advancedFilters[tableId]) || {};
+	var url = $('#' + tableId).data('ajax') || ('ajax/datatable-clientes.ajax.php');
+	var postData = {
+		adv_debug: 1,
+		draw: 1,
+		start: 0,
+		length: 1000,
+		nombre: filters.nombre || '',
+		telefono: filters.telefono || '',
+		documento: filters.documento || '',
+		adv_nombre: filters.nombre || '',
+		adv_telefono: filters.telefono || '',
+		adv_documento: filters.documento || '',
+		adv_periodo: filters.periodo || '',
+		adv_fecha_inicio: filters.fecha_inicio || '',
+		adv_fecha_fin: filters.fecha_fin || '',
+		adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion',
+		adv_servidor: filters.servidor || ''
+	};
+
+	console.debug('fetchAndReplaceTable: sending POST to', url, postData);
+	$.ajax({
+		url: url,
+		method: 'POST',
+		data: postData,
+		dataType: 'json'
+	}).done(function(resp){
+		console.debug('fetchAndReplaceTable: server response', resp);
+		if(!resp){ console.warn('No response'); return; }
+
+		// Replace table body (destroy DataTable temporarily if exists)
+		try {
+			if ($.fn.DataTable.isDataTable('#'+tableId)) {
+				try { $('#'+tableId).DataTable().destroy(); } catch(e){ console.warn('Error destroying DataTable', e); }
+			}
+
+			var $tbody = $('#'+tableId+' tbody');
+			if ($tbody.length === 0) {
+				$('#'+tableId).append('<tbody></tbody>');
+				$tbody = $('#'+tableId+' tbody');
+			}
+			$tbody.empty();
+			if (Array.isArray(resp.data) && resp.data.length>0) {
+				resp.data.forEach(function(row){
+					var tr = '<tr>';
+					row.forEach(function(col){ tr += '<td>'+ (col === null ? '' : col) +'</td>'; });
+					tr += '</tr>';
+					$tbody.append(tr);
+				});
+			} else {
+				$tbody.append('<tr><td colspan="14" style="text-align:center;">No se encontraron resultados</td></tr>');
+			}
+
+			// Re-aplicar preferencias de columnas después del redibujado
+			if (typeof reapplyColumnPreferencesAfterDraw === 'function') {
+				reapplyColumnPreferencesAfterDraw(tableId);
+			}
+
+			// Re-inicializar DataTable
+			try {
+				$('#'+tableId).DataTable({
+					"responsive": true,
+					"autoWidth": false,
+					"pageLength": 10,
+					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+				});
+			} catch(e) { console.warn('Error reinitializing DataTable', e); }
+
+		} catch(e){ console.error('fetchAndReplaceTable failed', e); }
+	}).fail(function(xhr){
+		console.error('fetchAndReplaceTable AJAX failed', xhr.status, xhr.responseText);
+	});
+};
 
 // Debug helpers: only enabled when `window.PLANTILLA_DEV === true`.
 if (window.PLANTILLA_DEV === true) {

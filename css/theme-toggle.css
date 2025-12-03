@@ -820,20 +820,75 @@ body,
 }
 
 /* ========================================
-   KANBAN BOARD
+   KANBAN BOARD - CRM
 ======================================== */
 [data-theme="dark"] .kanban-column {
   background-color: var(--bg-secondary);
   border-color: var(--border-color);
 }
 
-[data-theme="dark"] .kanban-card {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
+[data-theme="dark"] .kanban-card,
+[data-theme="dark"] .panel-kanban {
+  background: linear-gradient(135deg, #1e2d3d 0%, #192734 100%) !important;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .kanban-card:hover {
-  background-color: var(--hover-bg);
+[data-theme="dark"] .kanban-card:hover,
+[data-theme="dark"] .panel-kanban:hover {
+  background: linear-gradient(135deg, #243447 0%, #1e2d3d 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent-primary);
+}
+
+[data-theme="dark"] .kanban-card h5,
+[data-theme="dark"] .panel-kanban h5 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .kanban-card p,
+[data-theme="dark"] .panel-kanban p {
+  color: var(--text-secondary) !important;
+}
+
+/* Estados del CRM en modo oscuro - Mantener colores vibrantes */
+[data-theme="dark"] .estado-cuadro {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .estado-1 { 
+  background: linear-gradient(135deg, #3a9bdc 0%, #2980b9 100%) !important;
+}
+
+[data-theme="dark"] .estado-2 { 
+  background: linear-gradient(135deg, #4aba68 0%, #27ae60 100%) !important;
+}
+
+[data-theme="dark"] .estado-3 { 
+  background: linear-gradient(135deg, #f5b041 0%, #d68910 100%) !important;
+}
+
+[data-theme="dark"] .estado-4 { 
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+}
+
+/* Box headers del CRM */
+[data-theme="dark"] .box.box-primary > .box-header {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .box.box-primary > .box-header .box-title {
+  color: var(--text-primary);
+}
+
+/* Filtros del CRM */
+[data-theme="dark"] #filtros-inline {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] #filtros-inline label {
+  color: var(--text-primary);
 }
 
 /* ========================================
