@@ -315,7 +315,10 @@ window.fetchAndReplaceTable = function(tableId, filters){
 				$tbody = $('#'+tableId+' tbody');
 			}
 			$tbody.empty();
-			if (Array.isArray(resp.data) && resp.data.length>0) {
+			
+			var hasData = Array.isArray(resp.data) && resp.data.length > 0;
+			
+			if (hasData) {
 				resp.data.forEach(function(row){
 					var tr = '<tr>';
 					row.forEach(function(col, idx){ 
@@ -326,9 +329,8 @@ window.fetchAndReplaceTable = function(tableId, filters){
 					tr += '</tr>';
 					$tbody.append(tr);
 				});
-			} else {
-				$tbody.append('<tr><td colspan="18" style="text-align:center;">No se encontraron resultados</td></tr>');
 			}
+			// No insertar fila con colspan - dejar tbody vacío para que DataTables muestre su mensaje nativo
 
 			// Re-aplicar preferencias de columnas después del redibujado
 			if (typeof reapplyColumnPreferencesAfterDraw === 'function') {
@@ -341,7 +343,23 @@ window.fetchAndReplaceTable = function(tableId, filters){
 					"responsive": true,
 					"autoWidth": false,
 					"pageLength": 10,
-					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+					"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+					"language": {
+						"sProcessing":     "Procesando...",
+						"sLengthMenu":     "Mostrar _MENU_ registros",
+						"sZeroRecords":    "No se encontraron resultados",
+						"sEmptyTable":     "No se encontraron resultados con los filtros aplicados",
+						"sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+						"sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+						"sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+						"sSearch":         "Buscar:",
+						"oPaginate": {
+							"sFirst":    "Primero",
+							"sLast":     "Último",
+							"sNext":     "Siguiente",
+							"sPrevious": "Anterior"
+						}
+					}
 				});
 			} catch(e) { console.warn('Error reinitializing DataTable', e); }
 
