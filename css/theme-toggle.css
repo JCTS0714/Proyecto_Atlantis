@@ -1085,9 +1085,95 @@ body,
 ======================================== */
 [data-theme="dark"] .advanced-search-container,
 [data-theme="dark"] .box[class*="search"],
-[data-theme="dark"] #advancedSearchPanel {
+[data-theme="dark"] #advancedSearchPanel,
+[data-theme="dark"] #advanced-search-panel-inline {
   background-color: var(--card-bg);
   border-color: var(--border-color);
+}
+
+/* Panel de búsqueda avanzada - fondo */
+[data-theme="dark"] #advanced-search-panel-inline .box {
+  background-color: var(--card-bg) !important;
+  border-color: var(--accent-color) !important;
+}
+
+[data-theme="dark"] #advanced-search-panel-inline .box-body {
+  background-color: var(--card-bg) !important;
+}
+
+/* Labels de búsqueda avanzada */
+[data-theme="dark"] .adv-search-label {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .adv-search-label i {
+  color: var(--accent-color) !important;
+}
+
+/* Inputs de búsqueda avanzada */
+[data-theme="dark"] #advanced-search-panel-inline .form-control,
+[data-theme="dark"] .adv-form-group .form-control {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] #advanced-search-panel-inline .form-control::placeholder,
+[data-theme="dark"] .adv-form-group .form-control::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] #advanced-search-panel-inline .form-control:focus,
+[data-theme="dark"] .adv-form-group .form-control:focus {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 2px rgba(60, 141, 188, 0.2) !important;
+}
+
+/* Select de búsqueda avanzada */
+[data-theme="dark"] #advanced-search-panel-inline select.form-control {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] #advanced-search-panel-inline select.form-control option {
+  background-color: var(--dropdown-bg);
+  color: var(--text-primary);
+}
+
+/* Botones de tipo fecha (Creación/Contacto) */
+[data-theme="dark"] .adv-tipo-fecha-group .btn-default {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .adv-tipo-fecha-group .btn-default:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .adv-tipo-fecha-group .btn-default.active,
+[data-theme="dark"] .adv-tipo-fecha-group .btn-primary {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+/* Botones de acción (Buscar, Limpiar, Cerrar) */
+[data-theme="dark"] .adv-buttons-group .btn-info {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+[data-theme="dark"] .adv-buttons-group .btn-warning {
+  background-color: #f39c12 !important;
+  border-color: #f39c12 !important;
+}
+
+[data-theme="dark"] .adv-buttons-group .btn-default {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .advanced-search-container label,
