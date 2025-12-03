@@ -149,6 +149,16 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Tarjeta de Conteo de Registros -->
+      <?php 
+        $conteoEstado = 1; // Estado seguimiento
+        $conteoTitulo = 'Registros en Seguimiento';
+        $conteoColor = 'aqua';
+        $conteoIcono = 'fa-line-chart';
+        include 'partials/tarjeta_conteo_registros.php'; 
+      ?>
+      
     </div>
   </section>
 </div>

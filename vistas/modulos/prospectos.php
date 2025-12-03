@@ -159,6 +159,16 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Tarjeta de Conteo de Registros -->
+      <?php 
+        $conteoEstado = 0; // Estado prospecto
+        $conteoTitulo = 'Registros de Prospectos';
+        $conteoColor = 'blue';
+        $conteoIcono = 'fa-user-plus';
+        include 'partials/tarjeta_conteo_registros.php'; 
+      ?>
+      
     </div>
   </section>
 </div>

@@ -198,6 +198,16 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Tarjeta de Conteo de Registros -->
+      <?php 
+        $conteoEstado = 4; // Estado zona de espera
+        $conteoTitulo = 'Registros en Zona de Espera';
+        $conteoColor = 'yellow';
+        $conteoIcono = 'fa-clock-o';
+        include 'partials/tarjeta_conteo_registros.php'; 
+      ?>
+      
     </div>
   </section>
 </div>
