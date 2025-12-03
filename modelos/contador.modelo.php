@@ -43,7 +43,7 @@ class ModeloContador {
       }
     }
 
-    $sql = "INSERT INTO $tabla(nro, comercio, nom_contador, titular_tlf, telefono, telefono_actu, link, usuario, contrasena) VALUES (:nro, :comercio, :nom_contador, :titular_tlf, :telefono, :telefono_actu, :link, :usuario, :contrasena)";
+    $sql = "INSERT INTO $tabla(nro, comercio, nom_contador, titular_tlf, telefono, telefono_actu, link, usuario, contrasena, servidor) VALUES (:nro, :comercio, :nom_contador, :titular_tlf, :telefono, :telefono_actu, :link, :usuario, :contrasena, :servidor)";
     $stmt = Conexion::conectar()->prepare($sql);
     $stmt->bindParam(':nro', $datos['nro'], PDO::PARAM_STR);
     $stmt->bindParam(':comercio', $datos['comercio'], PDO::PARAM_STR);
@@ -54,6 +54,7 @@ class ModeloContador {
     $stmt->bindParam(':link', $datos['link'], PDO::PARAM_STR);
     $stmt->bindParam(':usuario', $datos['usuario'], PDO::PARAM_STR);
     $stmt->bindParam(':contrasena', $datos['contrasena'], PDO::PARAM_STR);
+    $stmt->bindParam(':servidor', $datos['servidor'], PDO::PARAM_STR);
 
     try {
       if ($stmt->execute()) {
@@ -71,7 +72,7 @@ class ModeloContador {
 
   static public function mdlEditarContador($tabla, $datos) {
     // No se permite modificar el campo 'nro' en la edición; conservar valor existente
-    $sql = "UPDATE $tabla SET comercio = :comercio, nom_contador = :nom_contador, titular_tlf = :titular_tlf, telefono = :telefono, telefono_actu = :telefono_actu, link = :link, usuario = :usuario, contrasena = :contrasena WHERE id = :id";
+    $sql = "UPDATE $tabla SET comercio = :comercio, nom_contador = :nom_contador, titular_tlf = :titular_tlf, telefono = :telefono, telefono_actu = :telefono_actu, link = :link, usuario = :usuario, contrasena = :contrasena, servidor = :servidor WHERE id = :id";
     $stmt = Conexion::conectar()->prepare($sql);
     $stmt->bindParam(':comercio', $datos['comercio'], PDO::PARAM_STR);
     $stmt->bindParam(':nom_contador', $datos['nom_contador'], PDO::PARAM_STR);
@@ -81,6 +82,7 @@ class ModeloContador {
     $stmt->bindParam(':link', $datos['link'], PDO::PARAM_STR);
     $stmt->bindParam(':usuario', $datos['usuario'], PDO::PARAM_STR);
     $stmt->bindParam(':contrasena', $datos['contrasena'], PDO::PARAM_STR);
+    $stmt->bindParam(':servidor', $datos['servidor'], PDO::PARAM_STR);
     $stmt->bindParam(':id', $datos['id'], PDO::PARAM_INT);
 
     try {

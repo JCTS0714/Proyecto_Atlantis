@@ -44,7 +44,8 @@ class ControladorContador {
         'telefono_actu' => $_POST['nuevoTelefonoActu'] ?? '',
         'link' => $_POST['nuevoLink'] ?? '',
         'usuario' => $_POST['nuevoUsuario'] ?? '',
-        'contrasena' => $_POST['nuevoContrasena'] ?? ''
+        'contrasena' => $_POST['nuevoContrasena'] ?? '',
+        'servidor' => $_POST['nuevoServidor'] ?? ''
       ];
 
       $tabla = 'contador';
@@ -108,7 +109,8 @@ class ControladorContador {
         'telefono_actu' => $_POST['editarTelefonoActu'] ?? '',
         'link' => $_POST['editarLink'] ?? '',
         'usuario' => $_POST['editarUsuario'] ?? '',
-        'contrasena' => $_POST['editarContrasena'] ?? ''
+        'contrasena' => $_POST['editarContrasena'] ?? '',
+        'servidor' => $_POST['editarServidorContador'] ?? ''
       ];
 
       $tabla = 'contador';

@@ -141,6 +141,7 @@ $(document).ready(function() {
       $('#editarLink').val(data.link);
       $('#editarUsuario').val(data.usuario);
       $('#editarContrasena').val(data.contrasena);
+      $('#editarServidorContador').val(data.servidor || '');
       
       // Limpiar comercios anteriores
       var $container = $('#comerciosContainerEditar');

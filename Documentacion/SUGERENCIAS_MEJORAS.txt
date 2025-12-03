@@ -1,0 +1,119 @@
+================================================================================
+                    SUGERENCIAS DE MEJORAS - PROYECTO ATLANTIS CRM
+                              Fecha: 3 de Diciembre 2025
+================================================================================
+
+================================================================================
+                              DISEÑO / UX
+================================================================================
+
+1. MODO OSCURO
+   - Implementar toggle para cambiar entre modo claro y oscuro
+   - Guardar preferencia del usuario en localStorage o BD
+
+2. RESPONSIVIDAD MÓVIL
+   - Mejorar visualización de tablas en dispositivos móviles
+   - Menú hamburguesa optimizado
+   - Modales adaptados a pantallas pequeñas
+
+3. TOOLTIPS INFORMATIVOS
+   - Agregar tooltips en botones de acción
+   - Ayuda contextual para campos de formulario
+
+4. ANIMACIONES Y TRANSICIONES
+   - Transiciones suaves en modales (fade in/out)
+   - Efectos hover en botones y tarjetas
+   - Loading spinners consistentes
+
+5. DASHBOARD CON ESTADÍSTICAS
+   - Gráficos de clientes por mes
+   - Tasa de conversión (prospecto -> cliente)
+   - Métricas de seguimiento
+   - KPIs por vendedor
+
+================================================================================
+                         FUNCIONALIDADES SECUNDARIAS
+================================================================================
+
+1. EXPORTAR DATOS
+   - Exportar tablas a Excel (.xlsx)
+   - Exportar a PDF con formato
+   - Seleccionar columnas a exportar
+
+2. HISTORIAL DE CAMBIOS
+   - Log de cambios de estado por cliente
+   - Quién hizo el cambio y cuándo
+   - Timeline visual de actividad
+
+3. SISTEMA DE NOTAS/COMENTARIOS
+   - Agregar notas internas por cliente
+   - Menciones a otros usuarios (@usuario)
+   - Adjuntar archivos a notas
+
+4. RECORDATORIOS Y ALERTAS
+   - Programar recordatorios de seguimiento
+   - Notificaciones por email
+   - Alertas en el dashboard
+
+5. BÚSQUEDA GLOBAL
+   - Buscar en todas las tablas simultáneamente
+   - Resultados agrupados por categoría
+   - Búsqueda por voz (opcional)
+
+6. DUPLICAR CLIENTE
+   - Crear nuevo cliente basado en uno existente
+   - Plantillas de cliente predefinidas
+
+7. IMPORTAR DATOS
+   - Importar clientes desde Excel/CSV
+   - Validación de datos antes de importar
+   - Mapeo de columnas flexible
+
+8. GESTIÓN DE INCIDENCIAS MEJORADA
+   - Dashboard de incidencias
+   - Estados de incidencia (abierta, en proceso, cerrada)
+   - Prioridades (alta, media, baja)
+
+================================================================================
+                            OPTIMIZACIONES
+================================================================================
+
+1. CACHE DE CONSULTAS
+   - Implementar Redis o Memcached
+   - Cache de listas frecuentes (ciudades, rubros, etc.)
+
+2. LAZY LOADING
+   - Cargar datos bajo demanda
+   - Paginación infinita en tablas grandes
+   - Imágenes con lazy load
+
+3. COMPRESIÓN DE ASSETS
+   - Minificar CSS y JS
+   - Combinar archivos
+   - Implementar GZIP
+
+4. OPTIMIZACIÓN DE BASE DE DATOS
+   - Índices en campos de búsqueda frecuente
+   - Queries optimizadas
+   - Limpieza de datos huérfanos
+
+================================================================================
+                           SEGURIDAD
+================================================================================
+
+1. Implementar CSRF tokens en formularios
+2. Rate limiting en endpoints AJAX
+3. Logs de auditoría de acciones críticas
+4. Autenticación de dos factores (2FA)
+5. Políticas de contraseñas fuertes
+
+================================================================================
+                           INTEGRACIONES
+================================================================================
+
+1. WhatsApp Business API - enviar mensajes directos
+2. Email marketing - campañas automatizadas
+3. Google Calendar - sincronizar citas
+4. Facturación electrónica SUNAT
+
+================================================================================

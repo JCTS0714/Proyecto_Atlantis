@@ -57,6 +57,10 @@
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-contrasena" checked>
                 <label>Contraseña</label>
               </div>
+              <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaContadores" data-column="col-servidor" checked>
+                <label>Servidor</label>
+              </div>
             </div>
           </div>
         </div>
@@ -75,6 +79,7 @@
               <th data-column="col-link">Link</th>
               <th data-column="col-usuario">Usuario</th>
               <th data-column="col-contrasena">Contraseña</th>
+              <th data-column="col-servidor">Servidor</th>
               <th style="width: 100px;">Acciones</th>
             </tr>
           </thead>
@@ -103,6 +108,7 @@
                 </td>
                 <td data-column="col-usuario"><?php echo htmlspecialchars($c['usuario']); ?></td>
                 <td data-column="col-contrasena"><?php echo htmlspecialchars($c['contrasena']); ?></td>
+                <td data-column="col-servidor"><?php echo htmlspecialchars($c['servidor'] ?? ''); ?></td>
                 <td>
                   <div class="btn-group">
                     <button class="btn btn-warning btn-sm btnEditarContador" data-id="<?php echo $c['id']; ?>" data-toggle="modal" data-target="#modalEditarContador">
@@ -195,6 +201,19 @@
               <div class="form-group">
                 <label><i class="fa fa-lock"></i> Contraseña</label>
                 <input class="form-control" name="nuevoContrasena" type="text" placeholder="Contraseña de acceso" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+              
+              <!-- Servidor -->
+              <div class="form-group">
+                <label><i class="fa fa-server"></i> Servidor</label>
+                <select class="form-control" name="nuevoServidor">
+                  <option value="">Seleccionar servidor...</option>
+                  <option value="LORITO">LORITO</option>
+                  <option value="ATLANTIS FAST">ATLANTIS FAST</option>
+                  <option value="ATLANTIS POS">ATLANTIS POS</option>
+                  <option value="ATLANTIS ONLINE">ATLANTIS ONLINE</option>
+                  <option value="ATLANTIS VIP">ATLANTIS VIP</option>
+                </select>
               </div>
             </div>
           </div>
@@ -290,6 +309,19 @@
               <div class="form-group">
                 <label><i class="fa fa-lock"></i> Contraseña</label>
                 <input id="editarContrasena" class="form-control" name="editarContrasena" type="text" placeholder="Contraseña de acceso" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+              </div>
+              
+              <!-- Servidor -->
+              <div class="form-group">
+                <label><i class="fa fa-server"></i> Servidor</label>
+                <select class="form-control" id="editarServidorContador" name="editarServidorContador">
+                  <option value="">Seleccionar servidor...</option>
+                  <option value="LORITO">LORITO</option>
+                  <option value="ATLANTIS FAST">ATLANTIS FAST</option>
+                  <option value="ATLANTIS POS">ATLANTIS POS</option>
+                  <option value="ATLANTIS ONLINE">ATLANTIS ONLINE</option>
+                  <option value="ATLANTIS VIP">ATLANTIS VIP</option>
+                </select>
               </div>
             </div>
           </div>
