@@ -85,6 +85,10 @@
                 <label>Contraseña</label>
               </div>
               <div class="column-toggle-item">
+                <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-servidor" checked>
+                <label>Servidor</label>
+              </div>
+              <div class="column-toggle-item">
                 <input type="checkbox" class="column-toggle-checkbox" data-table="tablaClientes" data-column="col-cambiar-estado" checked>
                 <label>Cambiar Estado</label>
               </div>
@@ -114,6 +118,7 @@
               <th data-column="col-link">Link</th>
               <th data-column="col-usuario">Usuario</th>
               <th data-column="col-contrasena">Contraseña</th>
+              <th data-column="col-servidor">Servidor</th>
               <th data-column="col-cambiar-estado">Cambiar Estado</th>
               <th data-column="col-acciones">Acciones</th>
             </tr>
@@ -151,6 +156,7 @@
               echo '</td>';
               echo '<td data-column="col-usuario">'.($value["post_usuario"] ?? '-').'</td>';
               echo '<td data-column="col-contrasena">'.($value["post_contrasena"] ?? '-').'</td>';
+              echo '<td data-column="col-servidor">'.($value["servidor"] ?? '-').'</td>';
               // Select para cambiar estado
               echo '<td data-column="col-cambiar-estado">'
                    .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
@@ -330,6 +336,22 @@
                   <input type="text" class="form-control" id="editarContrasena" name="editarContrasena" placeholder="Contraseña de acceso" autocomplete="new-password">
                 </div>
               </div>
+
+              <!-- Servidor -->
+              <div class="form-group">
+                <label for="editarServidor">Servidor</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-server"></i></span>
+                  <select class="form-control" id="editarServidor" name="editarServidor">
+                    <option value="">Seleccionar servidor...</option>
+                    <option value="LORITO">LORITO</option>
+                    <option value="ATLANTIS FAST">ATLANTIS FAST</option>
+                    <option value="ATLANTIS POS">ATLANTIS POS</option>
+                    <option value="ATLANTIS ONLINE">ATLANTIS ONLINE</option>
+                    <option value="ATLANTIS VIP">ATLANTIS VIP</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -498,6 +520,22 @@
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-lock"></i></span>
                   <input type="text" class="form-control" id="nuevoContrasena" name="nuevoContrasena" placeholder="Contraseña de acceso" autocomplete="new-password" data-lpignore="true" data-form-type="other">
+                </div>
+              </div>
+
+              <!-- Servidor -->
+              <div class="form-group">
+                <label for="nuevoServidor">Servidor</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-server"></i></span>
+                  <select class="form-control" id="nuevoServidor" name="nuevoServidor">
+                    <option value="">Seleccionar servidor...</option>
+                    <option value="LORITO">LORITO</option>
+                    <option value="ATLANTIS FAST">ATLANTIS FAST</option>
+                    <option value="ATLANTIS POS">ATLANTIS POS</option>
+                    <option value="ATLANTIS ONLINE">ATLANTIS ONLINE</option>
+                    <option value="ATLANTIS VIP">ATLANTIS VIP</option>
+                  </select>
                 </div>
               </div>
             </div>

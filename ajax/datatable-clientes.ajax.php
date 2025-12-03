@@ -202,6 +202,7 @@ foreach ($rows as $k => $r) {
     $linkHtml,                                          // Link
     htmlspecialchars($r['post_usuario'] ?? '-'),        // Usuario
     htmlspecialchars($r['post_contrasena'] ?? '-'),     // Contraseña
+    htmlspecialchars($r['servidor'] ?? '-'),            // Servidor
     $selectEstado,                                      // Cambiar Estado
     $actions                                            // Acciones
   ];

@@ -171,7 +171,8 @@ class ModeloCliente{
       post_mes = :post_mes,
       post_link = :post_link,
       post_usuario = :post_usuario,
-      post_contrasena = :post_contrasena
+      post_contrasena = :post_contrasena,
+      servidor = :servidor
       WHERE id = :id");
 
     $stmt->bindParam(":nombre", $datos["nombre"], PDO::PARAM_STR);
@@ -193,6 +194,7 @@ class ModeloCliente{
     $stmt->bindParam(":post_link", $datos["post_link"], PDO::PARAM_STR);
     $stmt->bindParam(":post_usuario", $datos["post_usuario"], PDO::PARAM_STR);
     $stmt->bindParam(":post_contrasena", $datos["post_contrasena"], PDO::PARAM_STR);
+    $stmt->bindParam(":servidor", $datos["servidor"], PDO::PARAM_STR);
     $stmt->bindParam(":id", $datos["id"], PDO::PARAM_INT);
 
     try {
@@ -366,15 +368,15 @@ class ModeloCliente{
 
   /**
    * MÉTODO PARA REGISTRAR CLIENTE POSTVENTA
-   * Incluye campos adicionales: precio, rubro, anio, mes, link, usuario, contrasena
+   * Incluye campos adicionales: precio, rubro, anio, mes, link, usuario, contrasena, servidor
    */
   static public function mdlRegistrarClientePostventa($datos) {
     $sql = "INSERT INTO clientes (
       empresa, nombre, telefono, ciudad, tipo, documento, fecha_contacto,
-      post_precio, post_rubro, post_ano, post_mes, post_link, post_usuario, post_contrasena, estado
+      post_precio, post_rubro, post_ano, post_mes, post_link, post_usuario, post_contrasena, servidor, estado
     ) VALUES (
       :empresa, :nombre, :telefono, :ciudad, :tipo, :documento, CURDATE(),
-      :post_precio, :post_rubro, :post_ano, :post_mes, :post_link, :post_usuario, :post_contrasena, :estado
+      :post_precio, :post_rubro, :post_ano, :post_mes, :post_link, :post_usuario, :post_contrasena, :servidor, :estado
     )";
     
     $stmt = Conexion::conectar()->prepare($sql);
@@ -392,6 +394,7 @@ class ModeloCliente{
     $stmt->bindParam(":post_link", $datos["post_link"], PDO::PARAM_STR);
     $stmt->bindParam(":post_usuario", $datos["post_usuario"], PDO::PARAM_STR);
     $stmt->bindParam(":post_contrasena", $datos["post_contrasena"], PDO::PARAM_STR);
+    $stmt->bindParam(":servidor", $datos["servidor"], PDO::PARAM_STR);
     $stmt->bindParam(":estado", $datos["estado"], PDO::PARAM_INT);
 
     try {

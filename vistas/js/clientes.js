@@ -123,6 +123,7 @@ $(document).off("click", ".btnEditarCliente").on("click", ".btnEditarCliente", f
       $("#editarLink").val(respuesta["post_link"] || "");
       $("#editarUsuario").val(respuesta["post_usuario"] || "");
       $("#editarContrasena").val(respuesta["post_contrasena"] || "");
+      $("#editarServidor").val(respuesta["servidor"] || "");
       
       // Establecer la ruta para el redirect después de editar
       $("#rutaCliente").val(ruta);

@@ -187,7 +187,8 @@ class ControladorCliente {
                     "post_mes" => $_POST["editarMes"] ?? '',
                     "post_link" => $_POST["editarLink"] ?? '',
                     "post_usuario" => $_POST["editarUsuario"] ?? '',
-                    "post_contrasena" => $_POST["editarContrasena"] ?? ''
+                    "post_contrasena" => $_POST["editarContrasena"] ?? '',
+                    "servidor" => $_POST["editarServidor"] ?? ''
                 );
 
                 $respuesta = ModeloCliente::mdlEditarCliente($tabla, $datos);

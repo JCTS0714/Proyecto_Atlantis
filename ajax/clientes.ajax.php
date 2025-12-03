@@ -246,6 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
         'post_link' => isset($_POST['nuevoLink']) ? trim($_POST['nuevoLink']) : '',
         'post_usuario' => isset($_POST['nuevoUsuario']) ? trim($_POST['nuevoUsuario']) : '',
         'post_contrasena' => isset($_POST['nuevoContrasena']) ? trim($_POST['nuevoContrasena']) : '',
+        'servidor' => isset($_POST['nuevoServidor']) ? trim($_POST['nuevoServidor']) : '',
         'estado' => 2 // Estado 2 = Cliente (postventa)
     ];
     
