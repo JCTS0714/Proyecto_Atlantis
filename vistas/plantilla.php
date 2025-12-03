@@ -23,19 +23,19 @@
       $usuario = ModeloUsuarios::mdlMostrarUsuarios($tabla, $item, $valor);
 
       // Validar token de sesión único (protección contra acceso múltiple)
-      if (!$usuario || $usuario["sesion_token"] !== $_SESSION["sesion_token"]) {
+      $tokenDB = $usuario ? $usuario["sesion_token"] : 'NO_USER';
+      $tokenSession = $_SESSION["sesion_token"] ?? 'NO_TOKEN';
+      
+      if (!$usuario || $tokenDB !== $tokenSession) {
+        error_log("Token mismatch: DB={$tokenDB} vs SESSION={$tokenSession} | user_id={$valor}");
         session_destroy();
-          echo '<script>
-            window.location.href = "'.BASE_URL.'/login";
-          </script>';
+        echo '<script>window.location.href = "'.rtrim(BASE_URL, '/').'/login";</script>';
         exit;
       }
 
       // Si hay sesión pero no hay ruta específica, redirigir a inicio
       if (!isset($_GET["ruta"])) {
-        echo '<script>
-            window.location.href = "'.BASE_URL.'/inicio";
-        </script>';
+        echo '<script>window.location.href = "'.rtrim(BASE_URL, '/').'/inicio";</script>';
         exit;
       }
     }
