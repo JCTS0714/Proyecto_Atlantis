@@ -160,8 +160,9 @@ class ControladorCliente {
             // Obtener motivo de forma segura
             $motivo = isset($_POST["editarMotivo"]) ? $_POST["editarMotivo"] : '';
             
-            // Validar teléfono: permitir formatos variables (entre 7 y 15 dígitos)
-            $telefonoValido = preg_match('/^[0-9]{7,15}$/', $_POST["editarTelefono"]);
+            // Validar teléfono: limpiar espacios y permitir formatos variables (entre 7 y 15 dígitos)
+            $telefonoLimpio = preg_replace('/\s+/', '', $_POST["editarTelefono"]);
+            $telefonoValido = empty($telefonoLimpio) || preg_match('/^[0-9]{7,15}$/', $telefonoLimpio);
             
             if (
                 (empty($_POST["editarNombre"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"])) &&
@@ -181,7 +182,7 @@ class ControladorCliente {
                     "nombre" => $_POST["editarNombre"],
                     "tipo" => $_POST["editarTipo"],
                     "documento" => $_POST["editarDocumento"],
-                    "telefono" => $_POST["editarTelefono"],
+                    "telefono" => $telefonoLimpio,
                     "correo" => $_POST["editarCorreo"] ?? '',
                     "ciudad" => $_POST["editarCiudad"] ?? '',
                     "migracion" => $_POST["editarMigracion"] ?? '',
