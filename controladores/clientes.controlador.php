@@ -163,7 +163,7 @@ class ControladorCliente {
                 (empty($_POST["editarCiudad"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarCiudad"])) &&
                 (empty($_POST["editarMigracion"]) || preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarMigracion"])) &&
                 (empty($_POST["editarReferencia"]) || preg_match('/^[\p{L}\p{N}\s\.,#\-]+$/u', $_POST["editarReferencia"])) &&
-                preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"]) &&
+                (empty($_POST["editarFechaContacto"]) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST["editarFechaContacto"])) &&
                 preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarEmpresa"])
             ) {
                 $tabla = "clientes";
