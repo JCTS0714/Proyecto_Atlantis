@@ -927,6 +927,7 @@ formEditar.off('submit').on('submit', function (e) {
       var label = document.createElement('span');
       label.textContent = 'Sonido:';
       label.style.marginRight = '8px';
+      label.style.fontWeight = '600';
 
       var btnToggle = document.createElement('button');
       btnToggle.className = 'btn btn-xs';

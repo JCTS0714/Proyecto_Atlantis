@@ -64,9 +64,11 @@
 
                     <!--DROPWN-->
                     <ul class="dropdown-menu">
-                        <li class="user-body">
-                            <div class="pull-right">
-                                <a href="<?php echo BASE_URL; ?>/salir" class="btn btn-default btn-flat">Salir</a>
+                        <li class="user-body" style="padding: 15px;">
+                            <div class="text-center">
+                                <a href="<?php echo BASE_URL; ?>/salir" class="btn btn-danger btn-block" style="font-weight: 600;">
+                                    <i class="fa fa-sign-out mr-2"></i> Salir
+                                </a>
                             </div>
                         </li>
                     </ul>

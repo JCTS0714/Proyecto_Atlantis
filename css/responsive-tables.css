@@ -154,3 +154,72 @@ table.dataTable tbody td {
     padding: 0 15px;
   }
 }
+
+/*================================================
+  SCROLL HORIZONTAL GENERAL PARA TABLAS ANCHAS
+  Permite scroll horizontal desde cualquier altura
+================================================*/
+
+/* Hacer que el contenedor principal de contenido tenga scroll horizontal */
+.content-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* El contenido dentro del wrapper */
+.content-wrapper > .content {
+  min-width: fit-content;
+}
+
+/* Box que contiene las tablas */
+.box {
+  min-width: fit-content;
+}
+
+/* Asegurar que las tablas DataTables mantengan su ancho */
+.dataTables_wrapper {
+  min-width: fit-content;
+}
+
+/* Scrollbar siempre visible en el contenedor principal */
+.content-wrapper::-webkit-scrollbar {
+  height: 12px;
+  display: block;
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox scrollbar */
+.content-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+/* Tema oscuro - scrollbar */
+.dark-mode .content-wrapper::-webkit-scrollbar-track {
+  background: #2c3e50;
+}
+
+.dark-mode .content-wrapper::-webkit-scrollbar-thumb {
+  background: #5a6a7a;
+}
+
+.dark-mode .content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #7a8a9a;
+}
+
+.dark-mode .content-wrapper {
+  scrollbar-color: #5a6a7a #2c3e50;
+}

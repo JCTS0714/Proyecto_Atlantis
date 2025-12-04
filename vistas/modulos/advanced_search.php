@@ -60,9 +60,36 @@
   #advanced-search-panel-inline .box-body {
     padding: 8px 10px !important;
   }
+  /* Estilos para filas de periodo */
+  .adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas {
+    background: transparent !important;
+    border-left: 3px solid #3c8dbc;
+    padding: 8px 0 !important;
+    margin-left: 8px;
+  }
+  .adv_por_mes .adv-search-col,
+  .adv_entre_meses .adv-search-col,
+  .adv_por_fecha .adv-search-col,
+  .adv_entre_fechas .adv-search-col {
+    flex: 0 0 auto;
+    max-width: 200px;
+  }
+  .adv_por_mes .adv-search-col:last-child,
+  .adv_entre_meses .adv-search-col:last-child,
+  .adv_por_fecha .adv-search-col:last-child,
+  .adv_entre_fechas .adv-search-col:last-child {
+    flex: 1;
+    max-width: none;
+  }
   @media (max-width: 768px) {
     .adv-search-col {
       flex: 0 0 100%;
+    }
+    .adv_por_mes .adv-search-col,
+    .adv_entre_meses .adv-search-col,
+    .adv_por_fecha .adv-search-col,
+    .adv_entre_fechas .adv-search-col {
+      max-width: 100%;
     }
   }
 </style>
@@ -176,7 +203,7 @@
 
           <!-- Tercera fila: Campos dinámicos según periodo seleccionado -->
           <!-- Por mes: Un selector de mes/año -->
-          <div class="adv-search-row adv_por_mes" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+          <div class="adv-search-row adv_por_mes" style="display:none; margin-top: 8px;">
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
@@ -198,7 +225,7 @@
           </div>
 
           <!-- Entre meses: Dos selectores de mes/año -->
-          <div class="adv-search-row adv_entre_meses" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+          <div class="adv-search-row adv_entre_meses" style="display:none; margin-top: 8px;">
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
@@ -228,7 +255,7 @@
           </div>
 
           <!-- Por fecha: Un campo de fecha única -->
-          <div class="adv-search-row adv_por_fecha" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+          <div class="adv-search-row adv_por_fecha" style="display:none; margin-top: 8px;">
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
@@ -250,7 +277,7 @@
           </div>
 
           <!-- Entre fechas: Dos campos de fecha -->
-          <div class="adv-search-row adv_entre_fechas" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+          <div class="adv-search-row adv_entre_fechas" style="display:none; margin-top: 8px;">
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
