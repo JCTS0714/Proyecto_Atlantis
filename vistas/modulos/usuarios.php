@@ -1,4 +1,13 @@
 <!-- =============================================== -->
+<?php
+// Procesar acciones de usuario ANTES de renderizar HTML
+// Esto asegura que los mensajes de Swal se muestren correctamente
+$editarUsuarioCtrl = new ControladorUsuarios();
+$editarUsuarioCtrl->ctrEditarUsuario();
+
+$borrarUsuarioCtrl = new ControladorUsuarios();
+$borrarUsuarioCtrl->ctrBorrarUsuario();
+?>
 
  <!-- Content Wrapper. Contains page content -->
 
@@ -509,27 +518,10 @@
 
    <!--==========================
 
-   LLAMAR AL MÉTODO PARA EDITAR A UN USUARIO
+   LLAMAR AL MÉTODO PARA EDITAR/BORRAR USUARIO
+   (Movido al inicio del archivo para correcta ejecución)
 
    ==============================-->
-
-   <?php
-
-    $editarUsuario = new ControladorUsuarios();
-
-   $editarUsuario->ctrEditarUsuario();
-
-   ?>
-   <!--==========================
-
-   LLAMAR AL MÉTODO PARA BORRAR A UN USUARIO
-
-   ==============================-->
-   <?php
-     $borrarUsuario = new ControladorUsuarios();
-
-     $borrarUsuario -> ctrBorrarUsuario();
-    ?>
 
 
 
