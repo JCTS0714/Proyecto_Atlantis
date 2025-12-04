@@ -70,7 +70,6 @@
         <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">
           <thead>
             <tr>
-              <th style="width: 40px;">#</th>
               <th style="width: 50px;" data-column="col-numero">N°</th>
               <th data-column="col-comercios">Comercio(s)</th>
               <th data-column="col-nombre">Nombre Contador</th>
@@ -86,7 +85,6 @@
           <tbody>
             <?php foreach ($contadores as $key => $c): ?>
               <tr>
-                <td><?php echo $key + 1; ?></td>
                 <td data-column="col-numero"><?php echo htmlspecialchars($c['nro']); ?></td>
                 <td data-column="col-comercios"><?php echo htmlspecialchars($c['comercios_lista'] ?: $c['comercio'] ?: '-'); ?></td>
                 <td data-column="col-nombre"><?php echo htmlspecialchars($c['nom_contador']); ?></td>
