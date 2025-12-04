@@ -210,11 +210,14 @@ class ControladorCliente {
                             icon: "success",
                             title: "¡El cliente ha sido editado correctamente!",
                             showConfirmButton: true,
-                            confirmButtonText: "Cerrar"
-                        }).then((result) => {
-                            if(result.isConfirmed){
-                                window.location = window.BASE_URL + "/'.$ruta.'";
+                            confirmButtonText: "Cerrar",
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                // Evitar doble animación
+                                Swal.stopTimer();
                             }
+                        }).then(() => {
+                            window.location = window.BASE_URL + "/'.$ruta.'";
                         });
                     </script>';
                 } else {
