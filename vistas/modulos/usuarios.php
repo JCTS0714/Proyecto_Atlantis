@@ -559,27 +559,25 @@ if (isset($mensajePendiente) && $mensajePendiente !== null) {
                 <?php if ($texto): ?>
                 text: '<?php echo addslashes($texto); ?>',
                 <?php endif; ?>
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: true,
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6',
-                allowOutsideClick: true,
-                allowEscapeKey: true,
-                backdrop: true,
-                showCloseButton: true
-            }).then(function(result) {
-                // Forzar cierre del modal
-                if (Swal.close) Swal.close();
-            }).catch(function(err) {
-                console.error('Swal error:', err);
+                willClose: function() {
+                    // Limpiar cualquier backdrop residual
+                    document.querySelectorAll('.swal2-container').forEach(function(el) {
+                        el.remove();
+                    });
+                }
             });
         } else {
-            // Si Swal no está disponible, usar alert nativo
             alert('<?php echo addslashes($titulo); ?>');
         }
     }
     
-    // Esperar más tiempo para asegurar que Swal esté completamente cargado
     window.addEventListener('load', function() {
-        setTimeout(mostrarMensaje, 300);
+        setTimeout(mostrarMensaje, 500);
     });
 })();
 </script>
