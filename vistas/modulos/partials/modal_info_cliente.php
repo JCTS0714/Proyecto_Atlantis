@@ -44,6 +44,12 @@
     margin-bottom: 15px;
     border-left: 4px solid #3c8dbc;
   }
+  #modalInfoCliente .info-card.orange-border {
+    border-left-color: #f39c12;
+  }
+  #modalInfoCliente .info-card.green-border {
+    border-left-color: #00a65a;
+  }
   #modalInfoCliente .info-item {
     display: flex;
     align-items: flex-start;
@@ -82,8 +88,21 @@
     display: flex;
     align-items: center;
   }
+  #modalInfoCliente .info-section-title.orange {
+    color: #f39c12;
+    border-bottom-color: #f39c12;
+  }
+  #modalInfoCliente .info-section-title.green {
+    color: #00a65a;
+    border-bottom-color: #00a65a;
+  }
   #modalInfoCliente .info-section-title i {
     margin-right: 8px;
+  }
+  #modalInfoCliente .fecha-item {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
   }
   #modalInfoCliente .oport-title {
     font-size: 18px;
@@ -125,55 +144,81 @@
     text-transform: uppercase;
     margin-top: 4px;
   }
-  /* Tema oscuro */
-  .dark-mode #modalInfoCliente .modal-content {
-    background: #1e2a35;
+  
+  /* ========== TEMA OSCURO ========== */
+  [data-theme="dark"] #modalInfoCliente .modal-content,
+  [data-theme="dark"] #modalInfoCliente .modal-body {
+    background: #192734 !important;
   }
-  .dark-mode #modalInfoCliente .nav-tabs {
-    border-bottom-color: #3d5a73;
+  [data-theme="dark"] #modalInfoCliente .nav-tabs {
+    border-bottom-color: #38444d;
   }
-  .dark-mode #modalInfoCliente .nav-tabs > li > a {
-    color: #a0aec0;
+  [data-theme="dark"] #modalInfoCliente .nav-tabs > li > a {
+    color: #8b98a5;
   }
-  .dark-mode #modalInfoCliente .nav-tabs > li > a:hover {
-    background: #2d3e50;
+  [data-theme="dark"] #modalInfoCliente .nav-tabs > li > a:hover {
+    background: #273340;
+    color: #e7e9ea;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-card {
+    background: #273340 !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-item {
+    border-bottom-color: #38444d;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-label {
+    color: #1d9bf0 !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-value {
+    color: #e7e9ea !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-section-title {
+    color: #1d9bf0 !important;
+    border-bottom-color: #1d9bf0 !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-section-title.orange {
+    color: #f39c12 !important;
+    border-bottom-color: #f39c12 !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .info-section-title.green {
+    color: #00a65a !important;
+    border-bottom-color: #00a65a !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .fecha-item {
+    background: #273340 !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .oport-title {
+    background: linear-gradient(135deg, #273340 0%, #192734 100%) !important;
+    color: #e7e9ea !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .oport-stat {
+    background: #273340 !important;
+    border-color: #38444d !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .oport-stat-value {
+    color: #1d9bf0;
+  }
+  [data-theme="dark"] #modalInfoCliente .oport-stat-label {
+    color: #8b98a5;
+  }
+  [data-theme="dark"] #modalInfoCliente .oport-empty {
+    color: #8b98a5;
+  }
+  [data-theme="dark"] #modalInfoCliente #infoOportDescripcion {
+    color: #e7e9ea !important;
+  }
+  [data-theme="dark"] #modalInfoCliente .modal-footer {
+    background: #192734 !important;
+    border-top-color: #38444d;
+  }
+  [data-theme="dark"] #modalInfoCliente .modal-footer .btn-default {
+    background: #273340;
+    color: #e7e9ea;
+    border-color: #38444d;
+  }
+  [data-theme="dark"] #modalInfoCliente .modal-footer .btn-default:hover {
+    background: #38444d;
     color: #fff;
-  }
-  .dark-mode #modalInfoCliente .info-card {
-    background: #2d3e50;
-    border-left-color: #4a90d9;
-  }
-  .dark-mode #modalInfoCliente .info-item {
-    border-bottom-color: #3d5a73;
-  }
-  .dark-mode #modalInfoCliente .info-label {
-    color: #64b5f6;
-  }
-  .dark-mode #modalInfoCliente .info-value {
-    color: #e0e0e0;
-  }
-  .dark-mode #modalInfoCliente .info-section-title {
-    color: #64b5f6;
-    border-bottom-color: #4a90d9;
-  }
-  .dark-mode #modalInfoCliente .oport-title {
-    background: linear-gradient(135deg, #2d3e50 0%, #1e2a35 100%);
-    color: #e0e0e0;
-    border-left-color: #4caf50;
-  }
-  .dark-mode #modalInfoCliente .oport-stat {
-    background: #2d3e50;
-    border-color: #3d5a73;
-  }
-  .dark-mode #modalInfoCliente .oport-stat-value {
-    color: #64b5f6;
-  }
-  .dark-mode #modalInfoCliente .oport-stat-label {
-    color: #a0aec0;
-  }
-  .dark-mode #modalInfoCliente .modal-footer {
-    background: #1e2a35;
-    border-top-color: #3d5a73;
   }
 </style>
 
@@ -247,8 +292,8 @@
             </div>
             <div class="row">
               <div class="col-md-12">
-                <div class="info-card" style="border-left-color: #f39c12;">
-                  <div class="info-section-title" style="color: #f39c12; border-bottom-color: #f39c12;">
+                <div class="info-card orange-border">
+                  <div class="info-section-title orange">
                     <i class="fa fa-sticky-note"></i> Observaciones y Motivo
                   </div>
                   <div class="info-item">
@@ -264,13 +309,13 @@
             </div>
             <div class="row">
               <div class="col-md-6">
-                <div class="info-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px;">
+                <div class="info-item fecha-item">
                   <span class="info-label"><i class="fa fa-calendar-check-o"></i> Fecha Contacto:</span>
                   <span class="info-value" id="infoFechaContacto">-</span>
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="info-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px;">
+                <div class="info-item fecha-item">
                   <span class="info-label"><i class="fa fa-calendar-plus-o"></i> Fecha Creación:</span>
                   <span class="info-value" id="infoFechaCreacion">-</span>
                 </div>
@@ -298,11 +343,11 @@
                 </div>
               </div>
 
-              <div class="info-card" style="border-left-color: #00a65a;">
-                <div class="info-section-title" style="color: #00a65a; border-bottom-color: #00a65a;">
+              <div class="info-card green-border">
+                <div class="info-section-title green">
                   <i class="fa fa-file-text"></i> Descripción
                 </div>
-                <div id="infoOportDescripcion" style="color: #555; line-height: 1.6;">-</div>
+                <div id="infoOportDescripcion" class="info-value">-</div>
               </div>
 
               <div class="row">
