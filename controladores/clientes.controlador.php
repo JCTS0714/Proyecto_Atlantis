@@ -190,7 +190,6 @@ class ControladorCliente {
                     "motivo" => $motivo,
                     "fecha_contacto" => $_POST["editarFechaContacto"],
                     "empresa" => $_POST["editarEmpresa"],
-                    "fecha_creacion" => $_POST["editarFechaCreacion"] ?? null,
                     "post_precio" => $_POST["editarPrecio"] ?? '',
                     "post_rubro" => $_POST["editarRubro"] ?? '',
                     "post_ano" => $_POST["editarAnio"] ?? '',

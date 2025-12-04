@@ -164,7 +164,6 @@ class ModeloCliente{
       fecha_contacto = :fecha_contacto, 
       empresa = :empresa, 
       motivo = :motivo, 
-      fecha_creacion = :fecha_creacion,
       post_precio = :post_precio,
       post_rubro = :post_rubro,
       post_ano = :post_ano,
@@ -186,7 +185,6 @@ class ModeloCliente{
     $stmt->bindParam(":fecha_contacto", $datos["fecha_contacto"], PDO::PARAM_STR);
     $stmt->bindParam(":empresa", $datos["empresa"], PDO::PARAM_STR);
     $stmt->bindParam(":motivo", $datos["motivo"], PDO::PARAM_STR);
-    $stmt->bindParam(":fecha_creacion", $datos["fecha_creacion"], PDO::PARAM_STR);
     $stmt->bindParam(":post_precio", $datos["post_precio"], PDO::PARAM_STR);
     $stmt->bindParam(":post_rubro", $datos["post_rubro"], PDO::PARAM_STR);
     $stmt->bindParam(":post_ano", $datos["post_ano"], PDO::PARAM_STR);
