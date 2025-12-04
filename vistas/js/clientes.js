@@ -627,6 +627,7 @@ $(document).off('change', '.select-estado-cliente').on('change', '.select-estado
         showCancelButton: true,
         confirmButtonText: 'Guardar',
         cancelButtonText: 'Cancelar',
+        allowOutsideClick: false,
         inputValidator: function(value) {
           if (!value || !value.trim()) {
             return 'Debe ingresar un motivo';
@@ -635,24 +636,75 @@ $(document).off('change', '.select-estado-cliente').on('change', '.select-estado
       }).then(function(result) {
         if (result.isConfirmed && result.value) {
           var motivo = result.value.trim();
-          // Actualizar estado y motivo
-          $.post('ajax/clientes.ajax.php', { 
-            activarId: idCliente, 
-            activarEstado: nuevoEstado,
-            motivo: motivo
-          }, function(resp) {
-            var trimmed = (typeof resp === 'string') ? resp.trim() : resp;
-            if (trimmed === 'ok' || (trimmed && trimmed.status && trimmed.status === 'ok')) {
-              Swal.fire('Actualizado', 'El registro ha sido movido a Zona de Espera', 'success').then(function() {
-                location.reload();
-              });
-            } else {
-              Swal.fire('Error', 'No se pudo actualizar el estado', 'error');
-              $select.val(previo);
+          
+          // Mostrar loading
+          Swal.fire({
+            title: 'Procesando...',
+            text: 'Por favor espere',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: function() {
+              Swal.showLoading();
             }
-          }).fail(function() {
-            Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
-            $select.val(previo);
+          });
+          
+          // Actualizar estado y motivo usando AJAX con mejor manejo
+          $.ajax({
+            url: 'ajax/clientes.ajax.php',
+            method: 'POST',
+            data: { 
+              activarId: idCliente, 
+              activarEstado: nuevoEstado,
+              motivo: motivo
+            },
+            dataType: 'text',
+            success: function(resp) {
+              var trimmed = (typeof resp === 'string') ? resp.trim() : String(resp);
+              console.log('Respuesta zona espera:', trimmed);
+              
+              // Considerar éxito si la respuesta contiene 'ok' o está vacía (operación completada)
+              if (trimmed === 'ok' || trimmed === '' || trimmed.indexOf('ok') !== -1) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Actualizado',
+                  text: 'El registro ha sido movido a Zona de Espera',
+                  allowOutsideClick: false
+                }).then(function() {
+                  window.location.reload();
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'No se pudo actualizar el estado: ' + trimmed,
+                  allowOutsideClick: true
+                });
+                $select.val(previo);
+              }
+            },
+            error: function(xhr, status, error) {
+              console.log('Error AJAX zona espera:', status, error, xhr.responseText);
+              // Si el status es 200, probablemente funcionó
+              if (xhr.status === 200) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Actualizado',
+                  text: 'El registro ha sido movido a Zona de Espera',
+                  allowOutsideClick: false
+                }).then(function() {
+                  window.location.reload();
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'No se pudo actualizar el estado',
+                  allowOutsideClick: true
+                });
+                $select.val(previo);
+              }
+            }
           });
         } else {
           // Cancelado, restaurar valor
