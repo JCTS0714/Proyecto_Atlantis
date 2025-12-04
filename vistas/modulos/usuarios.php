@@ -12,6 +12,23 @@ try {
 } catch (Exception $e) {
     error_log("ERROR en usuarios.php: " . $e->getMessage());
 }
+
+// Mostrar mensaje de sesión si existe
+if (isset($_SESSION["mensaje"])) {
+    $msg = $_SESSION["mensaje"];
+    $tipo = isset($msg["tipo"]) ? $msg["tipo"] : "info";
+    $titulo = isset($msg["titulo"]) ? $msg["titulo"] : "";
+    $texto = isset($msg["texto"]) ? $msg["texto"] : "";
+    unset($_SESSION["mensaje"]);
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                icon: "' . $tipo . '",
+                title: "' . addslashes($titulo) . '"' . ($texto ? ', text: "' . addslashes($texto) . '"' : '') . '
+            });
+        });
+    </script>';
+}
 ?>
 
  <!-- Content Wrapper. Contains page content -->

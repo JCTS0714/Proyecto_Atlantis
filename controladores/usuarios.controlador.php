@@ -181,17 +181,19 @@ class ControladorUsuarios {
         if (!isset($_POST["editarUsuario"])) return;
 
         // Log para debug
-        error_log("ctrEditarUsuario: POST recibido - editarUsuario=" . $_POST["editarUsuario"] . ", editarNombre=" . (isset($_POST["editarNombre"]) ? $_POST["editarNombre"] : 'NO DEFINIDO'));
+        error_log("ctrEditarUsuario: POST recibido - " . json_encode($_POST));
 
         // Validar que editarNombre exista
         if (!isset($_POST["editarNombre"]) || trim($_POST["editarNombre"]) === '') {
-            echo '<script>Swal.fire({icon: "error", title: "¡El nombre no puede ir vacío!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
-            return;
+            $_SESSION["mensaje"] = ["tipo" => "error", "titulo" => "¡El nombre no puede ir vacío!"];
+            header("Location: " . BASE_URL . "/usuarios");
+            exit;
         }
 
         if (!preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"])) {
-            echo '<script>Swal.fire({icon: "error", title: "¡El nombre contiene caracteres no permitidos!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
-            return;
+            $_SESSION["mensaje"] = ["tipo" => "error", "titulo" => "¡El nombre contiene caracteres no permitidos!"];
+            header("Location: " . BASE_URL . "/usuarios");
+            exit;
         }
 
         $ruta = isset($_POST["fotoActual"]) ? $_POST["fotoActual"] : '';
@@ -252,9 +254,13 @@ class ControladorUsuarios {
                 $_SESSION["foto"] = $ruta;
                 $_SESSION["nombre"] = $_POST["editarNombre"];
             }
-            echo '<script>Swal.fire({icon: "success", title: "¡El usuario ha sido editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            $_SESSION["mensaje"] = ["tipo" => "success", "titulo" => "¡El usuario ha sido editado correctamente!"];
+            header("Location: " . BASE_URL . "/usuarios");
+            exit;
         } else {
-            echo '<script>Swal.fire({icon: "error", title: "Error al editar usuario", text: "Ocurrió un error al guardar los cambios."}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            $_SESSION["mensaje"] = ["tipo" => "error", "titulo" => "Error al editar usuario", "texto" => "Ocurrió un error al guardar los cambios."];
+            header("Location: " . BASE_URL . "/usuarios");
+            exit;
         }
     }
 
