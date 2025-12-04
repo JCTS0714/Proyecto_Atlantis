@@ -1,69 +1,340 @@
 <!-- Partial: Modal Info Cliente (solo lectura) -->
+<style>
+  /* Estilos para modal info cliente */
+  #modalInfoCliente .modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #modalInfoCliente .modal-header {
+    background: linear-gradient(135deg, #3c8dbc 0%, #2c6d9c 100%);
+    border-bottom: none;
+    padding: 15px 20px;
+  }
+  #modalInfoCliente .modal-title {
+    font-weight: 600;
+    font-size: 18px;
+  }
+  #modalInfoCliente .nav-tabs {
+    border-bottom: 2px solid #e0e0e0;
+  }
+  #modalInfoCliente .nav-tabs > li > a {
+    border: none;
+    color: #666;
+    font-weight: 500;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.2s;
+  }
+  #modalInfoCliente .nav-tabs > li > a:hover {
+    background: #f5f5f5;
+    color: #333;
+  }
+  #modalInfoCliente .nav-tabs > li.active > a,
+  #modalInfoCliente .nav-tabs > li.active > a:focus,
+  #modalInfoCliente .nav-tabs > li.active > a:hover {
+    background: #3c8dbc;
+    color: white;
+    border: none;
+  }
+  #modalInfoCliente .info-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3c8dbc;
+  }
+  #modalInfoCliente .info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  #modalInfoCliente .info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  #modalInfoCliente .info-label {
+    font-weight: 600;
+    color: #3c8dbc;
+    min-width: 130px;
+    font-size: 13px;
+  }
+  #modalInfoCliente .info-label i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+  }
+  #modalInfoCliente .info-value {
+    color: #333;
+    font-size: 14px;
+    flex: 1;
+  }
+  #modalInfoCliente .info-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3c8dbc;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3c8dbc;
+    display: flex;
+    align-items: center;
+  }
+  #modalInfoCliente .info-section-title i {
+    margin-right: 8px;
+  }
+  #modalInfoCliente .oport-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 6px;
+    border-left: 4px solid #00a65a;
+  }
+  #modalInfoCliente .oport-empty {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-style: italic;
+  }
+  #modalInfoCliente .oport-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  #modalInfoCliente .oport-stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+  #modalInfoCliente .oport-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3c8dbc;
+  }
+  #modalInfoCliente .oport-stat-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Tema oscuro */
+  .dark-mode #modalInfoCliente .modal-content {
+    background: #1e2a35;
+  }
+  .dark-mode #modalInfoCliente .nav-tabs {
+    border-bottom-color: #3d5a73;
+  }
+  .dark-mode #modalInfoCliente .nav-tabs > li > a {
+    color: #a0aec0;
+  }
+  .dark-mode #modalInfoCliente .nav-tabs > li > a:hover {
+    background: #2d3e50;
+    color: #fff;
+  }
+  .dark-mode #modalInfoCliente .info-card {
+    background: #2d3e50;
+    border-left-color: #4a90d9;
+  }
+  .dark-mode #modalInfoCliente .info-item {
+    border-bottom-color: #3d5a73;
+  }
+  .dark-mode #modalInfoCliente .info-label {
+    color: #64b5f6;
+  }
+  .dark-mode #modalInfoCliente .info-value {
+    color: #e0e0e0;
+  }
+  .dark-mode #modalInfoCliente .info-section-title {
+    color: #64b5f6;
+    border-bottom-color: #4a90d9;
+  }
+  .dark-mode #modalInfoCliente .oport-title {
+    background: linear-gradient(135deg, #2d3e50 0%, #1e2a35 100%);
+    color: #e0e0e0;
+    border-left-color: #4caf50;
+  }
+  .dark-mode #modalInfoCliente .oport-stat {
+    background: #2d3e50;
+    border-color: #3d5a73;
+  }
+  .dark-mode #modalInfoCliente .oport-stat-value {
+    color: #64b5f6;
+  }
+  .dark-mode #modalInfoCliente .oport-stat-label {
+    color: #a0aec0;
+  }
+  .dark-mode #modalInfoCliente .modal-footer {
+    background: #1e2a35;
+    border-top-color: #3d5a73;
+  }
+</style>
+
 <div id="modalInfoCliente" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header" style="background:#3c8dbc; color:white;">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Información del Prospecto / Oportunidad</h4>
+      <div class="modal-header" style="background: linear-gradient(135deg, #3c8dbc 0%, #2c6d9c 100%); color:white;">
+        <button type="button" class="close" data-dismiss="modal" style="color:white; opacity:0.8;">&times;</button>
+        <h4 class="modal-title"><i class="fa fa-info-circle"></i> Información del Prospecto / Oportunidad</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="padding: 20px;">
         <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active"><a href="#tabProspecto" aria-controls="tabProspecto" role="tab" data-toggle="tab">Prospecto</a></li>
-          <li role="presentation"><a href="#tabOportunidad" aria-controls="tabOportunidad" role="tab" data-toggle="tab">Oportunidad</a></li>
+          <li role="presentation" class="active">
+            <a href="#tabProspecto" aria-controls="tabProspecto" role="tab" data-toggle="tab">
+              <i class="fa fa-user"></i> Prospecto
+            </a>
+          </li>
+          <li role="presentation">
+            <a href="#tabOportunidad" aria-controls="tabOportunidad" role="tab" data-toggle="tab">
+              <i class="fa fa-briefcase"></i> Oportunidad
+            </a>
+          </li>
         </ul>
 
-        <div class="tab-content" style="margin-top:10px;">
+        <div class="tab-content" style="margin-top:15px;">
+          <!-- Tab Prospecto -->
           <div role="tabpanel" class="tab-pane active" id="tabProspecto">
             <div class="row">
-              <div class="col-md-6"><b>Nombre:</b> <span id="infoNombre"></span></div>
-              <div class="col-md-6"><b>Tipo:</b> <span id="infoTipo"></span></div>
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-section-title"><i class="fa fa-id-card"></i> Datos Personales</div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-user"></i> Nombre:</span>
+                    <span class="info-value" id="infoNombre">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-tag"></i> Tipo:</span>
+                    <span class="info-value" id="infoTipo">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-id-badge"></i> Documento:</span>
+                    <span class="info-value" id="infoDocumento">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-phone"></i> Teléfono:</span>
+                    <span class="info-value" id="infoTelefono">-</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-card">
+                  <div class="info-section-title"><i class="fa fa-building"></i> Información Comercial</div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-briefcase"></i> Empresa:</span>
+                    <span class="info-value" id="infoEmpresa">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-map-marker"></i> Ciudad:</span>
+                    <span class="info-value" id="infoCiudad">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-exchange"></i> Migración:</span>
+                    <span class="info-value" id="infoMigracion">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-link"></i> Referencia:</span>
+                    <span class="info-value" id="infoReferencia">-</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Documento:</b> <span id="infoDocumento"></span></div>
-              <div class="col-md-6"><b>Teléfono:</b> <span id="infoTelefono"></span></div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="info-card" style="border-left-color: #f39c12;">
+                  <div class="info-section-title" style="color: #f39c12; border-bottom-color: #f39c12;">
+                    <i class="fa fa-sticky-note"></i> Observaciones y Motivo
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-comment"></i> Observación:</span>
+                    <span class="info-value" id="infoCorreo">-</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label"><i class="fa fa-question-circle"></i> Motivo:</span>
+                    <span class="info-value" id="infoMotivo">-</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Observación:</b> <span id="infoCorreo"></span></div>
-              <div class="col-md-6"><b>Motivo:</b> <span id="infoMotivo"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Ciudad:</b> <span id="infoCiudad"></span></div>
-              <div class="col-md-6"><b>Migración:</b> <span id="infoMigracion"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Referencia:</b> <span id="infoReferencia"></span></div>
-              <div class="col-md-6"><b>Empresa:</b> <span id="infoEmpresa"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha Contacto:</b> <span id="infoFechaContacto"></span></div>
-              <div class="col-md-6"><b>Fecha Creación:</b> <span id="infoFechaCreacion"></span></div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px;">
+                  <span class="info-label"><i class="fa fa-calendar-check-o"></i> Fecha Contacto:</span>
+                  <span class="info-value" id="infoFechaContacto">-</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item" style="background: #f8f9fa; padding: 10px; border-radius: 6px;">
+                  <span class="info-label"><i class="fa fa-calendar-plus-o"></i> Fecha Creación:</span>
+                  <span class="info-value" id="infoFechaCreacion">-</span>
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- Tab Oportunidad -->
           <div role="tabpanel" class="tab-pane" id="tabOportunidad">
-            <div class="row">
-              <div class="col-md-12"><h4 id="infoOportTitulo"></h4></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-12"><b>Descripción:</b> <div id="infoOportDescripcion"></div></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-4"><b>Valor Estimado:</b> <span id="infoOportValor"></span></div>
-              <div class="col-md-4"><b>Probabilidad:</b> <span id="infoOportProbabilidad"></span></div>
-              <div class="col-md-4"><b>Estado:</b> <span id="infoOportEstado"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha Cierre Estimada:</b> <span id="infoOportFechaCierre"></span></div>
-              <div class="col-md-6"><b>Actividad:</b> <span id="infoOportActividad"></span></div>
-            </div>
-            <div class="row" style="margin-top:8px;">
-              <div class="col-md-6"><b>Fecha Actividad:</b> <span id="infoOportFechaActividad"></span></div>
+            <div id="oportunidadContent">
+              <div class="oport-title" id="infoOportTitulo">Sin oportunidades</div>
+              
+              <div class="oport-stats">
+                <div class="oport-stat">
+                  <div class="oport-stat-value" id="infoOportValor">-</div>
+                  <div class="oport-stat-label">Valor Estimado</div>
+                </div>
+                <div class="oport-stat">
+                  <div class="oport-stat-value" id="infoOportProbabilidad">-</div>
+                  <div class="oport-stat-label">Probabilidad</div>
+                </div>
+                <div class="oport-stat">
+                  <div class="oport-stat-value" id="infoOportEstado">-</div>
+                  <div class="oport-stat-label">Estado</div>
+                </div>
+              </div>
+
+              <div class="info-card" style="border-left-color: #00a65a;">
+                <div class="info-section-title" style="color: #00a65a; border-bottom-color: #00a65a;">
+                  <i class="fa fa-file-text"></i> Descripción
+                </div>
+                <div id="infoOportDescripcion" style="color: #555; line-height: 1.6;">-</div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="info-card">
+                    <div class="info-item">
+                      <span class="info-label"><i class="fa fa-calendar"></i> Fecha Cierre:</span>
+                      <span class="info-value" id="infoOportFechaCierre">-</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-card">
+                    <div class="info-item">
+                      <span class="info-label"><i class="fa fa-tasks"></i> Actividad:</span>
+                      <span class="info-value" id="infoOportActividad">-</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label"><i class="fa fa-clock-o"></i> Fecha Act.:</span>
+                      <span class="info-value" id="infoOportFechaActividad">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          <i class="fa fa-times"></i> Cerrar
+        </button>
       </div>
     </div>
   </div>
