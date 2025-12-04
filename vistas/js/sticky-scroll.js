@@ -1,14 +1,15 @@
 /**
  * Sticky Horizontal Scroll
  * Muestra una barra de scroll horizontal fija en la parte inferior de la pantalla
- * cuando hay scroll horizontal disponible y el usuario no puede ver la barra de scroll natural.
+ * cuando la tabla es más ancha que su contenedor visible.
  */
 (function() {
   'use strict';
 
   var stickyWrapper = null;
   var stickyContent = null;
-  var scrollableElement = null;
+  var targetTable = null;
+  var scrollContainer = null;
   var isInitialized = false;
 
   function init() {
@@ -44,49 +45,57 @@
     setTimeout(updateAll, 3000);
   }
 
-  function findScrollableElement() {
-    // Buscar el elemento que tiene scroll horizontal
-    // Prioridad: dataTables_scrollBody > content-wrapper > table-responsive
-    var candidates = [
-      '.dataTables_scrollBody',
-      '.content-wrapper',
-      '.table-responsive',
-      '.box-body'
-    ];
+  function findTable() {
+    // Buscar la tabla principal (DataTable o tabla normal)
+    var tables = document.querySelectorAll(
+      '#tablaClientes, #tablaProspectos, #tablaContadores, ' +
+      '#tablaOportunidades, #tablaIncidencias, #tablaVentas, ' +
+      'table.dataTable, .dataTables_wrapper table'
+    );
     
-    for (var i = 0; i < candidates.length; i++) {
-      var elements = document.querySelectorAll(candidates[i]);
-      for (var j = 0; j < elements.length; j++) {
-        var el = elements[j];
-        if (el.scrollWidth > el.clientWidth + 10) {
-          console.log('[sticky-scroll] Found scrollable:', candidates[i], 'scrollWidth:', el.scrollWidth, 'clientWidth:', el.clientWidth);
-          return el;
-        }
+    var widestTable = null;
+    var maxWidth = 0;
+    
+    tables.forEach(function(table) {
+      var width = table.scrollWidth || table.offsetWidth;
+      if (width > maxWidth) {
+        maxWidth = width;
+        widestTable = table;
       }
-    }
+    });
     
-    // Fallback: buscar cualquier tabla ancha
-    var tables = document.querySelectorAll('table');
-    for (var k = 0; k < tables.length; k++) {
-      var table = tables[k];
-      var parent = table.parentElement;
-      if (parent && table.offsetWidth > parent.clientWidth + 10) {
-        console.log('[sticky-scroll] Found wide table, using parent');
+    return widestTable;
+  }
+
+  function findScrollContainer(table) {
+    // Buscar el contenedor scrolleable de la tabla
+    var parent = table.parentElement;
+    while (parent) {
+      var style = window.getComputedStyle(parent);
+      if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
         return parent;
       }
+      if (parent.classList.contains('dataTables_wrapper') ||
+          parent.classList.contains('content-wrapper') ||
+          parent.classList.contains('box-body')) {
+        return parent;
+      }
+      parent = parent.parentElement;
     }
-    
-    return null;
+    return document.querySelector('.content-wrapper');
   }
 
   function updateAll() {
-    scrollableElement = findScrollableElement();
+    targetTable = findTable();
     
-    if (!scrollableElement) {
-      console.log('[sticky-scroll] No scrollable element found');
+    if (!targetTable) {
+      console.log('[sticky-scroll] No table found');
       if (stickyWrapper) stickyWrapper.classList.remove('visible');
       return;
     }
+    
+    scrollContainer = findScrollContainer(targetTable);
+    console.log('[sticky-scroll] Table found:', targetTable.id || 'unnamed', 'width:', targetTable.scrollWidth);
     
     setupScrollSync();
     updateStickyWidth();
@@ -94,74 +103,69 @@
   }
 
   function setupScrollSync() {
-    if (!scrollableElement || !stickyWrapper) return;
-    
-    // Remover listeners anteriores
-    stickyWrapper.onscroll = null;
-    scrollableElement.onscroll = null;
+    if (!scrollContainer || !stickyWrapper) return;
     
     // Sincronizar scroll
     stickyWrapper.onscroll = function() {
-      if (!stickyWrapper._syncing) {
-        scrollableElement._syncing = true;
-        scrollableElement.scrollLeft = stickyWrapper.scrollLeft;
-        scrollableElement._syncing = false;
+      if (!stickyWrapper._syncing && scrollContainer) {
+        scrollContainer._syncing = true;
+        scrollContainer.scrollLeft = stickyWrapper.scrollLeft;
+        scrollContainer._syncing = false;
       }
     };
     
-    scrollableElement.onscroll = function() {
-      if (!scrollableElement._syncing) {
+    scrollContainer.onscroll = function() {
+      if (!scrollContainer._syncing && stickyWrapper) {
         stickyWrapper._syncing = true;
-        stickyWrapper.scrollLeft = scrollableElement.scrollLeft;
+        stickyWrapper.scrollLeft = scrollContainer.scrollLeft;
         stickyWrapper._syncing = false;
       }
     };
   }
 
   function updateStickyWidth() {
-    if (!scrollableElement || !stickyContent || !stickyWrapper) return;
+    if (!targetTable || !stickyContent || !stickyWrapper || !scrollContainer) return;
     
-    var scrollWidth = scrollableElement.scrollWidth;
-    var clientWidth = scrollableElement.clientWidth;
-    var rect = scrollableElement.getBoundingClientRect();
+    var tableWidth = targetTable.scrollWidth || targetTable.offsetWidth;
+    var containerRect = scrollContainer.getBoundingClientRect();
+    var visibleWidth = containerRect.width;
     
-    console.log('[sticky-scroll] scrollWidth:', scrollWidth, 'clientWidth:', clientWidth);
+    console.log('[sticky-scroll] tableWidth:', tableWidth, 'visibleWidth:', visibleWidth);
     
-    if (scrollWidth > clientWidth + 10) {
-      stickyContent.style.width = scrollWidth + 'px';
-      stickyWrapper.style.width = clientWidth + 'px';
-      stickyWrapper.style.left = rect.left + 'px';
-      stickyWrapper.scrollLeft = scrollableElement.scrollLeft;
+    // Si la tabla es más ancha que el contenedor visible
+    if (tableWidth > visibleWidth + 10) {
+      stickyContent.style.width = tableWidth + 'px';
+      stickyWrapper.style.width = visibleWidth + 'px';
+      stickyWrapper.style.left = containerRect.left + 'px';
+      stickyWrapper.scrollLeft = scrollContainer.scrollLeft;
     }
   }
 
   function updateVisibility() {
-    if (!scrollableElement || !stickyWrapper) return;
+    if (!targetTable || !stickyWrapper || !scrollContainer) return;
     
-    var scrollWidth = scrollableElement.scrollWidth;
-    var clientWidth = scrollableElement.clientWidth;
+    var tableWidth = targetTable.scrollWidth || targetTable.offsetWidth;
+    var containerRect = scrollContainer.getBoundingClientRect();
+    var visibleWidth = containerRect.width;
     
-    // No hay scroll horizontal, ocultar
-    if (scrollWidth <= clientWidth + 10) {
+    // No hay scroll horizontal necesario, ocultar
+    if (tableWidth <= visibleWidth + 10) {
       stickyWrapper.classList.remove('visible');
+      console.log('[sticky-scroll] Hidden: table fits in container');
       return;
     }
 
-    var rect = scrollableElement.getBoundingClientRect();
+    // Verificar si la tabla está visible en pantalla
+    var tableRect = targetTable.getBoundingClientRect();
     var windowHeight = window.innerHeight;
+    var tableInView = tableRect.top < windowHeight && tableRect.bottom > 0;
     
-    // Verificar si el elemento está en vista (al menos parcialmente)
-    var elementInView = rect.top < windowHeight && rect.bottom > 0;
-    
-    console.log('[sticky-scroll] inView:', elementInView, 'hasScroll:', true);
+    console.log('[sticky-scroll] tableInView:', tableInView, 'needsScroll:', tableWidth > visibleWidth);
 
-    if (elementInView) {
-      // El elemento está en vista y tiene scroll horizontal - mostrar siempre
+    if (tableInView) {
       stickyWrapper.classList.add('visible');
-      
-      // Actualizar posición
-      stickyWrapper.style.width = clientWidth + 'px';
-      stickyWrapper.style.left = rect.left + 'px';
+      stickyWrapper.style.width = visibleWidth + 'px';
+      stickyWrapper.style.left = containerRect.left + 'px';
     } else {
       stickyWrapper.classList.remove('visible');
     }
@@ -181,7 +185,6 @@
     jQuery(document).ready(function() {
       setTimeout(init, 800);
       
-      // Actualizar cuando DataTables se redibuje
       jQuery(document).on('draw.dt init.dt', function() {
         console.log('[sticky-scroll] DataTable event detected');
         setTimeout(updateAll, 300);
