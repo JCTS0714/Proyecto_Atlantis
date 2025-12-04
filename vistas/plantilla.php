@@ -270,6 +270,7 @@
   </script>
 
   <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/sticky-scroll.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js"></script>

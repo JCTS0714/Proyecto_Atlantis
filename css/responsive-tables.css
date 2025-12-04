@@ -157,69 +157,111 @@ table.dataTable tbody td {
 
 /*================================================
   SCROLL HORIZONTAL GENERAL PARA TABLAS ANCHAS
-  Permite scroll horizontal desde cualquier altura
+  Scroll sticky en la parte inferior de la pantalla
 ================================================*/
 
-/* Hacer que el contenedor principal de contenido tenga scroll horizontal */
+/* Contenedor de tabla con scroll */
+.box-body {
+  position: relative;
+}
+
+/* Barra de scroll sticky flotante */
+.sticky-scroll-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.1));
+  z-index: 1000;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: none;
+  border-top: 1px solid #ddd;
+}
+
+.sticky-scroll-wrapper.visible {
+  display: block;
+}
+
+.sticky-scroll-content {
+  height: 1px;
+}
+
+/* Scrollbar estilos para la barra sticky */
+.sticky-scroll-wrapper::-webkit-scrollbar {
+  height: 12px;
+}
+
+.sticky-scroll-wrapper::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 0;
+}
+
+.sticky-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #6c757d, #495057);
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+}
+
+.sticky-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #495057, #343a40);
+}
+
+/* Firefox scrollbar */
+.sticky-scroll-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #6c757d #e9ecef;
+}
+
+/* Tema oscuro - barra sticky */
+.dark-mode .sticky-scroll-wrapper {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(255,255,255,0.05));
+  border-top: 1px solid #3d5a73;
+}
+
+.dark-mode .sticky-scroll-wrapper::-webkit-scrollbar-track {
+  background: #1e2a35;
+}
+
+.dark-mode .sticky-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #4a6a8a, #3d5a73);
+  border: 2px solid #1e2a35;
+}
+
+.dark-mode .sticky-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #5a7a9a, #4a6a8a);
+}
+
+.dark-mode .sticky-scroll-wrapper {
+  scrollbar-color: #4a6a8a #1e2a35;
+}
+
+/* Contenedor principal - scroll normal */
 .content-wrapper {
   overflow-x: auto;
   overflow-y: visible;
 }
 
-/* El contenido dentro del wrapper */
 .content-wrapper > .content {
   min-width: fit-content;
 }
 
-/* Box que contiene las tablas */
 .box {
   min-width: fit-content;
 }
 
-/* Asegurar que las tablas DataTables mantengan su ancho */
 .dataTables_wrapper {
   min-width: fit-content;
 }
 
-/* Scrollbar siempre visible en el contenedor principal */
-.content-wrapper::-webkit-scrollbar {
-  height: 12px;
-  display: block;
+/* Ocultar scrollbar del content-wrapper cuando hay sticky scroll */
+.has-sticky-scroll .content-wrapper::-webkit-scrollbar {
+  height: 0;
+  display: none;
 }
 
-.content-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 6px;
+.has-sticky-scroll .content-wrapper {
+  scrollbar-width: none;
 }
 
-.content-wrapper::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 6px;
-}
-
-.content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Firefox scrollbar */
-.content-wrapper {
-  scrollbar-width: thin;
-  scrollbar-color: #888 #f1f1f1;
-}
-
-/* Tema oscuro - scrollbar */
-.dark-mode .content-wrapper::-webkit-scrollbar-track {
-  background: #2c3e50;
-}
-
-.dark-mode .content-wrapper::-webkit-scrollbar-thumb {
-  background: #5a6a7a;
-}
-
-.dark-mode .content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #7a8a9a;
-}
-
-.dark-mode .content-wrapper {
-  scrollbar-color: #5a6a7a #2c3e50;
-}
