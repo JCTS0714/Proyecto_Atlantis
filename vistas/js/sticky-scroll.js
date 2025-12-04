@@ -1,198 +1,194 @@
 /**
  * Sticky Horizontal Scroll
  * Muestra una barra de scroll horizontal fija en la parte inferior de la pantalla
- * cuando la tabla es más ancha que la pantalla y el scroll natural no es visible.
- * Se oculta cuando el usuario puede ver el scroll natural de la tabla.
+ * cuando hay scroll horizontal disponible y el usuario no puede ver la barra de scroll natural.
  */
 (function() {
   'use strict';
 
   var stickyWrapper = null;
   var stickyContent = null;
-  var contentWrapper = null;
-  var targetTable = null;
+  var scrollableElement = null;
   var isInitialized = false;
 
   function init() {
     if (isInitialized) return;
     
-    contentWrapper = document.querySelector('.content-wrapper');
-    if (!contentWrapper) {
-      console.log('sticky-scroll: content-wrapper not found');
-      return;
-    }
-
     // Crear el wrapper del scroll sticky
     stickyWrapper = document.createElement('div');
     stickyWrapper.className = 'sticky-scroll-wrapper';
+    stickyWrapper.id = 'sticky-scroll-wrapper';
     
     stickyContent = document.createElement('div');
     stickyContent.className = 'sticky-scroll-content';
     
     stickyWrapper.appendChild(stickyContent);
     document.body.appendChild(stickyWrapper);
-    
-    // Sincronizar scroll entre la barra sticky y el content-wrapper
-    stickyWrapper.addEventListener('scroll', function() {
-      if (contentWrapper && !stickyWrapper._syncing) {
-        contentWrapper._syncing = true;
-        contentWrapper.scrollLeft = stickyWrapper.scrollLeft;
-        contentWrapper._syncing = false;
-      }
-    });
-    
-    contentWrapper.addEventListener('scroll', function() {
-      if (stickyWrapper && !contentWrapper._syncing) {
-        stickyWrapper._syncing = true;
-        stickyWrapper.scrollLeft = contentWrapper.scrollLeft;
-        stickyWrapper._syncing = false;
-      }
-    });
 
-    // Eventos para actualizar la visibilidad
-    window.addEventListener('scroll', updateVisibility);
+    // Eventos para actualizar
+    window.addEventListener('scroll', updateVisibility, { passive: true });
     window.addEventListener('resize', updateAll);
     
-    // Observar cambios en el DOM (para cuando se carga la tabla)
+    // Observar cambios en el DOM
     var observer = new MutationObserver(function() {
-      setTimeout(updateAll, 100);
+      setTimeout(updateAll, 200);
     });
-    observer.observe(contentWrapper, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     isInitialized = true;
-    console.log('sticky-scroll: initialized');
+    console.log('[sticky-scroll] Initialized');
     
-    // Actualizar inicialmente con varios intentos
+    // Actualizar con varios intentos
     setTimeout(updateAll, 500);
-    setTimeout(updateAll, 1000);
-    setTimeout(updateAll, 2000);
+    setTimeout(updateAll, 1500);
+    setTimeout(updateAll, 3000);
+  }
+
+  function findScrollableElement() {
+    // Buscar el elemento que tiene scroll horizontal
+    // Prioridad: dataTables_scrollBody > content-wrapper > table-responsive
+    var candidates = [
+      '.dataTables_scrollBody',
+      '.content-wrapper',
+      '.table-responsive',
+      '.box-body'
+    ];
+    
+    for (var i = 0; i < candidates.length; i++) {
+      var elements = document.querySelectorAll(candidates[i]);
+      for (var j = 0; j < elements.length; j++) {
+        var el = elements[j];
+        if (el.scrollWidth > el.clientWidth + 10) {
+          console.log('[sticky-scroll] Found scrollable:', candidates[i], 'scrollWidth:', el.scrollWidth, 'clientWidth:', el.clientWidth);
+          return el;
+        }
+      }
+    }
+    
+    // Fallback: buscar cualquier tabla ancha
+    var tables = document.querySelectorAll('table');
+    for (var k = 0; k < tables.length; k++) {
+      var table = tables[k];
+      var parent = table.parentElement;
+      if (parent && table.offsetWidth > parent.clientWidth + 10) {
+        console.log('[sticky-scroll] Found wide table, using parent');
+        return parent;
+      }
+    }
+    
+    return null;
   }
 
   function updateAll() {
-    findTargetTable();
+    scrollableElement = findScrollableElement();
+    
+    if (!scrollableElement) {
+      console.log('[sticky-scroll] No scrollable element found');
+      if (stickyWrapper) stickyWrapper.classList.remove('visible');
+      return;
+    }
+    
+    setupScrollSync();
     updateStickyWidth();
     updateVisibility();
   }
 
-  function findTargetTable() {
-    // Buscar la tabla más ancha
-    var tables = contentWrapper.querySelectorAll('table.dataTable, .dataTables_wrapper table, table.tabla');
-    var maxWidth = 0;
+  function setupScrollSync() {
+    if (!scrollableElement || !stickyWrapper) return;
     
-    tables.forEach(function(t) {
-      var w = t.scrollWidth || t.offsetWidth;
-      if (w > maxWidth) {
-        maxWidth = w;
-        targetTable = t;
+    // Remover listeners anteriores
+    stickyWrapper.onscroll = null;
+    scrollableElement.onscroll = null;
+    
+    // Sincronizar scroll
+    stickyWrapper.onscroll = function() {
+      if (!stickyWrapper._syncing) {
+        scrollableElement._syncing = true;
+        scrollableElement.scrollLeft = stickyWrapper.scrollLeft;
+        scrollableElement._syncing = false;
       }
-    });
+    };
     
-    if (!targetTable) {
-      targetTable = contentWrapper.querySelector('.dataTables_wrapper, .box-body, table');
-    }
+    scrollableElement.onscroll = function() {
+      if (!scrollableElement._syncing) {
+        stickyWrapper._syncing = true;
+        stickyWrapper.scrollLeft = scrollableElement.scrollLeft;
+        stickyWrapper._syncing = false;
+      }
+    };
   }
 
   function updateStickyWidth() {
-    if (!contentWrapper || !stickyContent || !stickyWrapper) return;
+    if (!scrollableElement || !stickyContent || !stickyWrapper) return;
     
-    // Buscar el elemento con mayor ancho de scroll
-    var scrollWidth = contentWrapper.scrollWidth;
-    var clientWidth = contentWrapper.clientWidth;
+    var scrollWidth = scrollableElement.scrollWidth;
+    var clientWidth = scrollableElement.clientWidth;
+    var rect = scrollableElement.getBoundingClientRect();
     
-    // También verificar tablas específicas
-    if (targetTable) {
-      var tableWidth = targetTable.scrollWidth || targetTable.offsetWidth;
-      if (tableWidth > scrollWidth) {
-        scrollWidth = tableWidth;
-      }
-    }
+    console.log('[sticky-scroll] scrollWidth:', scrollWidth, 'clientWidth:', clientWidth);
     
-    console.log('sticky-scroll: scrollWidth=' + scrollWidth + ', clientWidth=' + clientWidth);
-    
-    // Solo mostrar si hay contenido que scrollear (más de 20px de diferencia)
-    if (scrollWidth > clientWidth + 20) {
+    if (scrollWidth > clientWidth + 10) {
       stickyContent.style.width = scrollWidth + 'px';
       stickyWrapper.style.width = clientWidth + 'px';
-      stickyWrapper.style.left = contentWrapper.getBoundingClientRect().left + 'px';
-      document.body.classList.add('has-sticky-scroll');
-      console.log('sticky-scroll: scroll needed');
-    } else {
-      stickyWrapper.classList.remove('visible');
-      document.body.classList.remove('has-sticky-scroll');
-      console.log('sticky-scroll: no scroll needed');
+      stickyWrapper.style.left = rect.left + 'px';
+      stickyWrapper.scrollLeft = scrollableElement.scrollLeft;
     }
   }
 
   function updateVisibility() {
-    if (!contentWrapper || !stickyWrapper) return;
+    if (!scrollableElement || !stickyWrapper) return;
     
-    var scrollWidth = contentWrapper.scrollWidth;
-    var clientWidth = contentWrapper.clientWidth;
+    var scrollWidth = scrollableElement.scrollWidth;
+    var clientWidth = scrollableElement.clientWidth;
     
-    // También verificar tabla
-    if (targetTable) {
-      var tableWidth = targetTable.scrollWidth || targetTable.offsetWidth;
-      if (tableWidth > scrollWidth) {
-        scrollWidth = tableWidth;
-      }
-    }
-    
-    // Si no hay nada que scrollear, ocultar
-    if (scrollWidth <= clientWidth + 20) {
+    // No hay scroll horizontal, ocultar
+    if (scrollWidth <= clientWidth + 10) {
       stickyWrapper.classList.remove('visible');
       return;
     }
 
-    // Encontrar la tabla o el elemento scrolleable principal
-    var table = targetTable || contentWrapper.querySelector('.dataTables_wrapper, .table-responsive, table.dataTable, .box-body');
-    if (!table) {
-      stickyWrapper.classList.remove('visible');
-      return;
-    }
-
-    var tableRect = table.getBoundingClientRect();
+    var rect = scrollableElement.getBoundingClientRect();
     var windowHeight = window.innerHeight;
     
-    // El scroll natural de la tabla está en la parte inferior del contenedor
-    // Si el final de la tabla está visible en pantalla, ocultar el sticky scroll
-    var tableBottomVisible = tableRect.bottom <= windowHeight + 20; // 20px de margen
+    // Verificar si el elemento está en vista
+    var elementInView = rect.top < windowHeight && rect.bottom > 0;
     
-    // También verificar si la tabla es visible en pantalla
-    var tableTopVisible = tableRect.top < windowHeight;
-    var tableInView = tableTopVisible && tableRect.bottom > 0;
+    // Verificar si la parte inferior (donde está el scroll natural) es visible
+    // El scroll natural está en la parte inferior del elemento
+    var bottomVisible = rect.bottom <= windowHeight;
+    
+    console.log('[sticky-scroll] inView:', elementInView, 'bottomVisible:', bottomVisible, 'rect.bottom:', rect.bottom, 'windowHeight:', windowHeight);
 
-    console.log('sticky-scroll: tableInView=' + tableInView + ', tableBottomVisible=' + tableBottomVisible);
-
-    if (tableInView && !tableBottomVisible) {
-      // La tabla está en vista pero su parte inferior no es visible
+    if (elementInView && !bottomVisible) {
+      // El elemento está en vista pero su scroll natural no es visible
       stickyWrapper.classList.add('visible');
       
-      // Actualizar posición y ancho
+      // Actualizar posición
       stickyWrapper.style.width = clientWidth + 'px';
-      stickyWrapper.style.left = contentWrapper.getBoundingClientRect().left + 'px';
+      stickyWrapper.style.left = rect.left + 'px';
     } else {
-      // El final de la tabla es visible o la tabla no está en vista
       stickyWrapper.classList.remove('visible');
     }
   }
 
-  // Inicializar cuando el DOM esté listo
+  // Inicializar
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(init, 300);
+      setTimeout(init, 500);
     });
   } else {
-    setTimeout(init, 300);
+    setTimeout(init, 500);
   }
 
-  // También reinicializar después de que DataTables cargue
-  if (typeof $ !== 'undefined') {
-    $(document).ready(function() {
-      setTimeout(init, 500);
+  // También inicializar con jQuery si está disponible
+  if (typeof jQuery !== 'undefined') {
+    jQuery(document).ready(function() {
+      setTimeout(init, 800);
       
-      // Reinicializar cuando se redibuje cualquier DataTable
-      $(document).on('draw.dt', function() {
-        setTimeout(updateAll, 100);
+      // Actualizar cuando DataTables se redibuje
+      jQuery(document).on('draw.dt init.dt', function() {
+        console.log('[sticky-scroll] DataTable event detected');
+        setTimeout(updateAll, 300);
       });
     });
   }
