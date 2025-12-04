@@ -124,7 +124,7 @@ class ControladorUsuarios {
         if (!preg_match('/^[\\p{L}\\p{N}\\p{P}\\p{M}\\s]+$/u', $nuevoNombre) ||
             !preg_match('/^[\\p{L}\\p{N}._\\-\\s]+$/u', $nuevoUsuario) ||
             strlen($nuevoPassword) == 0) {
-                echo '<script>swal.fire({icon: "error", title: "¡El campo usuario no puede estar vacio o con caracteres inválidos!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+                echo '<script>Swal.fire({icon: "error", title: "¡El campo usuario no puede estar vacio o con caracteres inválidos!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -163,7 +163,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlRegistrarUsuario($tabla, $datos);
         if ($respuesta === "ok") {
-            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios" });</script>';
+            echo '<script>Swal.fire({icon: "success", title: "¡El usuario ha sido registrado correctamente!", showConfirmButton: true, confirmButtonText: "Cerrar"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios" });</script>';
         } else {
             error_log("mdlRegistrarUsuario: ERROR para usuario=" . $nuevoUsuario . " | respuesta=" . json_encode($respuesta));
         }
@@ -185,12 +185,12 @@ class ControladorUsuarios {
 
         // Validar que editarNombre exista
         if (!isset($_POST["editarNombre"]) || trim($_POST["editarNombre"]) === '') {
-            echo '<script>swal.fire({icon: "error", title: "¡El nombre no puede ir vacío!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            echo '<script>Swal.fire({icon: "error", title: "¡El nombre no puede ir vacío!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
         if (!preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"])) {
-            echo '<script>swal.fire({icon: "error", title: "¡El nombre contiene caracteres no permitidos!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            echo '<script>Swal.fire({icon: "error", title: "¡El nombre contiene caracteres no permitidos!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -237,7 +237,12 @@ class ControladorUsuarios {
             "estado" => isset($_POST["editarEstado"]) ? $_POST["editarEstado"] : 1
         );
 
+        error_log("ctrEditarUsuario: Datos a enviar - " . json_encode($datos));
+
         $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);
+        
+        error_log("ctrEditarUsuario: Respuesta del modelo - " . $respuesta);
+        
         if ($respuesta == "ok") {
             // Si el usuario editado es el que está en sesión, actualizar la sesión
             if (session_status() == PHP_SESSION_NONE) {
@@ -247,7 +252,9 @@ class ControladorUsuarios {
                 $_SESSION["foto"] = $ruta;
                 $_SESSION["nombre"] = $_POST["editarNombre"];
             }
-            echo '<script>swal.fire({icon: "success", title: "¡El usuario ha sido Editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios" });</script>';
+            echo '<script>Swal.fire({icon: "success", title: "¡El usuario ha sido editado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+        } else {
+            echo '<script>Swal.fire({icon: "error", title: "Error al editar usuario", text: "Ocurrió un error al guardar los cambios."}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
         }
     }
 
@@ -256,7 +263,7 @@ class ControladorUsuarios {
         if (!isset($_GET["idUsuario"])) return;
 
         if ($_SESSION["perfil"] == "Vendedor") {
-              echo '<script>swal.fire({icon: "error", title: "¡No tienes permisos para eliminar usuarios!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+              echo '<script>Swal.fire({icon: "error", title: "¡No tienes permisos para eliminar usuarios!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 
@@ -269,7 +276,7 @@ class ControladorUsuarios {
 
         $respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $datos);
         if ($respuesta == "ok") {
-              echo '<script>swal.fire({icon: "success", title: "¡El usuario se ha borrado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+              echo '<script>Swal.fire({icon: "success", title: "¡El usuario se ha borrado correctamente!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
         }
     }
 
