@@ -176,6 +176,10 @@ tablasContactos.forEach(function(tableId) {
 
 		// date filter using DataTables ext.search
 		var periodo = (filters && filters.periodo) ? filters.periodo : '';
+		var mesUnico = filters && filters.mes_unico ? filters.mes_unico : '';
+		var mesDesde = filters && filters.mes_desde ? filters.mes_desde : '';
+		var mesHasta = filters && filters.mes_hasta ? filters.mes_hasta : '';
+		var fechaUnica = filters && filters.fecha_unica ? parseDateString(filters.fecha_unica) : null;
 		var fechaInicio = filters && filters.fecha_inicio ? parseDateString(filters.fecha_inicio) : null;
 		var fechaFin = filters && filters.fecha_fin ? parseDateString(filters.fecha_fin) : null;
 
@@ -205,7 +209,27 @@ tablasContactos.forEach(function(tableId) {
 			// normalize today's date
 			today.setHours(0,0,0,0);
 			var start, end;
-			if(periodo === 'today'){
+			
+			// Nuevos filtros de periodo
+			if(periodo === 'por_mes' && mesUnico){
+				// mesUnico formato: YYYY-MM
+				var parts = mesUnico.split('-');
+				var year = parseInt(parts[0]);
+				var month = parseInt(parts[1]) - 1; // 0-indexed
+				start = new Date(year, month, 1);
+				end = new Date(year, month + 1, 0); // último día del mes
+			} else if(periodo === 'entre_meses' && mesDesde && mesHasta){
+				var partsDesde = mesDesde.split('-');
+				var partsHasta = mesHasta.split('-');
+				start = new Date(parseInt(partsDesde[0]), parseInt(partsDesde[1]) - 1, 1);
+				end = new Date(parseInt(partsHasta[0]), parseInt(partsHasta[1]), 0); // último día del mes hasta
+			} else if(periodo === 'por_fecha' && fechaUnica){
+				start = new Date(fechaUnica);
+				end = new Date(fechaUnica);
+			} else if(periodo === 'entre_fechas' && fechaInicio && fechaFin){
+				start = fechaInicio; end = fechaFin;
+			} else if(periodo === 'today'){
+				// Compatibilidad con valores antiguos
 				start = new Date(today);
 				end = new Date(today);
 			} else if(periodo === 'this_week'){
@@ -287,6 +311,10 @@ window.fetchAndReplaceTable = function(tableId, filters){
 		adv_telefono: filters.telefono || '',
 		adv_documento: filters.documento || '',
 		adv_periodo: filters.periodo || '',
+		adv_mes_unico: filters.mes_unico || '',
+		adv_mes_desde: filters.mes_desde || '',
+		adv_mes_hasta: filters.mes_hasta || '',
+		adv_fecha_unica: filters.fecha_unica || '',
 		adv_fecha_inicio: filters.fecha_inicio || '',
 		adv_fecha_fin: filters.fecha_fin || '',
 		adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion',
@@ -401,6 +429,10 @@ if (window.PLANTILLA_DEV === true) {
 			adv_telefono: filters.telefono || '',
 			adv_documento: filters.documento || '',
 			adv_periodo: filters.periodo || '',
+			adv_mes_unico: filters.mes_unico || '',
+			adv_mes_desde: filters.mes_desde || '',
+			adv_mes_hasta: filters.mes_hasta || '',
+			adv_fecha_unica: filters.fecha_unica || '',
 			adv_fecha_inicio: filters.fecha_inicio || '',
 			adv_fecha_fin: filters.fecha_fin || '',
 			adv_tipo_fecha: filters.tipo_fecha || 'fecha_creacion',

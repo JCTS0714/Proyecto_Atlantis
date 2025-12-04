@@ -20,6 +20,11 @@ $filters['documento'] = isset($_REQUEST['documento']) ? trim($_REQUEST['document
 $filters['periodo'] = isset($_REQUEST['periodo']) ? trim($_REQUEST['periodo']) : (isset($_REQUEST['adv_periodo']) ? trim($_REQUEST['adv_periodo']) : '');
 $filters['fecha_inicio'] = isset($_REQUEST['fecha_inicio']) ? trim($_REQUEST['fecha_inicio']) : (isset($_REQUEST['adv_fecha_inicio']) ? trim($_REQUEST['adv_fecha_inicio']) : '');
 $filters['fecha_fin'] = isset($_REQUEST['fecha_fin']) ? trim($_REQUEST['fecha_fin']) : (isset($_REQUEST['adv_fecha_fin']) ? trim($_REQUEST['adv_fecha_fin']) : '');
+// Nuevos campos de periodo
+$filters['mes_unico'] = isset($_REQUEST['mes_unico']) ? trim($_REQUEST['mes_unico']) : (isset($_REQUEST['adv_mes_unico']) ? trim($_REQUEST['adv_mes_unico']) : '');
+$filters['mes_desde'] = isset($_REQUEST['mes_desde']) ? trim($_REQUEST['mes_desde']) : (isset($_REQUEST['adv_mes_desde']) ? trim($_REQUEST['adv_mes_desde']) : '');
+$filters['mes_hasta'] = isset($_REQUEST['mes_hasta']) ? trim($_REQUEST['mes_hasta']) : (isset($_REQUEST['adv_mes_hasta']) ? trim($_REQUEST['adv_mes_hasta']) : '');
+$filters['fecha_unica'] = isset($_REQUEST['fecha_unica']) ? trim($_REQUEST['fecha_unica']) : (isset($_REQUEST['adv_fecha_unica']) ? trim($_REQUEST['adv_fecha_unica']) : '');
 // Nuevo: tipo de fecha (fecha_creacion o fecha_contacto)
 $filters['tipo_fecha'] = isset($_REQUEST['tipo_fecha']) ? trim($_REQUEST['tipo_fecha']) : (isset($_REQUEST['adv_tipo_fecha']) ? trim($_REQUEST['adv_tipo_fecha']) : 'fecha_creacion');
 // Filtro por servidor
@@ -53,7 +58,27 @@ if ($filters['servidor'] !== '') { $where[] = "c.servidor = :servidor"; $params[
 $campoFecha = ($filters['tipo_fecha'] === 'fecha_contacto') ? 'c.fecha_contacto' : 'c.fecha_creacion';
 
 // Date filtering based on periodo or explicit fechas
-if ($filters['periodo'] === 'today') {
+// Nuevos filtros de periodo
+if ($filters['periodo'] === 'por_mes' && $filters['mes_unico'] !== '') {
+  // Formato mes_unico: YYYY-MM
+  $where[] = "DATE_FORMAT($campoFecha, '%Y-%m') = :mes_unico";
+  $params[':mes_unico'] = $filters['mes_unico'];
+} elseif ($filters['periodo'] === 'entre_meses' && $filters['mes_desde'] !== '' && $filters['mes_hasta'] !== '') {
+  // Formato mes_desde/mes_hasta: YYYY-MM
+  $where[] = "DATE_FORMAT($campoFecha, '%Y-%m') BETWEEN :mes_desde AND :mes_hasta";
+  $params[':mes_desde'] = $filters['mes_desde'];
+  $params[':mes_hasta'] = $filters['mes_hasta'];
+} elseif ($filters['periodo'] === 'por_fecha' && $filters['fecha_unica'] !== '') {
+  // Formato fecha_unica: YYYY-MM-DD
+  $where[] = "DATE($campoFecha) = :fecha_unica";
+  $params[':fecha_unica'] = $filters['fecha_unica'];
+} elseif ($filters['periodo'] === 'entre_fechas' && $filters['fecha_inicio'] !== '' && $filters['fecha_fin'] !== '') {
+  // Formato fecha_inicio/fecha_fin: YYYY-MM-DD
+  $where[] = "DATE($campoFecha) BETWEEN :fi AND :ff";
+  $params[':fi'] = $filters['fecha_inicio'];
+  $params[':ff'] = $filters['fecha_fin'];
+} elseif ($filters['periodo'] === 'today') {
+  // Mantener compatibilidad con valores antiguos
   $where[] = "DATE($campoFecha) = CURDATE()";
 } elseif ($filters['periodo'] === 'yesterday') {
   $where[] = "DATE($campoFecha) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)";

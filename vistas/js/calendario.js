@@ -928,6 +928,24 @@ formEditar.off('submit').on('submit', function (e) {
       label.textContent = 'Sonido:';
       label.style.marginRight = '8px';
       label.style.fontWeight = '600';
+      label.className = 'sound-label-text';
+
+      // Función para actualizar el color del label según el modo
+      function updateLabelColor() {
+        var isDarkMode = document.body.classList.contains('dark-mode');
+        label.style.color = isDarkMode ? '#ffffff' : '#333333';
+      }
+      updateLabelColor();
+
+      // Observar cambios en el modo (dark/light)
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'class') {
+            updateLabelColor();
+          }
+        });
+      });
+      observer.observe(document.body, { attributes: true });
 
       var btnToggle = document.createElement('button');
       btnToggle.className = 'btn btn-xs';
