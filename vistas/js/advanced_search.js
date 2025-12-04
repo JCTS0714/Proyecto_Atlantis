@@ -94,26 +94,31 @@
     // Mostrar/ocultar campos según periodo seleccionado
     $(document).on('change', '[name=adv_periodo]', function() {
       try {
-        var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container');
+        var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container, .adv-periodo-container').parent();
         var valor = $(this).val();
         
         // Ocultar todos los campos de periodo
-        $container.find('.adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas').slideUp(150);
+        $container.find('.adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas').hide();
         
-        // Mostrar el campo correspondiente
+        // Mostrar el campo correspondiente con display flex
+        var $target = null;
         switch(valor) {
           case 'por_mes':
-            $container.find('.adv_por_mes').slideDown(150);
+            $target = $container.find('.adv_por_mes');
             break;
           case 'entre_meses':
-            $container.find('.adv_entre_meses').slideDown(150);
+            $target = $container.find('.adv_entre_meses');
             break;
           case 'por_fecha':
-            $container.find('.adv_por_fecha').slideDown(150);
+            $target = $container.find('.adv_por_fecha');
             break;
           case 'entre_fechas':
-            $container.find('.adv_entre_fechas').slideDown(150);
+            $target = $container.find('.adv_entre_fechas');
             break;
+        }
+        
+        if ($target && $target.length) {
+          $target.css('display', 'flex');
         }
       } catch (err) {
         console.warn('advanced_search: error toggling period fields', err);
