@@ -2,11 +2,16 @@
 <?php
 // Procesar acciones de usuario ANTES de renderizar HTML
 // Esto asegura que los mensajes de Swal se muestren correctamente
-$editarUsuarioCtrl = new ControladorUsuarios();
-$editarUsuarioCtrl->ctrEditarUsuario();
-
-$borrarUsuarioCtrl = new ControladorUsuarios();
-$borrarUsuarioCtrl->ctrBorrarUsuario();
+try {
+    if (class_exists('ControladorUsuarios')) {
+        ControladorUsuarios::ctrEditarUsuario();
+        ControladorUsuarios::ctrBorrarUsuario();
+    } else {
+        error_log("ERROR: Clase ControladorUsuarios no encontrada en usuarios.php");
+    }
+} catch (Exception $e) {
+    error_log("ERROR en usuarios.php: " . $e->getMessage());
+}
 ?>
 
  <!-- Content Wrapper. Contains page content -->
