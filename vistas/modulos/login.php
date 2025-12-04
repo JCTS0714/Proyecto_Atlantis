@@ -247,9 +247,6 @@ body.login-page {
 <div class="login-page-wrapper">
     <!-- Tarjeta de Login -->
     <div class="login-card">
-        <!-- Login encima del logo -->
-        <h2 class="login-title-top">Login</h2>
-        
         <!-- Logo -->
         <div class="login-logo-container">
             <img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png" alt="Atlantis CRM" class="login-logo-img" onerror="this.src='<?php echo BASE_URL; ?>/vistas/img/plantilla/LOGO-ATLANTIS.png'">

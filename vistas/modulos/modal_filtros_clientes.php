@@ -62,23 +62,52 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="filtro-periodo"><i class="fa fa-calendar mr-2"></i>Periodo de Contacto</label>
+                        <label for="filtro-periodo"><i class="fa fa-calendar mr-2"></i>Periodo</label>
                         <select class="form-control" id="filtro-periodo" name="periodo">
-                            <option value="">Todos los periodos</option>
-                            <option value="diario">Diario</option>
-                            <option value="semanal">Semanal</option>
-                            <option value="mensual">Mensual</option>
-                            <option value="personalizado">Personalizado</option>
+                            <option value="">Seleccionar periodo</option>
+                            <option value="por_mes">Por mes</option>
+                            <option value="entre_meses">Entre meses</option>
+                            <option value="por_fecha">Por fecha</option>
+                            <option value="entre_fechas">Entre fechas</option>
                         </select>
                     </div>
 
-                    <div id="filtro-fechas-personalizado" style="display: none;">
+                    <!-- Por mes: Un selector de mes/año -->
+                    <div id="filtro-por-mes" class="filtro-periodo-campos" style="display: none;">
                         <div class="form-group">
-                            <label for="fecha-contacto-desde"><i class="fa fa-calendar-check-o mr-2"></i>Fecha Contacto Desde</label>
+                            <label for="mes-unico"><i class="fa fa-calendar-o mr-2"></i>Mes</label>
+                            <input type="month" class="form-control" id="mes-unico" name="mesUnico">
+                        </div>
+                    </div>
+
+                    <!-- Entre meses: Dos selectores de mes/año -->
+                    <div id="filtro-entre-meses" class="filtro-periodo-campos" style="display: none;">
+                        <div class="form-group">
+                            <label for="mes-desde"><i class="fa fa-calendar-check-o mr-2"></i>Mes desde</label>
+                            <input type="month" class="form-control" id="mes-desde" name="mesDesde">
+                        </div>
+                        <div class="form-group">
+                            <label for="mes-hasta"><i class="fa fa-calendar-times-o mr-2"></i>Mes hasta</label>
+                            <input type="month" class="form-control" id="mes-hasta" name="mesHasta">
+                        </div>
+                    </div>
+
+                    <!-- Por fecha: Un campo de fecha única -->
+                    <div id="filtro-por-fecha" class="filtro-periodo-campos" style="display: none;">
+                        <div class="form-group">
+                            <label for="fecha-unica"><i class="fa fa-calendar-o mr-2"></i>Fecha</label>
+                            <input type="date" class="form-control" id="fecha-unica" name="fechaUnica">
+                        </div>
+                    </div>
+
+                    <!-- Entre fechas: Dos campos de fecha -->
+                    <div id="filtro-entre-fechas" class="filtro-periodo-campos" style="display: none;">
+                        <div class="form-group">
+                            <label for="fecha-contacto-desde"><i class="fa fa-calendar-check-o mr-2"></i>Fecha desde</label>
                             <input type="date" class="form-control" id="fecha-contacto-desde" name="fechaContactoDesde">
                         </div>
                         <div class="form-group">
-                            <label for="fecha-contacto-hasta"><i class="fa fa-calendar-times-o mr-2"></i>Fecha Contacto Hasta</label>
+                            <label for="fecha-contacto-hasta"><i class="fa fa-calendar-times-o mr-2"></i>Fecha hasta</label>
                             <input type="date" class="form-control" id="fecha-contacto-hasta" name="fechaContactoHasta">
                         </div>
                     </div>
@@ -105,49 +134,66 @@
 </div>
 
 <style>
-#filtro-fechas-personalizado {
+.filtro-periodo-campos {
     border-left: 3px solid #007bff;
     padding-left: 15px;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 </style>
 
 <script>
 $(document).ready(function() {
-    // Mostrar/ocultar campos de fecha cuando se selecciona "Personalizado"
+    // Mostrar/ocultar campos según el tipo de periodo seleccionado
     $('#filtro-periodo').change(function() {
-        if ($(this).val() === 'personalizado') {
-            $('#filtro-fechas-personalizado').slideDown();
-        } else {
-            $('#filtro-fechas-personalizado').slideUp();
+        var valor = $(this).val();
+        
+        // Ocultar todos los campos de periodo
+        $('.filtro-periodo-campos').slideUp();
+        
+        // Mostrar el campo correspondiente
+        switch(valor) {
+            case 'por_mes':
+                $('#filtro-por-mes').slideDown();
+                break;
+            case 'entre_meses':
+                $('#filtro-entre-meses').slideDown();
+                break;
+            case 'por_fecha':
+                $('#filtro-por-fecha').slideDown();
+                break;
+            case 'entre_fechas':
+                $('#filtro-entre-fechas').slideDown();
+                break;
         }
     });
 
-    // Validar que las fechas estén dentro del mismo mes solo si el periodo es personalizado
+    // Validar que mes hasta sea mayor o igual a mes desde
+    $('#mes-desde, #mes-hasta').change(function() {
+        var mesDesde = $('#mes-desde').val();
+        var mesHasta = $('#mes-hasta').val();
+        
+        if (mesDesde && mesHasta && mesHasta < mesDesde) {
+            alert('El mes hasta debe ser mayor o igual al mes desde');
+            $('#mes-hasta').val('');
+        }
+    });
+
+    // Validar que fecha hasta sea mayor o igual a fecha desde
     $('#fecha-contacto-desde, #fecha-contacto-hasta').change(function() {
-        if ($('#filtro-periodo').val() === 'personalizado') {
-            var fechaDesde = new Date($('#fecha-contacto-desde').val());
-            var fechaHasta = new Date($('#fecha-contacto-hasta').val());
-
-            if ($('#fecha-contacto-desde').val() && $('#fecha-contacto-hasta').val()) {
-                var mesDesde = fechaDesde.getMonth();
-                var mesHasta = fechaHasta.getMonth();
-                var añoDesde = fechaDesde.getFullYear();
-                var añoHasta = fechaHasta.getFullYear();
-
-                // Comentado para permitir rangos en diferentes meses y años
-                // if (mesDesde !== mesHasta || añoDesde !== añoHasta) {
-                //     alert('Las fechas deben estar dentro del mismo mes y año');
-                //     $(this).val('');
-                // }
-            }
+        var fechaDesde = $('#fecha-contacto-desde').val();
+        var fechaHasta = $('#fecha-contacto-hasta').val();
+        
+        if (fechaDesde && fechaHasta && fechaHasta < fechaDesde) {
+            alert('La fecha hasta debe ser mayor o igual a la fecha desde');
+            $('#fecha-contacto-hasta').val('');
         }
     });
 
     // Limpiar filtros
     $('#btn-limpiar-filtros-clientes').click(function() {
         $('#form-filtros-clientes')[0].reset();
-        $('#filtro-fechas-personalizado').slideUp();
+        $('.filtro-periodo-campos').slideUp();
         aplicarFiltrosClientes(); // Aplicar filtros vacíos para mostrar todo
     });
 
@@ -169,6 +215,10 @@ $(document).ready(function() {
             referencia: $('#filtro-referencia').val(),
             empresa: $('#filtro-empresa').val(),
             periodo: $('#filtro-periodo').val(),
+            mesUnico: $('#mes-unico').val(),
+            mesDesde: $('#mes-desde').val(),
+            mesHasta: $('#mes-hasta').val(),
+            fechaUnica: $('#fecha-unica').val(),
             fechaContactoDesde: $('#fecha-contacto-desde').val(),
             fechaContactoHasta: $('#fecha-contacto-hasta').val(),
             estado: $('#filtro-estado').val()
