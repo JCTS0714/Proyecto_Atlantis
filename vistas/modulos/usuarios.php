@@ -552,7 +552,7 @@ if (isset($mensajePendiente) && $mensajePendiente !== null) {
 <script>
 (function() {
     function mostrarMensaje() {
-        if (typeof Swal !== 'undefined') {
+        if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
             Swal.fire({
                 icon: '<?php echo $tipo; ?>',
                 title: '<?php echo addslashes($titulo); ?>',
@@ -560,8 +560,16 @@ if (isset($mensajePendiente) && $mensajePendiente !== null) {
                 text: '<?php echo addslashes($texto); ?>',
                 <?php endif; ?>
                 confirmButtonText: 'OK',
+                confirmButtonColor: '#3085d6',
                 allowOutsideClick: true,
-                allowEscapeKey: true
+                allowEscapeKey: true,
+                backdrop: true,
+                showCloseButton: true
+            }).then(function(result) {
+                // Forzar cierre del modal
+                if (Swal.close) Swal.close();
+            }).catch(function(err) {
+                console.error('Swal error:', err);
             });
         } else {
             // Si Swal no está disponible, usar alert nativo
@@ -569,14 +577,10 @@ if (isset($mensajePendiente) && $mensajePendiente !== null) {
         }
     }
     
-    // Esperar a que el DOM esté listo
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(mostrarMensaje, 100);
-    } else {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(mostrarMensaje, 100);
-        });
-    }
+    // Esperar más tiempo para asegurar que Swal esté completamente cargado
+    window.addEventListener('load', function() {
+        setTimeout(mostrarMensaje, 300);
+    });
 })();
 </script>
 <?php } ?>

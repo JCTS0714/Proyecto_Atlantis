@@ -1354,3 +1354,52 @@ body,
   background-color: var(--hover-bg);
   color: var(--text-primary);
 }
+
+/* ========================================
+   SWEETALERT2 - MODO OSCURO
+======================================== */
+[data-theme="dark"] .swal2-popup {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .swal2-title {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .swal2-html-container,
+[data-theme="dark"] .swal2-content {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .swal2-confirm {
+  background-color: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] .swal2-cancel {
+  background-color: var(--accent-danger) !important;
+  border-color: var(--accent-danger) !important;
+}
+
+/* Asegurar que SweetAlert2 esté siempre encima */
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+.swal2-popup {
+  z-index: 99999 !important;
+}
+
+/* Asegurar que el botón sea clickeable */
+.swal2-confirm,
+.swal2-cancel,
+.swal2-deny {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.swal2-actions {
+  z-index: 100000 !important;
+  position: relative !important;
+}
