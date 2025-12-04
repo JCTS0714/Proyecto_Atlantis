@@ -13,21 +13,11 @@ try {
     error_log("ERROR en usuarios.php: " . $e->getMessage());
 }
 
-// Mostrar mensaje de sesión si existe
+// Guardar mensaje para mostrar al final de la página (cuando Swal esté cargado)
+$mensajePendiente = null;
 if (isset($_SESSION["mensaje"])) {
-    $msg = $_SESSION["mensaje"];
-    $tipo = isset($msg["tipo"]) ? $msg["tipo"] : "info";
-    $titulo = isset($msg["titulo"]) ? $msg["titulo"] : "";
-    $texto = isset($msg["texto"]) ? $msg["texto"] : "";
+    $mensajePendiente = $_SESSION["mensaje"];
     unset($_SESSION["mensaje"]);
-    echo '<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                icon: "' . $tipo . '",
-                title: "' . addslashes($titulo) . '"' . ($texto ? ', text: "' . addslashes($texto) . '"' : '') . '
-            });
-        });
-    </script>';
 }
 ?>
 
@@ -551,3 +541,42 @@ if (isset($_SESSION["mensaje"])) {
   </div>
  </div>
 </div>
+
+<?php
+// Mostrar mensaje pendiente al final (cuando Swal ya está cargado)
+if (isset($mensajePendiente) && $mensajePendiente !== null) {
+    $tipo = isset($mensajePendiente["tipo"]) ? $mensajePendiente["tipo"] : "info";
+    $titulo = isset($mensajePendiente["titulo"]) ? $mensajePendiente["titulo"] : "";
+    $texto = isset($mensajePendiente["texto"]) ? $mensajePendiente["texto"] : "";
+?>
+<script>
+(function() {
+    function mostrarMensaje() {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: '<?php echo $tipo; ?>',
+                title: '<?php echo addslashes($titulo); ?>',
+                <?php if ($texto): ?>
+                text: '<?php echo addslashes($texto); ?>',
+                <?php endif; ?>
+                confirmButtonText: 'OK',
+                allowOutsideClick: true,
+                allowEscapeKey: true
+            });
+        } else {
+            // Si Swal no está disponible, usar alert nativo
+            alert('<?php echo addslashes($titulo); ?>');
+        }
+    }
+    
+    // Esperar a que el DOM esté listo
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(mostrarMensaje, 100);
+    } else {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(mostrarMensaje, 100);
+        });
+    }
+})();
+</script>
+<?php } ?>
