@@ -150,17 +150,13 @@
     var rect = scrollableElement.getBoundingClientRect();
     var windowHeight = window.innerHeight;
     
-    // Verificar si el elemento está en vista
+    // Verificar si el elemento está en vista (al menos parcialmente)
     var elementInView = rect.top < windowHeight && rect.bottom > 0;
     
-    // Verificar si la parte inferior (donde está el scroll natural) es visible
-    // El scroll natural está en la parte inferior del elemento
-    var bottomVisible = rect.bottom <= windowHeight;
-    
-    console.log('[sticky-scroll] inView:', elementInView, 'bottomVisible:', bottomVisible, 'rect.bottom:', rect.bottom, 'windowHeight:', windowHeight);
+    console.log('[sticky-scroll] inView:', elementInView, 'hasScroll:', true);
 
-    if (elementInView && !bottomVisible) {
-      // El elemento está en vista pero su scroll natural no es visible
+    if (elementInView) {
+      // El elemento está en vista y tiene scroll horizontal - mostrar siempre
       stickyWrapper.classList.add('visible');
       
       // Actualizar posición
