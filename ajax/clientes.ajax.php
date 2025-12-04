@@ -88,6 +88,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["activarId"]) && isset
     $activarEstado = new AjaxClientes();
     $activarEstado->activarId = $_POST["activarId"];
     $activarEstado->activarEstado = $_POST["activarEstado"];
+    
+    // Si viene un motivo (para zona de espera), actualizarlo también
+    if (isset($_POST["motivo"]) && !empty($_POST["motivo"])) {
+        $tabla = "clientes";
+        $motivoResp = ModeloCliente::mdlActualizarCliente($tabla, "motivo", $_POST["motivo"], "id", $_POST["activarId"]);
+    }
+    
     $activarEstado->ajaxActivarEstado();
     exit;
 }

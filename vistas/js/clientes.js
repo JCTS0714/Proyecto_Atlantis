@@ -613,6 +613,80 @@ $(document).off('change', '.select-estado-cliente').on('change', '.select-estado
     return;
   }
 
+  // Si el nuevo estado es En Espera (4): pedir motivo y luego actualizar
+  if (parseInt(nuevoEstado) === 4) {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        title: 'Motivo para Zona de Espera',
+        input: 'textarea',
+        inputLabel: 'Ingrese el motivo por el cual este registro pasa a Zona de Espera',
+        inputPlaceholder: 'Escriba el motivo aquí...',
+        inputAttributes: {
+          'aria-label': 'Motivo'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: function(value) {
+          if (!value || !value.trim()) {
+            return 'Debe ingresar un motivo';
+          }
+        }
+      }).then(function(result) {
+        if (result.isConfirmed && result.value) {
+          var motivo = result.value.trim();
+          // Actualizar estado y motivo
+          $.post('ajax/clientes.ajax.php', { 
+            activarId: idCliente, 
+            activarEstado: nuevoEstado,
+            motivo: motivo
+          }, function(resp) {
+            var trimmed = (typeof resp === 'string') ? resp.trim() : resp;
+            if (trimmed === 'ok' || (trimmed && trimmed.status && trimmed.status === 'ok')) {
+              Swal.fire('Actualizado', 'El registro ha sido movido a Zona de Espera', 'success').then(function() {
+                location.reload();
+              });
+            } else {
+              Swal.fire('Error', 'No se pudo actualizar el estado', 'error');
+              $select.val(previo);
+            }
+          }).fail(function() {
+            Swal.fire('Error', 'No se pudo actualizar el estado (request failed)', 'error');
+            $select.val(previo);
+          });
+        } else {
+          // Cancelado, restaurar valor
+          $select.val(previo);
+        }
+      });
+    } else {
+      var motivo = prompt('Ingrese el motivo para Zona de Espera:');
+      if (motivo && motivo.trim()) {
+        $.post('ajax/clientes.ajax.php', { 
+          activarId: idCliente, 
+          activarEstado: nuevoEstado,
+          motivo: motivo.trim()
+        }, function(resp) {
+          var trimmed = (typeof resp === 'string') ? resp.trim() : resp;
+          if (trimmed === 'ok' || (trimmed && trimmed.status && trimmed.status === 'ok')) {
+            alert('El registro ha sido movido a Zona de Espera');
+            location.reload();
+          } else {
+            alert('No se pudo actualizar el estado');
+            $select.val(previo);
+          }
+        }).fail(function() {
+          alert('No se pudo actualizar el estado (request failed)');
+          $select.val(previo);
+        });
+      } else {
+        $select.val(previo);
+      }
+    }
+
+    return;
+  }
+
   // Usar $.post para enviar datos URL-encoded y evitar problemas con FormData en algunos entornos
   $.post('ajax/clientes.ajax.php', { activarId: idCliente, activarEstado: nuevoEstado }, function(respuesta, textStatus, xhr) {
     console.log('Respuesta POST cambiar estado:', { respuesta: respuesta, textStatus: textStatus });
