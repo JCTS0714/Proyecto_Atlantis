@@ -33,11 +33,17 @@
     display: flex;
     flex-wrap: wrap;
     margin: 0 -8px;
+    align-items: flex-end;
   }
   .adv-search-col {
     flex: 1;
-    min-width: 150px;
+    min-width: 120px;
+    max-width: 200px;
     padding: 0;
+  }
+  .adv-search-col.col-auto {
+    flex: 0 0 auto;
+    max-width: none;
   }
   .adv-tipo-fecha-group {
     display: inline-flex;
@@ -60,35 +66,56 @@
   #advanced-search-panel-inline .box-body {
     padding: 8px 10px !important;
   }
-  /* Estilos para filas de periodo */
-  .adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas {
-    background: transparent !important;
+  /* Periodo y campos dinámicos en línea */
+  .adv-periodo-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0;
+  }
+  .adv-periodo-select {
+    flex: 0 0 130px;
+    max-width: 130px;
+  }
+  .adv-periodo-fields {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0;
     border-left: 3px solid #3c8dbc;
-    padding: 8px 0 !important;
+    padding-left: 8px;
     margin-left: 8px;
   }
-  .adv_por_mes .adv-search-col,
-  .adv_entre_meses .adv-search-col,
-  .adv_por_fecha .adv-search-col,
-  .adv_entre_fechas .adv-search-col {
+  .adv-periodo-fields .adv-search-col {
     flex: 0 0 auto;
-    max-width: 200px;
+    min-width: 100px;
+    max-width: 140px;
   }
-  .adv_por_mes .adv-search-col:last-child,
-  .adv_entre_meses .adv-search-col:last-child,
-  .adv_por_fecha .adv-search-col:last-child,
-  .adv_entre_fechas .adv-search-col:last-child {
-    flex: 1;
-    max-width: none;
+  .adv-periodo-info {
+    font-size: 11px;
+    color: #777;
+    padding: 4px 8px;
+    align-self: center;
   }
   @media (max-width: 768px) {
     .adv-search-col {
       flex: 0 0 100%;
+      max-width: 100%;
     }
-    .adv_por_mes .adv-search-col,
-    .adv_entre_meses .adv-search-col,
-    .adv_por_fecha .adv-search-col,
-    .adv_entre_fechas .adv-search-col {
+    .adv-periodo-select {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    .adv-periodo-fields {
+      flex-wrap: wrap;
+      margin-top: 8px;
+      margin-left: 0;
+      border-left: none;
+      border-top: 3px solid #3c8dbc;
+      padding-left: 0;
+      padding-top: 8px;
+    }
+    .adv-periodo-fields .adv-search-col {
       max-width: 100%;
     }
   }
@@ -152,7 +179,7 @@
 
           <!-- Segunda fila: Filtro de periodo y tipo de fecha -->
           <div class="adv-search-row" style="margin-top: 10px;">
-            <div class="adv-search-col">
+            <div class="adv-search-col" style="max-width: 180px;">
               <div class="adv-form-group">
                 <label class="adv-search-label">
                   <i class="fa fa-calendar"></i>Filtrar por fecha de:
@@ -169,21 +196,80 @@
                 </div>
               </div>
             </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-clock-o"></i>Periodo
-                </label>
-                <select name="adv_periodo" class="form-control input-sm adv-periodo">
-                  <option value="">Todos los periodos</option>
-                  <option value="por_mes">Por mes</option>
-                  <option value="entre_meses">Entre meses</option>
-                  <option value="por_fecha">Por fecha</option>
-                  <option value="entre_fechas">Entre fechas</option>
-                </select>
+            
+            <!-- Periodo y campos dinámicos en línea -->
+            <div class="adv-periodo-container">
+              <div class="adv-periodo-select">
+                <div class="adv-form-group">
+                  <label class="adv-search-label">
+                    <i class="fa fa-clock-o"></i>Periodo
+                  </label>
+                  <select name="adv_periodo" class="form-control input-sm adv-periodo">
+                    <option value="">Todos</option>
+                    <option value="por_mes">Por mes</option>
+                    <option value="entre_meses">Entre meses</option>
+                    <option value="por_fecha">Por fecha</option>
+                    <option value="entre_fechas">Entre fechas</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Por mes -->
+              <div class="adv-periodo-fields adv_por_mes" style="display:none;">
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-o"></i>Mes</label>
+                    <input type="month" name="adv_mes_unico" class="form-control input-sm adv-mes-unico">
+                  </div>
+                </div>
+                <span class="adv-periodo-info"><i class="fa fa-info-circle"></i> Seleccione el mes para filtrar.</span>
+              </div>
+              
+              <!-- Entre meses -->
+              <div class="adv-periodo-fields adv_entre_meses" style="display:none;">
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-check-o" style="color:#00a65a;"></i>Desde</label>
+                    <input type="month" name="adv_mes_desde" class="form-control input-sm adv-mes-desde">
+                  </div>
+                </div>
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-times-o" style="color:#dd4b39;"></i>Hasta</label>
+                    <input type="month" name="adv_mes_hasta" class="form-control input-sm adv-mes-hasta">
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Por fecha -->
+              <div class="adv-periodo-fields adv_por_fecha" style="display:none;">
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-o"></i>Fecha</label>
+                    <input type="date" name="adv_fecha_unica" class="form-control input-sm adv-fecha-unica">
+                  </div>
+                </div>
+                <span class="adv-periodo-info"><i class="fa fa-info-circle"></i> Seleccione la fecha para filtrar.</span>
+              </div>
+              
+              <!-- Entre fechas -->
+              <div class="adv-periodo-fields adv_entre_fechas" style="display:none;">
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-check-o" style="color:#00a65a;"></i>Desde</label>
+                    <input type="date" name="adv_fecha_inicio" class="form-control input-sm adv-fecha-inicio">
+                  </div>
+                </div>
+                <div class="adv-search-col">
+                  <div class="adv-form-group">
+                    <label class="adv-search-label"><i class="fa fa-calendar-times-o" style="color:#dd4b39;"></i>Hasta</label>
+                    <input type="date" name="adv_fecha_fin" class="form-control input-sm adv-fecha-fin">
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="adv-search-col">
+            
+            <div class="adv-search-col col-auto">
               <div class="adv-form-group">
                 <label class="adv-search-label">&nbsp;</label>
                 <div class="adv-buttons-group">
@@ -197,111 +283,6 @@
                     <i class="fa fa-times"></i> Cerrar
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tercera fila: Campos dinámicos según periodo seleccionado -->
-          <!-- Por mes: Un selector de mes/año -->
-          <div class="adv-search-row adv_por_mes" style="display:none; margin-top: 8px;">
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-o" style="color: #3c8dbc;"></i>Mes
-                </label>
-                <input type="month" name="adv_mes_unico" class="form-control input-sm adv-mes-unico">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label" style="color: #777;">
-                  <i class="fa fa-info-circle"></i>Información
-                </label>
-                <p class="text-muted" style="font-size: 11px; margin: 0;">
-                  Seleccione el mes para filtrar.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Entre meses: Dos selectores de mes/año -->
-          <div class="adv-search-row adv_entre_meses" style="display:none; margin-top: 8px;">
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Mes desde
-                </label>
-                <input type="month" name="adv_mes_desde" class="form-control input-sm adv-mes-desde">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Mes hasta
-                </label>
-                <input type="month" name="adv_mes_hasta" class="form-control input-sm adv-mes-hasta">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label" style="color: #777;">
-                  <i class="fa fa-info-circle"></i>Información
-                </label>
-                <p class="text-muted" style="font-size: 11px; margin: 0;">
-                  Seleccione el rango de meses para filtrar.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Por fecha: Un campo de fecha única -->
-          <div class="adv-search-row adv_por_fecha" style="display:none; margin-top: 8px;">
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-o" style="color: #3c8dbc;"></i>Fecha
-                </label>
-                <input type="date" name="adv_fecha_unica" class="form-control input-sm adv-fecha-unica">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label" style="color: #777;">
-                  <i class="fa fa-info-circle"></i>Información
-                </label>
-                <p class="text-muted" style="font-size: 11px; margin: 0;">
-                  Seleccione la fecha para filtrar.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Entre fechas: Dos campos de fecha -->
-          <div class="adv-search-row adv_entre_fechas" style="display:none; margin-top: 8px;">
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Fecha desde
-                </label>
-                <input type="date" name="adv_fecha_inicio" class="form-control input-sm adv-fecha-inicio">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label">
-                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Fecha hasta
-                </label>
-                <input type="date" name="adv_fecha_fin" class="form-control input-sm adv-fecha-fin">
-              </div>
-            </div>
-            <div class="adv-search-col">
-              <div class="adv-form-group">
-                <label class="adv-search-label" style="color: #777;">
-                  <i class="fa fa-info-circle"></i>Información
-                </label>
-                <p class="text-muted" style="font-size: 11px; margin: 0;">
-                  Seleccione el rango de fechas para filtrar.
-                </p>
               </div>
             </div>
           </div>
