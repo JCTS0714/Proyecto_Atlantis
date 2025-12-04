@@ -437,6 +437,7 @@
 
        <input type="password" class="form-control input-lg" name="editarPassword" placeholder="Ingresar nueva contraseña" requerid>
        <input type="hidden" id="passwordActual" name="passwordActual" >
+       <input type="hidden" id="editarEstado" name="editarEstado" value="1">
 
       </div>
 

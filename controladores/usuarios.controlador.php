@@ -180,8 +180,17 @@ class ControladorUsuarios {
     static public function ctrEditarUsuario() {
         if (!isset($_POST["editarUsuario"])) return;
 
-        if (!preg_match('/^[\\p{L}\\p{N}\\p{P}\\p{M}\\s]+$/u', $_POST["editarNombre"])) {
-              echo '<script>swal.fire({icon: "error", title: "¡El nombre no puede ir vacío o llevar caracteres especiales!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+        // Log para debug
+        error_log("ctrEditarUsuario: POST recibido - editarUsuario=" . $_POST["editarUsuario"] . ", editarNombre=" . (isset($_POST["editarNombre"]) ? $_POST["editarNombre"] : 'NO DEFINIDO'));
+
+        // Validar que editarNombre exista
+        if (!isset($_POST["editarNombre"]) || trim($_POST["editarNombre"]) === '') {
+            echo '<script>swal.fire({icon: "error", title: "¡El nombre no puede ir vacío!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
+            return;
+        }
+
+        if (!preg_match('/^[\p{L}\p{N}\p{P}\p{M}\s]+$/u', $_POST["editarNombre"])) {
+            echo '<script>swal.fire({icon: "error", title: "¡El nombre contiene caracteres no permitidos!"}).then(()=>{ window.location = "'.BASE_URL.'/usuarios"; });</script>';
             return;
         }
 

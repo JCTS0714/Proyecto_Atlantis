@@ -57,6 +57,7 @@ $(document).on("click",".btnEditarUsuario",function(){
             $("#editarPerfil").val(respuesta["perfil"]);
             $("#fotoActual").val(respuesta["foto"]);
             $("#passwordActual").val(respuesta["password"]);
+            $("#editarEstado").val(respuesta["estado"]);
 
             if(respuesta["foto"] !=""){
                 $(".previsualizarEditar").attr("src",respuesta["foto"]);
