@@ -255,6 +255,21 @@ table.dataTable tbody td {
   min-width: fit-content;
 }
 
+/* Forzar que las tablas DataTables siempre tengan scroll horizontal */
+/* Ancho mínimo para que siempre haya algo que scrollear */
+.dataTables_wrapper table.dataTable {
+  min-width: calc(100% + 100px);
+}
+
+#tablaClientes,
+#tablaProspectos,
+#tablaContadores,
+#tablaOportunidades,
+#tablaIncidencias,
+#tablaVentas {
+  min-width: calc(100% + 100px);
+}
+
 /* Ocultar scrollbar del content-wrapper cuando hay sticky scroll */
 .has-sticky-scroll .content-wrapper::-webkit-scrollbar {
   height: 0;
