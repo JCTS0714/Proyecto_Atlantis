@@ -25,6 +25,10 @@
         telefono: ($form.find('[name=adv_telefono]').val() || '').trim(),
         documento: ($form.find('[name=adv_documento]').val() || '').trim(),
         periodo: ($form.find('[name=adv_periodo]').val() || '').trim(),
+        mes_unico: ($form.find('[name=adv_mes_unico]').val() || '').trim(),
+        mes_desde: ($form.find('[name=adv_mes_desde]').val() || '').trim(),
+        mes_hasta: ($form.find('[name=adv_mes_hasta]').val() || '').trim(),
+        fecha_unica: ($form.find('[name=adv_fecha_unica]').val() || '').trim(),
         fecha_inicio: ($form.find('[name=adv_fecha_inicio]').val() || '').trim(),
         fecha_fin: ($form.find('[name=adv_fecha_fin]').val() || '').trim(),
         tipo_fecha: tipoFecha,
@@ -87,19 +91,32 @@
       }
     });
 
-    // Mostrar/ocultar fechas personalizadas según periodo seleccionado
+    // Mostrar/ocultar campos según periodo seleccionado
     $(document).on('change', '[name=adv_periodo]', function() {
       try {
         var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container');
-        var $customDates = $container.find('.adv_custom_dates');
+        var valor = $(this).val();
         
-        if ($(this).val() === 'custom') {
-          $customDates.slideDown(150);
-        } else {
-          $customDates.slideUp(150);
+        // Ocultar todos los campos de periodo
+        $container.find('.adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas').slideUp(150);
+        
+        // Mostrar el campo correspondiente
+        switch(valor) {
+          case 'por_mes':
+            $container.find('.adv_por_mes').slideDown(150);
+            break;
+          case 'entre_meses':
+            $container.find('.adv_entre_meses').slideDown(150);
+            break;
+          case 'por_fecha':
+            $container.find('.adv_por_fecha').slideDown(150);
+            break;
+          case 'entre_fechas':
+            $container.find('.adv_entre_fechas').slideDown(150);
+            break;
         }
       } catch (err) {
-        console.warn('advanced_search: error toggling custom dates', err);
+        console.warn('advanced_search: error toggling period fields', err);
       }
     });
 
@@ -138,9 +155,9 @@
       e.preventDefault();
       try {
         var $container = $(this).closest('#advanced-search-panel-inline, #advanced-search-container');
-        $container.find('input[type=text], input[type=date]').val('');
+        $container.find('input[type=text], input[type=date], input[type=month]').val('');
         $container.find('select').val('');
-        $container.find('.adv_custom_dates').hide();
+        $container.find('.adv_por_mes, .adv_entre_meses, .adv_por_fecha, .adv_entre_fechas').hide();
         
         // Resetear radio buttons al valor por defecto (fecha_creacion)
         $container.find('[name=adv_tipo_fecha]').prop('checked', false);

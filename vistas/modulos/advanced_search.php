@@ -149,14 +149,10 @@
                 </label>
                 <select name="adv_periodo" class="form-control input-sm adv-periodo">
                   <option value="">Todos los periodos</option>
-                  <option value="today">Hoy</option>
-                  <option value="yesterday">Ayer</option>
-                  <option value="this_week">Esta semana</option>
-                  <option value="last_week">Semana pasada</option>
-                  <option value="this_month">Este mes</option>
-                  <option value="last_month">Mes pasado</option>
-                  <option value="this_year">Este año</option>
-                  <option value="custom">Personalizado...</option>
+                  <option value="por_mes">Por mes</option>
+                  <option value="entre_meses">Entre meses</option>
+                  <option value="por_fecha">Por fecha</option>
+                  <option value="entre_fechas">Entre fechas</option>
                 </select>
               </div>
             </div>
@@ -178,12 +174,87 @@
             </div>
           </div>
 
-          <!-- Tercera fila: Fechas personalizadas (ocultas por defecto) -->
-          <div class="adv-search-row adv_custom_dates" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+          <!-- Tercera fila: Campos dinámicos según periodo seleccionado -->
+          <!-- Por mes: Un selector de mes/año -->
+          <div class="adv-search-row adv_por_mes" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
-                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Fecha Inicio
+                  <i class="fa fa-calendar-o" style="color: #3c8dbc;"></i>Mes
+                </label>
+                <input type="month" name="adv_mes_unico" class="form-control input-sm adv-mes-unico">
+              </div>
+            </div>
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label" style="color: #777;">
+                  <i class="fa fa-info-circle"></i>Información
+                </label>
+                <p class="text-muted" style="font-size: 11px; margin: 0;">
+                  Seleccione el mes para filtrar.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entre meses: Dos selectores de mes/año -->
+          <div class="adv-search-row adv_entre_meses" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Mes desde
+                </label>
+                <input type="month" name="adv_mes_desde" class="form-control input-sm adv-mes-desde">
+              </div>
+            </div>
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Mes hasta
+                </label>
+                <input type="month" name="adv_mes_hasta" class="form-control input-sm adv-mes-hasta">
+              </div>
+            </div>
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label" style="color: #777;">
+                  <i class="fa fa-info-circle"></i>Información
+                </label>
+                <p class="text-muted" style="font-size: 11px; margin: 0;">
+                  Seleccione el rango de meses para filtrar.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Por fecha: Un campo de fecha única -->
+          <div class="adv-search-row adv_por_fecha" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-o" style="color: #3c8dbc;"></i>Fecha
+                </label>
+                <input type="date" name="adv_fecha_unica" class="form-control input-sm adv-fecha-unica">
+              </div>
+            </div>
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label" style="color: #777;">
+                  <i class="fa fa-info-circle"></i>Información
+                </label>
+                <p class="text-muted" style="font-size: 11px; margin: 0;">
+                  Seleccione la fecha para filtrar.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entre fechas: Dos campos de fecha -->
+          <div class="adv-search-row adv_entre_fechas" style="display:none; background: #f9f9f9; padding: 10px 0; border-radius: 4px; margin-top: 10px;">
+            <div class="adv-search-col">
+              <div class="adv-form-group">
+                <label class="adv-search-label">
+                  <i class="fa fa-calendar-check-o" style="color: #00a65a;"></i>Fecha desde
                 </label>
                 <input type="date" name="adv_fecha_inicio" class="form-control input-sm adv-fecha-inicio">
               </div>
@@ -191,7 +262,7 @@
             <div class="adv-search-col">
               <div class="adv-form-group">
                 <label class="adv-search-label">
-                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Fecha Fin
+                  <i class="fa fa-calendar-times-o" style="color: #dd4b39;"></i>Fecha hasta
                 </label>
                 <input type="date" name="adv_fecha_fin" class="form-control input-sm adv-fecha-fin">
               </div>
