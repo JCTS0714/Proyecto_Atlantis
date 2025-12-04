@@ -1,3 +1,9 @@
+<?php
+// Procesar edición de cliente/prospecto antes de renderizar
+if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
+  ControladorCliente::ctrEditarCliente();
+}
+?>
 <!-- =============================================== -->
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
