@@ -197,29 +197,76 @@ class ControladorUsuarios {
         }
 
         $ruta = isset($_POST["fotoActual"]) ? $_POST["fotoActual"] : '';
-        if (isset($_FILES["editarFoto"]["tmp_name"]) && !empty($_FILES["editarFoto"]["tmp_name"])) {
-            list($ancho, $alto) = getimagesize($_FILES["editarFoto"]["tmp_name"]);
-            $nuevoAncho = 500; $nuevoAlto = 500;
-            $directorio = "vistas/img/usuarios/" . $_POST["editarUsuario"];
-            if (!empty($_POST["fotoActual"])) {
-                @unlink($_POST["fotoActual"]);
-            } else {
-                @mkdir($directorio, 0755);
-            }
-            if ($_FILES["editarFoto"]["type"] == "image/jpeg") {
-                $aleatorio = mt_rand(100,999);
-                $ruta = "vistas/img/usuarios/" . $_POST["editarUsuario"] . "/" . $aleatorio . ".jpg";
-                $origen = imagecreatefromjpeg($_FILES["editarFoto"]["tmp_name"]);
-                $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
-                imagecopyresized($destino, $origen, 0,0,0,0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
-                imagejpeg($destino, $ruta);
-            } elseif ($_FILES["editarFoto"]["type"] == "image/png") {
-                $aleatorio = mt_rand(100,999);
-                $ruta = "vistas/img/usuarios/" . $_POST["editarUsuario"] . "/" . $aleatorio . ".png";
-                $origen = imagecreatefrompng($_FILES["editarFoto"]["tmp_name"]);
-                $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
-                imagecopyresized($destino, $origen, 0,0,0,0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
-                imagepng($destino, $ruta);
+        
+        // Procesar imagen si se subió una nueva
+        if (isset($_FILES["editarFoto"]["tmp_name"]) && !empty($_FILES["editarFoto"]["tmp_name"]) && $_FILES["editarFoto"]["error"] === UPLOAD_ERR_OK) {
+            error_log("ctrEditarUsuario: Procesando imagen - " . json_encode($_FILES["editarFoto"]));
+            
+            try {
+                $imgInfo = @getimagesize($_FILES["editarFoto"]["tmp_name"]);
+                if ($imgInfo === false) {
+                    error_log("ctrEditarUsuario: getimagesize falló");
+                    $_SESSION["mensaje"] = ["tipo" => "error", "titulo" => "Error al procesar la imagen", "texto" => "El archivo no es una imagen válida."];
+                    header("Location: " . BASE_URL . "/usuarios");
+                    exit;
+                }
+                
+                $ancho = $imgInfo[0];
+                $alto = $imgInfo[1];
+                $nuevoAncho = 500; 
+                $nuevoAlto = 500;
+                $directorio = "vistas/img/usuarios/" . $_POST["editarUsuario"];
+                
+                // Crear directorio si no existe
+                if (!is_dir($directorio)) {
+                    if (!@mkdir($directorio, 0755, true)) {
+                        error_log("ctrEditarUsuario: No se pudo crear directorio $directorio");
+                    }
+                }
+                
+                // Eliminar foto anterior si existe
+                if (!empty($_POST["fotoActual"]) && file_exists($_POST["fotoActual"])) {
+                    @unlink($_POST["fotoActual"]);
+                }
+                
+                $aleatorio = mt_rand(100, 999);
+                $mimeType = $_FILES["editarFoto"]["type"];
+                
+                if ($mimeType == "image/jpeg" || $mimeType == "image/jpg") {
+                    $ruta = $directorio . "/" . $aleatorio . ".jpg";
+                    $origen = @imagecreatefromjpeg($_FILES["editarFoto"]["tmp_name"]);
+                    if ($origen) {
+                        $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+                        imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+                        imagejpeg($destino, $ruta, 90);
+                        imagedestroy($origen);
+                        imagedestroy($destino);
+                    } else {
+                        error_log("ctrEditarUsuario: imagecreatefromjpeg falló");
+                    }
+                } elseif ($mimeType == "image/png") {
+                    $ruta = $directorio . "/" . $aleatorio . ".png";
+                    $origen = @imagecreatefrompng($_FILES["editarFoto"]["tmp_name"]);
+                    if ($origen) {
+                        $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+                        // Preservar transparencia
+                        imagealphablending($destino, false);
+                        imagesavealpha($destino, true);
+                        imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+                        imagepng($destino, $ruta);
+                        imagedestroy($origen);
+                        imagedestroy($destino);
+                    } else {
+                        error_log("ctrEditarUsuario: imagecreatefrompng falló");
+                    }
+                } else {
+                    error_log("ctrEditarUsuario: Tipo de imagen no soportado: $mimeType");
+                    $_SESSION["mensaje"] = ["tipo" => "error", "titulo" => "Formato no soportado", "texto" => "Solo se permiten imágenes JPG y PNG."];
+                    header("Location: " . BASE_URL . "/usuarios");
+                    exit;
+                }
+            } catch (Exception $e) {
+                error_log("ctrEditarUsuario: Exception al procesar imagen - " . $e->getMessage());
             }
         }
 
