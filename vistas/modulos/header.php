@@ -1,6 +1,6 @@
 <header class="main-header">
 <!-- Logo -->
-     <a href="#" class="logo">
+     <a href="<?php echo BASE_URL; ?>/inicio" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><img src="<?php echo BASE_URL; ?>/vistas/img/plantilla/logo_alta_calidad.png" alt="ATL" style="width: 35px; height: 35px;"></span>
       <!-- logo for regular state and mobile devices -->
