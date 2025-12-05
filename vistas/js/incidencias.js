@@ -286,11 +286,18 @@ $(document).ready(function() {
                     $('#editarIdIncidencia').val(incidencia.id);
                     $('#editarCorrelativo').val(incidencia.correlativo || '');
                     $('#editarNombreIncidencia').val(incidencia.nombre_incidencia);
-                    $('#editarNombreCliente').val(incidencia.nombre_cliente || '');
+                    // Construir texto visible: Nombre (Empresa) si existe
+                    var empresa = incidencia.empresa_cliente || '';
+                    var nombreClienteVisible = incidencia.nombre_cliente || '';
+                    if (empresa && empresa.trim() !== '') {
+                        nombreClienteVisible = nombreClienteVisible + ' (' + empresa + ')';
+                    }
+
+                    $('#editarNombreCliente').val(nombreClienteVisible);
                     $('#editarIdClienteSeleccionado').val(incidencia.cliente_id);
                     // Si el select2 existe, setear la opción seleccionada y deshabilitarla (comportamiento previo)
                     if ($('#editarClienteSelect').length) {
-                        var opt = new Option(incidencia.nombre_cliente || '', incidencia.cliente_id, true, true);
+                        var opt = new Option(nombreClienteVisible || '', incidencia.cliente_id, true, true);
                         $('#editarClienteSelect').empty().append(opt).trigger('change');
                         $('#editarClienteSelect').prop('disabled', true);
                         $('#editarNombreCliente').hide();

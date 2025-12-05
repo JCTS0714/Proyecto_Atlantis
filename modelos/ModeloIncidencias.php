@@ -75,13 +75,13 @@ class ModeloIncidencias {
         }
 
         if ($item != null) {
-            $sql = "SELECT i.*, $columnaSelect, c.nombre as nombre_cliente, u.nombre as nombre_usuario FROM incidencias i LEFT JOIN clientes c ON i.cliente_id = c.id LEFT JOIN usuarios u ON i.usuario_id = u.id WHERE i.$item = :$item ORDER BY i.fecha_creacion DESC";
+            $sql = "SELECT i.*, $columnaSelect, c.nombre as nombre_cliente, c.empresa as empresa_cliente, u.nombre as nombre_usuario FROM incidencias i LEFT JOIN clientes c ON i.cliente_id = c.id LEFT JOIN usuarios u ON i.usuario_id = u.id WHERE i.$item = :$item ORDER BY i.fecha_creacion DESC";
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":" . $item, $valor, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetchAll();
         } else {
-            $sql = "SELECT i.*, $columnaSelect, c.nombre as nombre_cliente, u.nombre as nombre_usuario FROM incidencias i LEFT JOIN clientes c ON i.cliente_id = c.id LEFT JOIN usuarios u ON i.usuario_id = u.id ORDER BY i.fecha_creacion DESC";
+            $sql = "SELECT i.*, $columnaSelect, c.nombre as nombre_cliente, c.empresa as empresa_cliente, u.nombre as nombre_usuario FROM incidencias i LEFT JOIN clientes c ON i.cliente_id = c.id LEFT JOIN usuarios u ON i.usuario_id = u.id ORDER BY i.fecha_creacion DESC";
             $stmt = $db->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll();
