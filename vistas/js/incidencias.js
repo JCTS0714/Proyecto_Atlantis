@@ -279,8 +279,17 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(data) {
-                if (data && data.length > 0) {
-                    var incidencia = data[0];
+                // Aceptar diferentes formatos de respuesta:
+                // - Array directo: [{...}]
+                // - Objeto con clave `incidencias`: { success:true, incidencias: [{...}] }
+                var incidencia = null;
+                if (Array.isArray(data) && data.length > 0) {
+                    incidencia = data[0];
+                } else if (data && data.incidencias && Array.isArray(data.incidencias) && data.incidencias.length > 0) {
+                    incidencia = data.incidencias[0];
+                }
+
+                if (incidencia) {
 
                     // Llenar el modal con los datos
                     $('#editarIdIncidencia').val(incidencia.id);
