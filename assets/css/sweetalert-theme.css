@@ -1,0 +1,85 @@
+:root{
+  --swal-bg: #ffffff;
+  --swal-text: #1b1b1b;
+  --swal-border: #e5e5e5;
+  --swal-title: #111827;
+  --swal-btn-bg: #3085d6;
+  --swal-btn-text: #ffffff;
+  --swal-btn-bg-hover: #2573c9;
+  --swal-radius: 8px;
+  --swal-box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Modo oscuro */
+[data-theme="dark"]{
+  --swal-bg: #1f2933;
+  --swal-text: #e6eef6;
+  --swal-border: #2b3440;
+  --swal-title: #f1f5f9;
+  --swal-btn-bg: #2563eb;
+  --swal-btn-text: #ffffff;
+  --swal-btn-bg-hover: #1e4fc4;
+  --swal-box-shadow: 0 6px 24px rgba(2,6,23,0.6);
+}
+
+/* Aplicar a SweetAlert2 usando custom classes */
+.swal2-custom-popup{
+  background: var(--swal-bg);
+  color: var(--swal-text);
+  border-radius: var(--swal-radius) !important;
+  border: 1px solid var(--swal-border);
+  box-shadow: var(--swal-box-shadow) !important;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.swal2-custom-title{
+  color: var(--swal-title) !important;
+  font-weight: 600;
+}
+.swal2-custom-content{
+  color: var(--swal-text) !important;
+}
+
+.swal2-custom-confirm{
+  background-color: var(--swal-btn-bg) !important;
+  color: var(--swal-btn-text) !important;
+  border-radius: 6px;
+  padding: 8px 14px;
+  border: none !important;
+}
+.swal2-custom-confirm:hover{
+  background-color: var(--swal-btn-bg-hover) !important;
+}
+.swal2-custom-cancel{
+  background: transparent !important;
+  color: var(--swal-text) !important;
+  border: 1px solid var(--swal-border) !important;
+  border-radius: 6px;
+  padding: 8px 14px;
+}
+
+/* Fix: normalizar la animación del icono de éxito para evitar efecto adelante/atrás */
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-line-long{
+  animation-direction: normal !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+/* Ocultar elemento 'fix' que a veces crea un artefacto visual */
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-fix{
+  display: none !important;
+}
+
+/* Alternativa: si quieres desactivar por completo la animación del icono */
+/*
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-custom-popup .swal2-icon.swal2-success .swal2-success-line-long{
+  animation: none !important;
+}
+*/

@@ -117,3 +117,57 @@
 4. Facturación electrónica SUNAT
 
 ================================================================================
+
+================================================================================
+                                     SWEETALERT2 - TEMA CLARO / OSCURO
+================================================================================
+
+Se han añadido archivos de soporte para mostrar mensajes de SweetAlert2 adaptados
+al modo claro y oscuro. Los archivos añadidos son:
+
+- `assets/css/sweetalert-theme.css`  -> variables CSS y clases `swal2-custom-*`.
+- `assets/js/sweetalert-theme.js`    -> helper JS para detectar `prefers-color-scheme`,
+                                                          toggle persistente en `localStorage` y un
+                                                          `Swal.mixin()` llamado `SwalTheme`.
+
+Instrucciones de integración (incluir en la plantilla principal):
+
+1) Incluir CSS después de los estilos de SweetAlert2:
+
+    <link rel="stylesheet" href="/assets/css/sweetalert-theme.css">
+
+2) Incluir JS después de `sweetalert2.min.js`:
+
+    <script src="/path/to/sweetalert2.min.js"></script>
+    <script src="/assets/js/sweetalert-theme.js"></script>
+
+3) Uso recomendado (usar `SwalTheme` en lugar de `Swal` para que se apliquen
+    las clases por defecto):
+
+    SwalTheme.fire({
+       title: 'Guardado',
+       text: 'Los cambios se guardaron correctamente',
+       icon: 'success',
+       confirmButtonText: 'Ok'
+    });
+
+4) Toggle manual de tema (ejemplo de botón):
+
+    <button id="theme-toggle">Cambiar tema</button>
+    <script>
+       document.getElementById('theme-toggle').addEventListener('click', () => {
+          const t = window.toggleSiteTheme();
+          SwalTheme.fire('Tema cambiado', `Ahora estás en modo ${t}`, 'info');
+       });
+    </script>
+
+Notas:
+- `data-theme` se coloca sobre `document.documentElement` y puede usarse para
+   adaptar otros estilos de la aplicación.
+- `buttonsStyling: false` en el mixin permite usar estilos CSS personalizados
+   (evita la apariencia por defecto de SweetAlert2 en los botones).
+
+Revisar visualmente los modales `success`, `error`, `warning` y `info` para
+asegurar contraste suficiente en modo oscuro. Ajustar variables en
+`assets/css/sweetalert-theme.css` según sea necesario.
+
