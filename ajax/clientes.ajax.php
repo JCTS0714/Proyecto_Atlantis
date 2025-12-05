@@ -258,10 +258,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["
     ];
     
     // Verificar si ya existe un cliente con el mismo RUC
+    // Permitir que existan varios registros con el mismo RUC siempre que la empresa/comercio sea diferente.
     $clienteExistente = ModeloCliente::mdlBuscarPorDocumento($ruc);
     if (!empty($clienteExistente)) {
-        echo json_encode(['status' => 'error', 'message' => 'Ya existe un cliente con este RUC']);
-        exit;
+        $empresaNueva = mb_strtolower(trim($datos['empresa']));
+        $mismoEmpresa = false;
+        foreach ($clienteExistente as $c) {
+            $empresaExist = mb_strtolower(trim($c['empresa'] ?? ''));
+            if ($empresaExist === $empresaNueva) {
+                $mismoEmpresa = true;
+                break;
+            }
+        }
+
+        if ($mismoEmpresa) {
+            // Ya existe un cliente con el mismo RUC y la misma empresa
+            echo json_encode(['status' => 'error', 'message' => 'Ya existe un cliente con este RUC y comercio']);
+            exit;
+        }
+        // Si las empresas son diferentes, permitimos crear otro registro con el mismo RUC
     }
     
     // Insertar cliente
