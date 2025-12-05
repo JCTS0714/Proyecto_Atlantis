@@ -64,7 +64,12 @@ $(document).ready(function() {
                     if (!Array.isArray(data)) return { results: [] };
                     return {
                         results: data.map(function(cliente) {
-                            return { id: cliente.id, text: cliente.nombre };
+                            // Mostrar nombre del cliente + empresa/comercio si existe
+                            var displayText = cliente.nombre;
+                            if (cliente.empresa && cliente.empresa.trim() !== '') {
+                                displayText += ' (' + cliente.empresa + ')';
+                            }
+                            return { id: cliente.id, text: displayText };
                         })
                     };
                 },
@@ -341,7 +346,12 @@ $(document).ready(function() {
                     if (!Array.isArray(data)) return { results: [] };
                     return {
                         results: data.map(function(cliente) {
-                            return { id: cliente.id, text: cliente.nombre };
+                            // Mostrar nombre del cliente + empresa/comercio si existe
+                            var displayText = cliente.nombre;
+                            if (cliente.empresa && cliente.empresa.trim() !== '') {
+                                displayText += ' (' + cliente.empresa + ')';
+                            }
+                            return { id: cliente.id, text: displayText };
                         })
                     };
                 },

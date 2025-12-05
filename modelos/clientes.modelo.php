@@ -72,12 +72,14 @@ class ModeloCliente{
   static public function mdlMostrarClientesParaOportunidad($searchTerm = null) {
     // Limitar resultados para Select2 y evitar cargas masivas
     if ($searchTerm) {
-      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes WHERE nombre LIKE :nombre ORDER BY nombre ASC LIMIT 10");
+      // Buscar por nombre del cliente O por nombre del comercio/empresa
+      $stmt = Conexion::conectar()->prepare("SELECT id, nombre, empresa FROM clientes WHERE nombre LIKE :nombre OR empresa LIKE :empresa ORDER BY nombre ASC LIMIT 10");
       $likeTerm = "%".$searchTerm."%";
       $stmt->bindParam(":nombre", $likeTerm, PDO::PARAM_STR);
+      $stmt->bindParam(":empresa", $likeTerm, PDO::PARAM_STR);
     } else {
       // Cuando no hay término de búsqueda, devolver un conjunto limitado para evitar sobrecarga
-      $stmt = Conexion::conectar()->prepare("SELECT id, nombre FROM clientes ORDER BY nombre ASC LIMIT 50");
+      $stmt = Conexion::conectar()->prepare("SELECT id, nombre, empresa FROM clientes ORDER BY nombre ASC LIMIT 50");
     }
     try {
       $stmt->execute();
