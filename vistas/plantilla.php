@@ -170,6 +170,55 @@
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Global SweetAlert2 safety wrapper: ensure dialogs always close and remove lingering backdrop
+    (function(){
+      if (typeof Swal === 'undefined') return;
+      var _origFire = Swal.fire.bind(Swal);
+      var cleanup = function(){
+        try{
+          // Close any open Swal instance
+          if (typeof Swal.close === 'function') Swal.close();
+          // Remove any leftover containers just in case
+          document.querySelectorAll('.swal2-container').forEach(function(el){
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+          });
+          // Remove modal-open class on body if it was left
+          document.body.classList.remove('swal2-shown');
+          document.body.classList.remove('swal2-height-auto');
+        }catch(e){
+          console.error('Swal cleanup error', e);
+        }
+      };
+
+      Swal.fire = function(){
+        var p = _origFire.apply(null, arguments);
+        // Ensure cleanup after the promise resolves (confirmed/dismissed)
+        try{
+          p.then(function(res){
+            // Allow the default closing animation to run, then ensure cleanup
+            setTimeout(cleanup, 50);
+            return res;
+          }).catch(function(){
+            setTimeout(cleanup, 50);
+          });
+        }catch(e){
+          setTimeout(cleanup, 50);
+        }
+        return p;
+      };
+
+      // Also patch lowercase alias if present
+      if (typeof window.swal === 'object' && typeof window.swal.fire === 'function') {
+        var _alias = window.swal.fire.bind(window.swal);
+        window.swal.fire = function(){
+          var p = _alias.apply(null, arguments);
+          try{ p.then(function(){ setTimeout(cleanup,50); }).catch(function(){ setTimeout(cleanup,50); }); }catch(e){ setTimeout(cleanup,50); }
+          return p;
+        };
+      }
+    })();
+  </script>
   
   <!-- Sistema de Mostrar/Ocultar Columnas v2 -->
   <script src="<?php echo BASE_URL; ?>/vistas/js/column-toggle-v2.js"></script>
