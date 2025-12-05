@@ -440,6 +440,14 @@ $(document).ready(function() {
                 var selected = (cliente.value == incidencia.cliente_id) ? 'selected' : '';
                 $('#editar_cliente_id').append(`<option value="${cliente.value}" ${selected}>${cliente.label}</option>`);
               });
+              // Si el cliente específico no está entre los resultados (p.ej. top 10), agregarlo manualmente
+              if ($('#editar_cliente_id option[value="' + incidencia.cliente_id + '"]').length === 0) {
+                var label = incidencia.nombre_cliente || '';
+                if (incidencia.empresa_cliente && incidencia.empresa_cliente.trim() !== '') {
+                  label = label + ' (' + incidencia.empresa_cliente + ')';
+                }
+                $('#editar_cliente_id').append(`<option value="${incidencia.cliente_id}" selected>${label}</option>`);
+              }
               // Asegurar que el select muestre el cliente correcto aunque esté deshabilitado
               $('#editar_cliente_id').val(incidencia.cliente_id);
             }
