@@ -120,6 +120,9 @@ var tablasContactos = [
 	'tablaVentas'
 ];
 
+// Asegurar que la tabla de incidencias sea inicializada por plantilla.js
+tablasContactos.push('tablaIncidencias');
+
 tablasContactos.forEach(function(tableId) {
 	var $tabla = $('#' + tableId);
 	if ($tabla.length > 0) {

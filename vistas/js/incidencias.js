@@ -197,7 +197,7 @@ $(document).ready(function() {
     // Cargar datos de incidencias en la tabla al cargar la página
     cargarIncidencias();
 
-    // Función para cargar incidencias
+    // Función para cargar incidencias (llenado de tbody, plantilla.js inicializará DataTable)
     function cargarIncidencias() {
         $.ajax({
             url: 'ajax/incidencias.ajax.php',
@@ -208,33 +208,76 @@ $(document).ready(function() {
                 var tbody = $('#tablaIncidencias tbody');
                 tbody.empty();
 
-                if (data && data.length > 0) {
-                    data.forEach(function(incidencia, index) {
+                var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
+
+                if (rows && rows.length > 0) {
+                    rows.forEach(function(incidencia, index) {
                         var fila = '<tr>' +
-                            '<td>' + (index + 1) + '</td>' +
-                            '<td>' + (incidencia.correlativo || '') + '</td>' +
-                            '<td>' + incidencia.nombre_incidencia + '</td>' +
-                            '<td>' + (incidencia.nombre_cliente || '') + '</td>' +
-                            '<td>' + (incidencia.fecha_solicitud || '') + '</td>' +
-                            '<td>' + incidencia.prioridad + '</td>' +
-                            '<td>' + (incidencia.observaciones || '') + '</td>' +
-                            '<td>' + incidencia.fecha_creacion + '</td>' +
-                            '<td>' +
-                                '<div class="btn-group">' +
-                                    '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-pencil"></i></button>' +
-                                    '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-trash"></i></button>' +
-                                '</div>' +
-                            '</td>' +
-                        '</tr>';
+                                '<td>' + (index + 1) + '</td>' +
+                                '<td>' + (incidencia.correlativo || '') + '</td>' +
+                                '<td>' + (incidencia.nombre_incidencia || '') + '</td>' +
+                                '<td>' + (incidencia.nombre_cliente || '') + '</td>' +
+                                '<td>' + (incidencia.fecha_solicitud || '') + '</td>' +
+                                '<td>' + (incidencia.prioridad || '') + '</td>' +
+                                '<td>' + (incidencia.observaciones || '') + '</td>' +
+                                '<td>' + (incidencia.fecha_creacion || '') + '</td>' +
+                                '<td>' +
+                                    '<div class="btn-group">' +
+                                        '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-pencil"></i></button>' +
+                                        '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-trash"></i></button>' +
+                                    '</div>' +
+                                '</td>' +
+                            '</tr>';
                         tbody.append(fila);
                     });
                 } else {
                     tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
                 }
+
+                // Si DataTable ya está inicializado, destruirlo y reinicializarlo para refrescar
+                try {
+                    if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
+                        $('#tablaIncidencias').DataTable().destroy();
+                    }
+                    // Reinicializar DataTable si hay datos
+                    if (rows && rows.length > 0) {
+                        $('#tablaIncidencias').DataTable({
+                            "responsive": true,
+                            "autoWidth": false,
+                            "pageLength": 10,
+                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                            "language": {
+                                "sProcessing":     "Procesando...",
+                                "sLengthMenu":     "Mostrar _MENU_ registros",
+                                "sZeroRecords":    "No se encontraron resultados",
+                                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+                                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                                "sInfoPostFix":    "",
+                                "sSearch":         "Buscar:",
+                                "sUrl":            "",
+                                "sInfoThousands":  ",",
+                                "sLoadingRecords": "Cargando...",
+                                "oPaginate": {
+                                    "sFirst":    "Primero",
+                                    "sLast":     "Último",
+                                    "sNext":     "Siguiente",
+                                    "sPrevious": "Anterior"
+                                },
+                                "oAria": {
+                                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                                }
+                            }
+                        });
+                    }
+                } catch(e) { 
+                    console.error('Error inicializando DataTable:', e);
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Error al cargar incidencias:', status, error, xhr && xhr.responseText);
-                // Mostrar texto de error si viene en JSON
                 try {
                     var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
                     var msg = server && (server.message || server.error) ? (server.message || server.error) : null;
