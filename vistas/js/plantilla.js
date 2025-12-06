@@ -9,7 +9,6 @@
 	}
 
 $(document).ready(function() {
-	console.log('plantilla.js: $(document).ready ejecutado');
 	
 	// Global AJAX error logger: helps surface server response bodies for 500s/HTML errors
 	$(document).ajaxError(function(event, jqxhr, settings, thrownError) {
@@ -26,13 +25,11 @@ $(document).ready(function() {
 	}
 
 	// Tabla de Prospectos (#example2) con opciones completas de paginación
-	console.log('plantilla.js: Buscando #example2, encontrado:', $('#example2').length);
 	if ($('#example2').length) {
 		// Verificar si ya está inicializado
 		if ($.fn.DataTable.isDataTable('#example2')) {
-			console.log('plantilla.js: #example2 ya está inicializado como DataTable');
+			// Ya inicializado
 		} else {
-			console.log('plantilla.js: Inicializando #example2 como DataTable');
 			try {
 				$('#example2').DataTable({
 					"responsive": true,
@@ -127,12 +124,10 @@ tablasContactos.forEach(function(tableId) {
 	var $tabla = $('#' + tableId);
 	if ($tabla.length > 0) {
 		if (!$.fn.DataTable.isDataTable('#' + tableId)) {
-			console.log('Inicializando DataTable: ' + tableId);
 			try {
 				$tabla.DataTable(dtOptions);
-				console.log(tableId + ' inicializado OK');
 			} catch(e) {
-				console.error('Error inicializando ' + tableId + ':', e);
+				// Error silencioso
 			}
 		}
 	}

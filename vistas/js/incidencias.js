@@ -47,7 +47,9 @@ $(document).ready(function() {
 
     function initNuevoClienteSelect2() {
         var $sel = $('#nuevoClienteSelect');
-        try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+        if ($sel.data('select2')) {
+            try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+        }
 
         $sel.select2({
             placeholder: 'Buscar cliente',
@@ -205,12 +207,8 @@ $(document).ready(function() {
             data: { action: 'mostrarIncidencias' },
             dataType: 'json',
             success: function(data) {
-                console.log('Datos recibidos de incidencias:', data);
-                console.log('Tipo de datos:', typeof data, 'Es array?:', Array.isArray(data));
-                
                 // Verificar si hay error de autenticación
                 if (data && data.status === 'error') {
-                    console.error('Error del servidor:', data.message);
                     var tbody = $('#tablaIncidencias tbody');
                     tbody.html('<tr><td colspan="9" class="text-center text-danger">Error: ' + data.message + '</td></tr>');
                     return;
@@ -220,12 +218,9 @@ $(document).ready(function() {
                 tbody.empty();
 
                 var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
-                console.log('Rows procesados:', rows);
-                console.log('Cantidad de rows:', rows.length);
 
                 if (rows && rows.length > 0) {
                     rows.forEach(function(incidencia, index) {
-                        console.log('Procesando incidencia ' + index + ':', incidencia);
                         var fila = '<tr>' +
                                 '<td>' + (index + 1) + '</td>' +
                                 '<td>' + (incidencia.correlativo || '') + '</td>' +
@@ -287,11 +282,10 @@ $(document).ready(function() {
                         });
                     }
                 } catch(e) { 
-                    console.error('Error inicializando DataTable:', e);
+                    // Error silencioso al inicializar DataTable
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error al cargar incidencias:', status, error, xhr && xhr.responseText);
                 try {
                     var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
                     var msg = server && (server.message || server.error) ? (server.message || server.error) : null;
@@ -402,7 +396,9 @@ $(document).ready(function() {
 
     function initEditarClienteSelect2() {
         var $sel = $('#editarClienteSelect');
-        try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+        if ($sel.data('select2')) {
+            try { $sel.select2('destroy'); } catch(e) { /* ignore */ }
+        }
 
         $sel.select2({
             placeholder: 'Buscar cliente',
