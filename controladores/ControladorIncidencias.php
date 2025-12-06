@@ -69,7 +69,9 @@ class ControladorIncidencias {
     }
 
     static public function ctrMostrarIncidencias($item = null, $valor = null) {
-        return ModeloIncidencias::mdlMostrarIncidencias($item, $valor);
+        $incidencias = ModeloIncidencias::mdlMostrarIncidencias($item, $valor);
+        // Asegurar que siempre devuelva un array (vacío si no hay datos)
+        return is_array($incidencias) ? $incidencias : [];
     }
 
     static public function ctrEditarIncidencia($datos = null) {
