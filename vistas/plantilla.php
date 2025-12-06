@@ -168,6 +168,7 @@
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+  
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
@@ -318,11 +319,11 @@
   }
   </script>
 
-  <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js?v=20251206"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/sticky-scroll.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
-  <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js?v=20251206"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/ventas.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/oportunidades.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/prospectos.js"></script>
