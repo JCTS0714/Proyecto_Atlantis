@@ -208,6 +208,14 @@ $(document).ready(function() {
                 console.log('Datos recibidos de incidencias:', data);
                 console.log('Tipo de datos:', typeof data, 'Es array?:', Array.isArray(data));
                 
+                // Verificar si hay error de autenticación
+                if (data && data.status === 'error') {
+                    console.error('Error del servidor:', data.message);
+                    var tbody = $('#tablaIncidencias tbody');
+                    tbody.html('<tr><td colspan="9" class="text-center text-danger">Error: ' + data.message + '</td></tr>');
+                    return;
+                }
+                
                 var tbody = $('#tablaIncidencias tbody');
                 tbody.empty();
 
