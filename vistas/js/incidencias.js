@@ -217,7 +217,7 @@ $(document).ready(function() {
                                 '<td>' + (incidencia.correlativo || '') + '</td>' +
                                 '<td>' + (incidencia.nombre_incidencia || '') + '</td>' +
                                 '<td>' + (incidencia.nombre_cliente || '') + '</td>' +
-                                '<td>' + (incidencia.fecha_solicitud || '') + '</td>' +
+                                '<td>' + (incidencia.fecha || '') + '</td>' +
                                 '<td>' + (incidencia.prioridad || '') + '</td>' +
                                 '<td>' + (incidencia.observaciones || '') + '</td>' +
                                 '<td>' + (incidencia.fecha_creacion || '') + '</td>' +
@@ -356,7 +356,7 @@ $(document).ready(function() {
                     } else {
                         $('#editarNombreCliente').prop('disabled', true);
                     }
-                    $('#editarFecha').val(incidencia.fecha_solicitud);
+                    $('#editarFecha').val(incidencia.fecha);
                     $('#editarPrioridad').val(incidencia.prioridad);
                     $('#editarObservaciones').val(incidencia.observaciones || '');
 
