@@ -205,13 +205,19 @@ $(document).ready(function() {
             data: { action: 'mostrarIncidencias' },
             dataType: 'json',
             success: function(data) {
+                console.log('Datos recibidos de incidencias:', data);
+                console.log('Tipo de datos:', typeof data, 'Es array?:', Array.isArray(data));
+                
                 var tbody = $('#tablaIncidencias tbody');
                 tbody.empty();
 
                 var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
+                console.log('Rows procesados:', rows);
+                console.log('Cantidad de rows:', rows.length);
 
                 if (rows && rows.length > 0) {
                     rows.forEach(function(incidencia, index) {
+                        console.log('Procesando incidencia ' + index + ':', incidencia);
                         var fila = '<tr>' +
                                 '<td>' + (index + 1) + '</td>' +
                                 '<td>' + (incidencia.correlativo || '') + '</td>' +
