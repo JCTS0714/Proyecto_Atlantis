@@ -319,11 +319,11 @@
   }
   </script>
 
-  <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js?v=20251206c"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js?v=20251206e"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/sticky-scroll.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/usuarios.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/clientes.js"></script>
-  <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js?v=20251206d"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/incidencias.js?v=20251206e"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/ventas.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/oportunidades.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/prospectos.js"></script>
