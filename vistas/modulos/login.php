@@ -183,7 +183,7 @@
 
 /* Texto de bienvenida */
 .welcome-text {
-    color: #fff;
+    color: #fff !important;
     text-align: center;
     margin-bottom: 25px;
     font-size: 14px;
@@ -191,7 +191,7 @@
 
 /* Texto "Login" encima del logo */
 .login-title-top {
-    color: #fff;
+    color: #fff !important;
     text-align: center;
     margin-bottom: 15px;
     font-size: 32px;
@@ -205,7 +205,7 @@
 .atlantis-title {
     font-family: 'Amiamie Round', sans-serif;
     font-weight: 400;
-    color: #fff;
+    color: #fff !important;
     text-align: center;
     margin-top: 10px;
     margin-bottom: 25px;
