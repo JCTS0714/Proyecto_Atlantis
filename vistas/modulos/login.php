@@ -183,7 +183,7 @@
 
 /* Texto de bienvenida */
 .welcome-text {
-    color: rgba(255, 255, 255, 0.7);
+    color: #fff;
     text-align: center;
     margin-bottom: 25px;
     font-size: 14px;
