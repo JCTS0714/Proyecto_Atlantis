@@ -27,8 +27,9 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
       <div class="box-header with-border">
         <h3 class="box-title">Clientes en Zona de Espera</h3>
       
-      <!-- NUEVO: Contenedor para botones de exportación -->
-      <div class="export-buttons-container pull-right" id="export-tablaZonaEspera"></div>
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaZonaEspera"></div>
+      </div>
       
       <!-- Botón Mostrar/Ocultar Columnas -->
       <div class="column-toggle-container" style="margin-top:10px;">

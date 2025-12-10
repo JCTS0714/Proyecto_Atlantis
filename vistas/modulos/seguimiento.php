@@ -29,8 +29,9 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
           Agregar Cliente
         </button> -->
       
-      <!-- NUEVO: Contenedor para botones de exportación -->
-      <div class="export-buttons-container pull-right" id="export-tablaSeguimiento"></div>
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaSeguimiento"></div>
+      </div>
       
       <!-- Botón Mostrar/Ocultar Columnas -->
       <div class="column-toggle-container" style="margin-top:10px;">
