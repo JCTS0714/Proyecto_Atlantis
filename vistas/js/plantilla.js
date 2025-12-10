@@ -62,6 +62,13 @@ $(document).ready(function() {
 					}
 				});
 				console.log('plantilla.js: #example2 inicializado correctamente');
+				
+				// NUEVO: Inicializar exportación para example2
+				setTimeout(function() {
+					if (window.ExportTables && typeof window.ExportTables.init === 'function') {
+						ExportTables.init('example2');
+					}
+				}, 500);
 			} catch(e) {
 				console.error('plantilla.js: Error inicializando #example2:', e);
 			}
@@ -113,12 +120,11 @@ var tablasContactos = [
 	'tablaSeguimiento',
 	'tablaNoClientes',
 	'tablaZonaEspera',
-	'tablaContadores',
 	'tablaVentas'
 ];
 
 // NO agregar tablaIncidencias aquí - se inicializa en incidencias.js después de cargar datos
-// tablasContactos.push('tablaIncidencias');
+// NO agregar tablaContadores aquí - se inicializa en contadores.js con su propia configuración
 
 tablasContactos.forEach(function(tableId) {
 	var $tabla = $('#' + tableId);
@@ -126,6 +132,13 @@ tablasContactos.forEach(function(tableId) {
 		if (!$.fn.DataTable.isDataTable('#' + tableId)) {
 			try {
 				$tabla.DataTable(dtOptions);
+				
+				// NUEVO: Inicializar exportación después de crear DataTable
+				setTimeout(function() {
+					if (window.ExportTables && typeof window.ExportTables.init === 'function') {
+						ExportTables.init(tableId);
+					}
+				}, 500);
 			} catch(e) {
 				// Error silencioso
 			}
@@ -270,7 +283,7 @@ tablasContactos.forEach(function(tableId) {
 		if (!window._advancedFilters) window._advancedFilters = {};
 
 		// Tablas que necesitan búsqueda server-side (tienen filtro de servidor)
-		var serverSideTables = ['tablaClientes', 'tablaContadores'];
+		var serverSideTables = ['tablaClientes'];
 
 		['tablaProspectos','tablaClientes','tablaSeguimiento','tablaNoClientes','tablaZonaEspera','example2'].forEach(function(id){
 			// Si es una tabla que necesita server-side (por filtro de servidor), usar AJAX

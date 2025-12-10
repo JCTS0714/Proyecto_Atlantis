@@ -28,6 +28,10 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarProspecto">
           Agregar Prospecto
         </button>
+        
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaProspectos"></div>
+        
         <!-- Botón Mostrar/Ocultar Columnas -->
         <div class="column-toggle-container">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -113,8 +117,8 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
               <th data-column="col-fecha-contacto">Fecha Contacto</th>
               <th data-column="col-empresa">Empresa</th>
               <th data-column="col-fecha-creacion">Fecha Creación</th>
-              <th data-column="col-cambiar-estado">Cambiar Estado</th>
-              <th data-column="col-acciones">Acciones</th>
+              <th data-column="col-cambiar-estado" class="no-export">Cambiar Estado</th>
+              <th data-column="col-acciones" class="no-export">Acciones</th>
             </tr>
           </thead>
           <tbody>

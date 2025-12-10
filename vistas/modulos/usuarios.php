@@ -61,7 +61,8 @@ if (isset($_SESSION["mensaje"])) {
 
      <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarUsuario">Agregar usuario</button>
 
-
+     <!-- NUEVO: Contenedor para botones de exportación -->
+     <div class="export-buttons-container pull-right" id="export-example2"></div>
 
     </div>
 
@@ -89,7 +90,7 @@ if (isset($_SESSION["mensaje"])) {
 
         <th>Último login</th>
 
-        <th>Acciones</th>
+        <th class="no-export">Acciones</th>
 
        </tr>
 

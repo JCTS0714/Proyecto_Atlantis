@@ -24,6 +24,10 @@
         <button class="btn btn-success" data-toggle="modal" data-target="#modalAgregarClientePostventa" style="margin-left: 15px;">
           <i class="fa fa-plus"></i> Agregar Cliente
         </button>
+        
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaClientes"></div>
+        
         <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->
         <div class="column-toggle-container" style="margin-top:10px;">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -129,8 +133,8 @@
               <th data-column="col-servidor">Servidor</th>
               <th data-column="col-fecha-creacion" style="display:none;">F. Creación</th>
               <th data-column="col-fecha-contacto" style="display:none;">F. Contacto</th>
-              <th data-column="col-cambiar-estado">Cambiar Estado</th>
-              <th data-column="col-acciones">Acciones</th>
+              <th data-column="col-cambiar-estado" class="no-export">Cambiar Estado</th>
+              <th data-column="col-acciones" class="no-export">Acciones</th>
             </tr>
           </thead>
           <tbody>

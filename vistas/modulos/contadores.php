@@ -17,6 +17,9 @@
           <i class="fa fa-plus"></i> Agregar Contador
         </button>
         
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaContadores"></div>
+        
         <!-- Botón Mostrar/Ocultar Columnas -->
         <div class="column-toggle-container" style="margin-top:10px;">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
@@ -79,7 +82,7 @@
               <th data-column="col-usuario">Usuario</th>
               <th data-column="col-contrasena">Contraseña</th>
               <th data-column="col-servidor">Servidor</th>
-              <th style="width: 100px;">Acciones</th>
+              <th style="width: 100px;" class="no-export">Acciones</th>
             </tr>
           </thead>
           <tbody>

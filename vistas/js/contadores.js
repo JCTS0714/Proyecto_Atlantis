@@ -238,7 +238,14 @@ $(document).ready(function() {
         "language": {
           "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
         }
-      }); 
+      });
+      
+      // Inicializar botones de exportación después de crear DataTable
+      setTimeout(function() {
+        if (window.ExportTables && typeof window.ExportTables.init === 'function') {
+          ExportTables.init('tablaContadores');
+        }
+      }, 500);
     } catch(e) { /* ignore */ }
   }
   

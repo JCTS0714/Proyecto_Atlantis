@@ -18,6 +18,9 @@
         <button class="btn btn-primary" data-toggle="modal" data-target="#modalRegistrarIncidencia">
           Registrar Incidencia
         </button>
+        
+        <!-- NUEVO: Contenedor para botones de exportación -->
+        <div class="export-buttons-container pull-right" id="export-tablaIncidencias"></div>
       </div>
 
       <div class="box-body">
@@ -32,7 +35,7 @@
               <th>Prioridad</th>
               <th>Observaciones</th>
               <th>Fecha Creación</th>
-              <th>Acciones</th>
+              <th class="no-export">Acciones</th>
             </tr>
           </thead>
           <tbody>
