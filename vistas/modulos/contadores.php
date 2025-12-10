@@ -67,7 +67,6 @@
             </div>
           </div>
         </div>
-      </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">

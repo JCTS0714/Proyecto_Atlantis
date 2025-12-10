@@ -99,7 +99,6 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
             </div>
           </div>
         </div>
-      </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaProspectos">

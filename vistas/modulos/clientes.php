@@ -27,9 +27,10 @@
         
         <!-- NUEVO: Contenedor para botones de exportación -->
         <div class="export-buttons-container pull-right" id="export-tablaClientes"></div>
+      </div>
         
-        <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->
-        <div class="column-toggle-container" style="margin-top:10px;">
+      <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->
+      <div class="column-toggle-container" style="margin-top:10px;">
           <button class="btn btn-default btn-toggle-columns" onclick="toggleColumnPanel(event)" title="Mostrar/Ocultar Columnas">
             <i class="fa fa-columns"></i> Mostrar/Ocultar Columnas
           </button>
@@ -111,7 +112,6 @@
             </div>
           </div>
         </div>
-      </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaClientes">
