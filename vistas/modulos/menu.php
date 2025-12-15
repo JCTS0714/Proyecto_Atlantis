@@ -117,6 +117,12 @@
                             <span>Clientes</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?php echo BASE_URL; ?>/certificados">
+                            <i class="fa fa-circle-o"></i>
+                            <span>Certificados</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

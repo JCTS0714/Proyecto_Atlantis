@@ -95,8 +95,13 @@ require_once "controladores/prospectos.controlador.php";
 require_once "controladores/evento.controlador.php";
 require_once "controladores/calendario.controlador.php";
 require_once "controladores/contador.controlador.php";
-require_once "controladores/certificados.controlador.php";
-require_once "controladores/notificaciones_certificados.controlador.php";
+require_once __DIR__ . '/controladores/certificados.controlador.php';
+// Incluir controlador de notificaciones solo si existe (evita fatal cuando el archivo no se ha desplegado)
+if (file_exists(__DIR__ . '/controladores/notificaciones_certificados.controlador.php')) {
+    require_once __DIR__ . '/controladores/notificaciones_certificados.controlador.php';
+} else {
+    error_log('index.php: controlador notificaciones_certificados.controlador.php no encontrado; omitiendo include');
+}
 
 
 /**REQUERIMOS DE MODELOS */
@@ -107,8 +112,13 @@ require_once "modelos/ModeloCRM.php";
 require_once "modelos/evento.modelo.php";
 require_once "modelos/calendario.modelo.php";
 require_once "modelos/contador.modelo.php";
-require_once "modelos/certificados.modelo.php";
-require_once "modelos/notificaciones_certificados.modelo.php";
+require_once __DIR__ . '/modelos/certificados.modelo.php';
+// Incluir modelo de notificaciones solo si existe
+if (file_exists(__DIR__ . '/modelos/notificaciones_certificados.modelo.php')) {
+    require_once __DIR__ . '/modelos/notificaciones_certificados.modelo.php';
+} else {
+    error_log('index.php: modelo notificaciones_certificados.modelo.php no encontrado; omitiendo include');
+}
 
 /**
  * PROCESAR LOGIN ANTES DE LA PLANTILLA

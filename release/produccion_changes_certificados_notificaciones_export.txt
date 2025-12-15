@@ -1,0 +1,54 @@
+Lista mínima de archivos a incluir en el deploy (Produccion)
+Fecha: 2025-12-15
+
+Descripción: Contiene los cambios para las dos funcionalidades nuevas: "Certificados" (CRUD + protección de duplicados + notificaciones) y mejoras en exportación a Excel que respetan filtros.
+
+Archivos importantes (paths relativos al repo):
+- ajax/certificados.ajax.php                   # endpoint CRUD y notificaciones + prevención duplicados
+- modelos/notificaciones_certificados.modelo.php  # nuevo: registro de envíos de notificaciones
+- controladores/notificaciones_certificados.controlador.php  # nuevo: wrapper mínimo
+- sql/crear_notificaciones_certificados.sql   # nuevo: tabla notificaciones_certificados (ejecutar en BD)
+- vistas/js/certificados.js                    # JS: DataTable reload, delete handler, submit handler flag
+- vistas/modulos/certificados.php              # vista, modales y fallbacks para modal agregar/editar
+- vistas/js/export-tables.js                   # mejoras export: respetar filtros y enviar onlyFiltered
+- index.php                                    # includes para nuevos controlador/modelo
+
+Nota: Estos son exclusivamente los archivos que se modificaron/crearon para las funcionalidades solicitadas. No incluir archivos grandes o de terceros.
+
+Comandos sugeridos (PowerShell) para preparar la rama `Produccion`:
+
+# 1) Cambiar a la rama Produccion y actualizar
+git checkout Produccion
+git pull origin Produccion
+
+# 2) Crear una rama temporal de trabajo
+git checkout -b feat/certificados-notificaciones-export
+
+# 3) Añadir solo los archivos listados (copiar/pegar los paths)
+git add ajax/certificados.ajax.php \
+    modelos/notificaciones_certificados.modelo.php \
+    controladores/notificaciones_certificados.controlador.php \
+    sql/crear_notificaciones_certificados.sql \
+    vistas/js/certificados.js \
+    vistas/modulos/certificados.php \
+    vistas/js/export-tables.js \
+    index.php
+
+# 4) Commit con mensaje claro
+git commit -m "Feat: Certificados CRUD + notificaciones; export mejora (respeta filtros)"
+
+# 5) Push de la rama y abrir PR hacia Produccion
+git push origin feat/certificados-notificaciones-export
+# Abrir Pull Request desde la interfaz de GitHub/GitLab hacia Produccion
+
+Instrucciones extra (antes de merge en Produccion):
+- Ejecutar SQL `sql/crear_notificaciones_certificados.sql` en la BD de Produccion (o aplicarlo en migración).
+- Verificar permisos de BD y el usuario del pool para permitir INSERT en la nueva tabla.
+- Probar en staging/producción la exportación y la creación de certificados (test rápido: crear 1 registro, verificar no se duplica si se hace submit rápido).
+
+Si quieres, puedo:
+- Generar automáticamente un patch con `git diff`/`git format-patch` (si me pides ejecutar comandos en tu terminal), o
+- Crear un PR draft si me das acceso o instrucciones para hacerlo desde tu entorno.
+
+---
+Generado por el asistente para preparar el deploy de las nuevas funcionalidades.

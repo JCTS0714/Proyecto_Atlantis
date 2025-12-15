@@ -289,6 +289,7 @@
           if($_GET["ruta"]=="inicio"       ||
             $_GET["ruta"]=="usuarios"     ||
             $_GET["ruta"]=="clientes"     ||
+            $_GET["ruta"]=="certificados" ||
             $_GET["ruta"]=="reuniones-archivadas" ||
             $_GET["ruta"]=="ventas"       ||
             $_GET["ruta"]=="crear-venta"  ||
@@ -353,9 +354,11 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/dashboard.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.module.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/notificaciones_certificados.module.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/alarma.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/modal-detalles.js"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/advanced_search.js"></script>
+  <script src="<?php echo BASE_URL; ?>/vistas/js/certificados.js"></script>
 
   </body>
   </html>

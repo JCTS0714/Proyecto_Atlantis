@@ -42,6 +42,155 @@
     background: #367fa9;
   }
 }
+
+  /* ---------- Dark header contrast fixes (overrides) ---------- */
+  /* Improve navbar contrast for common dark skins without changing
+     the original theme colors too aggressively. These rules are
+     intentionally narrow and placed at the end so they override
+     earlier skin definitions. */
+  .skin-green .main-header .navbar,
+  .skin-blue .main-header .navbar,
+  .skin-purple .main-header .navbar,
+  .skin-red .main-header .navbar,
+  .skin-yellow .main-header .navbar,
+  .skin-aqua .main-header .navbar,
+  .skin-black .main-header .navbar,
+  .skin-green-light .main-header .navbar,
+  .skin-blue-light .main-header .navbar,
+  .skin-purple-light .main-header .navbar,
+  .skin-red-light .main-header .navbar,
+  .skin-yellow-light .main-header .navbar,
+  .skin-aqua-light .main-header .navbar,
+  .skin-black-light .main-header .navbar {
+    background-color: rgba(0,0,0,0.18);
+    background-blend-mode: multiply;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .skin-green .main-header .navbar .nav>li>a,
+  .skin-blue .main-header .navbar .nav>li>a,
+  .skin-purple .main-header .navbar .nav>li>a,
+  .skin-red .main-header .navbar .nav>li>a,
+  .skin-yellow .main-header .navbar .nav>li>a,
+  .skin-aqua .main-header .navbar .nav>li>a,
+  .skin-black .main-header .navbar .nav>li>a,
+  .skin-green-light .main-header .navbar .nav>li>a,
+  .skin-blue-light .main-header .navbar .nav>li>a,
+  .skin-purple-light .main-header .navbar .nav>li>a,
+  .skin-red-light .main-header .navbar .nav>li>a,
+  .skin-yellow-light .main-header .navbar .nav>li>a,
+  .skin-aqua-light .main-header .navbar .nav>li>a,
+  .skin-black-light .main-header .navbar .nav>li>a {
+    color: #ffffff;
+    text-shadow: none;
+  }
+
+  .skin-green .main-header .navbar .nav>li>a:hover,
+  .skin-blue .main-header .navbar .nav>li>a:hover,
+  .skin-purple .main-header .navbar .nav>li>a:hover,
+  .skin-red .main-header .navbar .nav>li>a:hover,
+  .skin-yellow .main-header .navbar .nav>li>a:hover,
+  .skin-aqua .main-header .navbar .nav>li>a:hover,
+  .skin-black .main-header .navbar .nav>li>a:hover {
+    color: #f6f6f6;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .skin-green .main-header .navbar .sidebar-toggle,
+  .skin-blue .main-header .navbar .sidebar-toggle,
+  .skin-purple .main-header .navbar .sidebar-toggle,
+  .skin-red .main-header .navbar .sidebar-toggle,
+  .skin-yellow .main-header .navbar .sidebar-toggle,
+  .skin-aqua .main-header .navbar .sidebar-toggle,
+  .skin-black .main-header .navbar .sidebar-toggle,
+  .skin-green-light .main-header .navbar .sidebar-toggle,
+  .skin-blue-light .main-header .navbar .sidebar-toggle,
+  .skin-purple-light .main-header .navbar .sidebar-toggle,
+  .skin-red-light .main-header .navbar .sidebar-toggle,
+  .skin-yellow-light .main-header .navbar .sidebar-toggle,
+  .skin-aqua-light .main-header .navbar .sidebar-toggle,
+  .skin-black-light .main-header .navbar .sidebar-toggle {
+    color: #ffffff;
+  }
+
+  /* Ensure logo text remains legible in dark headers */
+  .skin-green .main-header > .logo,
+  .skin-blue .main-header > .logo,
+  .skin-purple .main-header > .logo,
+  .skin-red .main-header > .logo,
+  .skin-yellow .main-header > .logo,
+  .skin-aqua .main-header > .logo,
+  .skin-black .main-header > .logo {
+    color: #ffffff;
+  }
+
+  /* Make .box containers inside the top content/header area blend into dark headers
+     so buttons don't appear inside a separate light box. Applied narrowly to header
+     content so it doesn't affect normal page boxes. */
+  .skin-green .content-header .box,
+  .skin-blue .content-header .box,
+  .skin-purple .content-header .box,
+  .skin-red .content-header .box,
+  .skin-yellow .content-header .box,
+  .skin-aqua .content-header .box,
+  .skin-black .content-header .box,
+  .skin-green-light .content-header .box,
+  .skin-blue-light .content-header .box,
+  .skin-purple-light .content-header .box,
+  .skin-red-light .content-header .box,
+  .skin-yellow-light .content-header .box,
+  .skin-aqua-light .content-header .box,
+  .skin-black-light .content-header .box {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .skin-green .content-header .box .box-header,
+  .skin-blue .content-header .box .box-header,
+  .skin-purple .content-header .box .box-header,
+  .skin-red .content-header .box .box-header,
+  .skin-yellow .content-header .box .box-header,
+  .skin-aqua .content-header .box .box-header,
+  .skin-black .content-header .box .box-header,
+  .skin-green-light .content-header .box .box-header,
+  .skin-blue-light .content-header .box .box-header,
+  .skin-purple-light .content-header .box .box-header,
+  .skin-red-light .content-header .box .box-header,
+  .skin-yellow-light .content-header .box .box-header,
+  .skin-aqua-light .content-header .box .box-header,
+  .skin-black-light .content-header .box .box-header {
+    background: transparent !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+  }
+
+  .skin-green .content-header .btn,
+  .skin-blue .content-header .btn,
+  .skin-purple .content-header .btn,
+  .skin-red .content-header .btn,
+  .skin-yellow .content-header .btn,
+  .skin-aqua .content-header .btn,
+  .skin-black .content-header .btn,
+  .skin-green-light .content-header .btn,
+  .skin-blue-light .content-header .btn,
+  .skin-purple-light .content-header .btn,
+  .skin-red-light .content-header .btn,
+  .skin-yellow-light .content-header .btn,
+  .skin-aqua-light .content-header .btn,
+  .skin-black-light .content-header .btn,
+  .skin-green .content-header .box .box-header .btn,
+  .skin-blue .content-header .box .box-header .btn,
+  .skin-purple .content-header .box .box-header .btn,
+  .skin-red .content-header .box .box-header .btn,
+  .skin-yellow .content-header .box .box-header .btn,
+  .skin-aqua .content-header .box .box-header .btn,
+  .skin-black .content-header .box .box-header .btn {
+    color: #ffffff !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
 .skin-blue .main-header .logo {
   background-color: #367fa9;
   color: #ffffff;

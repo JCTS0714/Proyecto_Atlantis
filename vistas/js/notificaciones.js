@@ -96,6 +96,21 @@ $(document).ready(function() {
             }
             // Arrancar
             window.NotificationsModule.start();
+            // Además de reuniones, obtener certificados próximos y agregarlos al dropdown
+            function fetchAndAppendCertificados(){
+                $.ajax({
+                    url: 'ajax/certificados.ajax.php',
+                    type: 'POST',
+                    data: { accion: 'obtener_para_notificar' },
+                    dataType: 'json'
+                }).done(function(resp){
+                    if(!resp || !Array.isArray(resp.eventos)) return;
+                    appendCertificadosToDropdown(resp.eventos || []);
+                }).fail(function(){ /* ignore */ });
+            }
+            // Append one-time fetch now and then periodically (align with poll interval)
+            fetchAndAppendCertificados();
+            setInterval(fetchAndAppendCertificados, 30 * 1000);
         } catch (e) {
             console.error('Error inicializando NotificationsModule', e);
         }
@@ -127,6 +142,52 @@ $(document).ready(function() {
         }
         document.addEventListener('visibilitychange', function() { if (document.hidden) stopPollingFallback(); else startPollingFallback(); });
         startPollingFallback();
+    }
+    
+    // Agregar certificados en el dropdown evitando duplicados
+    function appendCertificadosToDropdown(certificados) {
+        if (!Array.isArray(certificados) || certificados.length === 0) return;
+        var lista = $('#lista-notificaciones');
+        var contadorElem = $('#contador-notificaciones');
+        var header = $('#header-notificaciones');
+        var ahoraIso = new Date().toISOString().slice(0,19).replace('T',' ');
+        var appendedIds = [];
+        certificados.forEach(function(c){
+            var cid = 'cert-' + c.id;
+            if (lista.find('li[data-id="'+cid+'"]').length) return; // ya existe
+            var contenidoCompleto = '';
+            if (c.observacion && c.observacion.trim() !== '') contenidoCompleto += '<strong>Obs:</strong> ' + c.observacion + '<br>';
+            contenidoCompleto += 'Certificado <strong>' + (c.nombre || '-') + '</strong> vence el ' + (c.fecha_vencimiento || '-');
+            var item = '<li data-id="'+cid+'"><a href="#" class="notificacion-item" data-html="' + encodeURIComponent(contenidoCompleto) + '">' +
+                '<i class="fa fa-certificate text-purple"></i> ' + contenidoCompleto + '</a></li>';
+            lista.append(item);
+            appendedIds.push(c.id);
+        });
+        // Actualizar contador y header
+        var nuevoContador = parseInt(contadorElem.text() || '0') + appendedIds.length;
+        contadorElem.text(nuevoContador);
+        header.text(nuevoContador > 0 ? 'Tienes ' + nuevoContador + ' notificación' + (nuevoContador > 1 ? 'es' : '') : 'No tienes notificaciones');
+
+        // Marcar como vistas en lote (actualiza ultima_notificacion en certificados)
+        if (appendedIds.length > 0) {
+            $.ajax({ url: 'ajax/certificados.ajax.php', type: 'POST', data: { accion: 'marcar_notificaciones_vistas', ids: JSON.stringify(appendedIds), fecha: ahoraIso }, dataType: 'json' })
+            .done(function(resp){ /* opcional: log */ })
+            .fail(function(){ /* ignore */ });
+        }
+        // Rebind click for visual toast (same handler used para reuniones)
+        $('.notificacion-item').off('click').on('click', function(e) {
+            e.preventDefault();
+            var contenidoHtml = decodeURIComponent($(this).data('html'));
+            if ($('#mensaje-notificacion').length === 0) {
+                $('body').append('<div id="mensaje-notificacion" style="position: fixed; top: 20px; right: 20px; background-color: #007bff; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 1050; max-width: 300px; cursor: pointer;">' + contenidoHtml + '</div>');
+                $('#mensaje-notificacion').on('click', function() { $(this).fadeOut(300, function() { $(this).remove(); }); });
+            } else {
+                $('#mensaje-notificacion').stop(true, true).css('opacity', 1).html(contenidoHtml);
+                clearTimeout($('#mensaje-notificacion').data('timeoutId'));
+                var timeoutId = setTimeout(function() { $('#mensaje-notificacion').fadeOut(300, function() { $(this).remove(); }); }, 5000);
+                $('#mensaje-notificacion').data('timeoutId', timeoutId);
+            }
+        });
     }
 });
 
