@@ -45,6 +45,13 @@ var ExportTables = (function($) {
           return data;
         }
       }
+      ,
+      // Ensure client-side exports only include applied search/order by default
+      modifier: {
+        search: 'applied',
+        order: 'applied',
+        page: 'all'
+      }
     }
   };
 
@@ -147,23 +154,44 @@ var ExportTables = (function($) {
    * @param {string} baseFilename - Nombre base del archivo
    * @returns {string} Nombre de archivo con fecha
    */
-  function generateFilename(baseFilename) {
+  function generateFilename(baseFilename, tableId) {
     var date = new Date();
     var dateStr = date.getFullYear() + 
                   ('0' + (date.getMonth() + 1)).slice(-2) + 
                   ('0' + date.getDate()).slice(-2);
-    
-    // Verificar si hay filtros activos
+
+    // Determinar si hay filtros activos para la tabla específica
     var hasFilters = false;
-    if (window._advancedFilters) {
-      for (var key in window._advancedFilters) {
-        if (window._advancedFilters[key] && Object.keys(window._advancedFilters[key]).length > 0) {
+    try{
+      if (tableId) {
+        // check advanced filters
+        if (window._advancedFilters && window._advancedFilters[tableId] && Object.keys(window._advancedFilters[tableId]).length > 0) {
           hasFilters = true;
-          break;
+        }
+
+        // check datatable global search or column search
+        var tbl = $('#' + tableId);
+        if (tbl && tbl.length && $.fn.DataTable && $.fn.DataTable.isDataTable('#' + tableId)) {
+          var dt = tbl.DataTable();
+          var globalSearch = (dt.search && dt.search()) ? dt.search().toString().trim() : '';
+          if (globalSearch) hasFilters = true;
+          try{
+            dt.columns().every(function(){
+              var s = this.search && this.search();
+              if (s && String(s).trim()) { hasFilters = true; }
+            });
+          }catch(e){ /* ignore */ }
+        }
+      } else {
+        // fallback: check any advanced filters
+        if (window._advancedFilters) {
+          for (var key in window._advancedFilters) {
+            if (window._advancedFilters[key] && Object.keys(window._advancedFilters[key]).length > 0) { hasFilters = true; break; }
+          }
         }
       }
-    }
-    
+    }catch(e){ /* ignore errors */ }
+
     return baseFilename + '_' + dateStr + (hasFilters ? '_Filtrado' : '');
   }
 
@@ -190,7 +218,7 @@ var ExportTables = (function($) {
         className: 'btn btn-success btn-sm export-btn',
         title: tableConfig.title,
         filename: function() {
-          return generateFilename(tableConfig.filename);
+          return generateFilename(tableConfig.filename, tableId);
         },
         exportOptions: exportOptions,
         messageTop: tableConfig.messageTop ? tableConfig.messageTop() : null,
@@ -320,18 +348,37 @@ var ExportTables = (function($) {
       filters = window._advancedFilters[tableId];
     }
 
-    // Obtener búsqueda global de DataTable
+    // Obtener búsqueda global y detectar si existen filtros activos (global/column/advanced)
     var table = $('#' + tableId).DataTable();
-    var search = table.search();
+    var search = '';
+    var onlyFiltered = false;
+    try{
+      if (table && table.search) {
+        search = table.search() || '';
+        if (String(search).trim()) onlyFiltered = true;
+      }
+      // check column searches
+      try{
+        table.columns().every(function(){
+          var s = this.search && this.search();
+          if (s && String(s).trim()) { onlyFiltered = true; }
+        });
+      }catch(e){ /* ignore */ }
+      // advanced filters
+      if (window._advancedFilters && window._advancedFilters[tableId] && Object.keys(window._advancedFilters[tableId]).length > 0) {
+        onlyFiltered = true;
+      }
+    }catch(e){ /* ignore */ }
 
-    // Hacer request AJAX para obtener todos los datos
+    // Hacer request AJAX para obtener todos los datos (o sólo los filtrados según onlyFiltered)
     $.ajax({
       url: 'ajax/export-data.ajax.php',
       method: 'POST',
       data: {
         tabla: tableId,
         filters: filters,
-        search: search
+        search: search,
+        onlyFiltered: onlyFiltered ? 1 : 0
       },
       dataType: 'json',
       success: function(response) {

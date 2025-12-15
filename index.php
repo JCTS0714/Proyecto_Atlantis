@@ -95,6 +95,8 @@ require_once "controladores/prospectos.controlador.php";
 require_once "controladores/evento.controlador.php";
 require_once "controladores/calendario.controlador.php";
 require_once "controladores/contador.controlador.php";
+require_once "controladores/certificados.controlador.php";
+require_once "controladores/notificaciones_certificados.controlador.php";
 
 
 /**REQUERIMOS DE MODELOS */
@@ -105,6 +107,8 @@ require_once "modelos/ModeloCRM.php";
 require_once "modelos/evento.modelo.php";
 require_once "modelos/calendario.modelo.php";
 require_once "modelos/contador.modelo.php";
+require_once "modelos/certificados.modelo.php";
+require_once "modelos/notificaciones_certificados.modelo.php";
 
 /**
  * PROCESAR LOGIN ANTES DE LA PLANTILLA
