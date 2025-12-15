@@ -1,63 +1,10 @@
-<!-- Early diagnostic + fallback binding: runs before other scripts to help debugging when scripts at the footer are missing -->
+<!-- Certificados Module -->
 <script>
   (function(){
-    try{
-      console.log('certificados: módulo cargado (early)');
-      // Early event capture for the Add button using plain JS (works even if jQuery/bootstrap not loaded)
-      document.addEventListener('click', function(ev){
-        var target = ev.target || ev.srcElement;
-        if(!target) return;
-        // Normalize to button in case an <i> inside button was clicked
-        var btn = target.closest ? target.closest('#btnAgregarCertificado') : (target.id === 'btnAgregarCertificado' ? target : null);
-        if(btn){
-          // If Bootstrap modal is available, let it handle via data-toggle. Otherwise show a basic fallback modal.
-          if (typeof jQuery !== 'undefined' && jQuery && jQuery.fn && typeof jQuery.fn.modal === 'function') {
-            // allow normal bootstrap behaviour
-            return;
-          }
-          ev.preventDefault();
-          console.log('certificados: Add button clicked (early handler)');
-          var modal = document.getElementById('modalAgregarCertificado');
-          if(!modal){ console.warn('certificados: modalAgregarCertificado no encontrado'); return; }
-          // Basic fallback: show modal by toggling classes/styles
-          modal.style.display = 'block';
-          modal.classList.add('in');
-          modal.setAttribute('aria-hidden','false');
-          document.body.classList.add('modal-open');
-          // Add backdrop if missing
-          if (!document.querySelector('.custom-backdrop')){
-            var backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade in custom-backdrop';
-            document.body.appendChild(backdrop);
-          }
-        }
-      }, false);
-      // Also bind escape key to close fallback modal
-      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.keyCode === 27) { var m = document.querySelector('.modal.in'); if(m){ m.style.display='none'; m.classList.remove('in'); m.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); var b = document.querySelector('.custom-backdrop'); if(b && b.parentNode) b.parentNode.removeChild(b); } } });
-    }catch(err){ console.error('Early certificados fallback error', err); }
-  })();
-</script>
-
-<!-- Diagnostic: check button/modal presence, bounding rect and top element; bind capture+bubble click handlers -->
-<script>
-  (function(){
-    function makeBackdrop(){
-      var b = document.querySelector('.custom-backdrop');
-      if(!b){ b = document.createElement('div'); b.className = 'modal-backdrop fade in custom-backdrop'; document.body.appendChild(b); }
-      return b;
-    }
-
-    document.addEventListener('DOMContentLoaded', function(){
-      try{
-        console.log('certificados: DOMContentLoaded diagnostic');
-        var btn = document.getElementById('btnAgregarCertificado');
-        var modal = document.getElementById('modalAgregarCertificado');
-        console.log('certificados: btn present?', !!btn, ' modal present?', !!modal);
 
         function ensureCreateModal(){
           // If the modal markup is missing in the page, create a minimal one and append to body
           if (!document.getElementById('modalAgregarCertificado')){
-            console.log('certificados: creando modalAgregarCertificado dinámicamente');
             var html = '' +
               '<div class="modal fade" id="modalAgregarCertificado" tabindex="-1" role="dialog">' +
                 '<div class="modal-dialog" role="document">' +
@@ -103,10 +50,9 @@
                   var obj = {};
                   data.forEach(function(v,k){ obj[k]=v; });
                   // send via jQuery if available
-                  console.log('certificados: submitting dynamic form payload', obj);
                   if (typeof $ !== 'undefined'){
                     $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: $(dynForm).serialize() + '&accion=crear', dataType: 'json' })
-                      .done(function(resp){ console.log('certificados: crear response', resp);
+                      .done(function(resp){
                         if(resp && resp.success === true){
                           try{ if(typeof $!== 'undefined' && $.fn && $.fn.modal){ $('#modalAgregarCertificado').modal('hide'); } }catch(e){}
                           if (typeof window.certificados_reloadTable === 'function'){
@@ -116,14 +62,14 @@
                           alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear'));
                         }
                       })
-                      .fail(function(jqxhr,textStatus,errorThrown){ console.error('certificados: crear ajax fail', textStatus, errorThrown, jqxhr.responseText); alert('Error de conexión al crear certificado'); });
+                      .fail(function(jqxhr,textStatus,errorThrown){ alert('Error de conexión al crear certificado'); });
                   } else {
                     // fallback using fetch
-                    fetch('ajax/certificados.ajax.php', { method: 'POST', body: data }).then(function(res){ return res.json().catch(function(){ return res.text(); }); }).then(function(resp){ console.log('certificados: crear fetch response', resp);
+                    fetch('ajax/certificados.ajax.php', { method: 'POST', body: data }).then(function(res){ return res.json().catch(function(){ return res.text(); }); }).then(function(resp){
                       if(resp && resp.success === true){ if(typeof window.certificados_reloadTable === 'function'){ window.certificados_reloadTable(); } else { location.reload(); } } else { alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear')); }
-                    }).catch(function(err){ console.error('certificados: crear fetch error', err); alert('Error de conexión al crear certificado'); });
+                    }).catch(function(err){ alert('Error de conexión al crear certificado'); });
                   }
-                }catch(ex){ console.error('certificados: error submit dyn form', ex); }
+                }catch(ex){ }
               });
             }
           }
@@ -131,14 +77,11 @@
 
         function clickHandler(e){
           try{
-            console.log('certificados: clickHandler fired (phase=' + (e.eventPhase||'n/a') + ')', e.target);
             var b = btn;
             if(!b) return;
             var rect = b.getBoundingClientRect();
-            console.log('certificados: btn rect', {left:rect.left, top:rect.top, width:rect.width, height:rect.height});
             var cx = rect.left + rect.width/2; var cy = rect.top + rect.height/2;
             var topEl = document.elementFromPoint(cx, cy);
-            console.log('certificados: elementFromPoint at center:', topEl && topEl.tagName, topEl && topEl.className);
 
             if (!modal){
               ensureCreateModal();
@@ -146,36 +89,30 @@
             }
             if (modal){
               if (typeof jQuery !== 'undefined' && jQuery && typeof jQuery.fn.modal === 'function'){
-                console.log('certificados: invoking bootstrap modal via jQuery');
                 $('#modalAgregarCertificado').modal('show');
               } else {
-                console.log('certificados: showing fallback modal (DOM)');
                 modal.style.display = 'block';
                 modal.classList.add('in');
                 modal.setAttribute('aria-hidden','false');
                 document.body.classList.add('modal-open');
                 makeBackdrop();
               }
-            } else {
-              console.warn('certificados: modal not found when clicking');
             }
-          }catch(err){ console.error('certificados: clickHandler error', err); }
+          }catch(err){ }
         }
 
         if(btn){
           // capture and bubble to ensure we get the event even if other handlers stopPropagation
           btn.addEventListener('click', clickHandler, true);
           btn.addEventListener('click', clickHandler, false);
-          // also log direct listener binding confirmation
-          console.log('certificados: direct listeners attached to #btnAgregarCertificado');
         }
 
-        // also periodically log visibility info in case CSS changes
+        // log modal visibility info periodically in case CSS changes
         setTimeout(function(){
-          if(modal){ var cs = window.getComputedStyle(modal); console.log('certificados: modal computed style display=', cs.display, 'visibility=', cs.visibility, 'opacity=', cs.opacity, 'zIndex=', cs.zIndex); }
+          if(modal){ var cs = window.getComputedStyle(modal); }
         },200);
 
-      }catch(e){ console.error('certificados: DOMContentLoaded diagnostic error', e); }
+      }catch(e){ }
     });
   })();
 </script>

@@ -244,6 +244,26 @@
   
   <!-- Sistema de Mostrar/Ocultar Columnas v2 -->
   <script src="<?php echo BASE_URL; ?>/vistas/js/column-toggle-v2.js"></script>
+  <script>
+    // Fallback ligero: si por alguna razón el módulo no se cargó,
+    // definimos una función mínima para evitar ReferenceError en los onclick.
+    if (typeof window.toggleColumnPanel !== 'function') {
+      window.toggleColumnPanel = function(event) {
+        try {
+          event = event || window.event;
+          var btn = event.currentTarget || event.srcElement;
+          var container = btn && btn.closest ? btn.closest('.column-toggle-container') : null;
+          if (!container) return;
+          var panel = container.querySelector('.column-toggle-panel');
+          if (!panel) return;
+          panel.classList.toggle('hidden');
+          panel.classList.toggle('visible');
+        } catch(e) {
+          // silencioso: solo evitar que el onclick rompa la página
+        }
+      };
+    }
+  </script>
   
   <!-- Responsive Tables Script -->
   <script src="<?php echo BASE_URL; ?>/vistas/js/responsive-tables.js"></script>
@@ -330,16 +350,6 @@
 
       ?>
   <!-- ./wrapper -->
-
-  <!-- Diagnóstico: verificar carga de jQuery y DataTables -->
-  <script>
-  console.log('=== DIAGNÓSTICO DE CARGA ===');
-  console.log('jQuery cargado:', typeof jQuery !== 'undefined');
-  console.log('$ cargado:', typeof $ !== 'undefined');
-  if (typeof $ !== 'undefined') {
-    console.log('$.fn.DataTable cargado:', typeof $.fn.DataTable !== 'undefined');
-  }
-  </script>
 
   <script src="<?php echo BASE_URL; ?>/vistas/js/plantilla.js?v=20251206f"></script>
   <script src="<?php echo BASE_URL; ?>/vistas/js/sticky-scroll.js"></script>

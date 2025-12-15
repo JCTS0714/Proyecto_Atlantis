@@ -96,6 +96,7 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
             </div>
           </div>
         </div>
+        </div>
 
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaNoClientes">
@@ -119,18 +120,10 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
           </thead>
           <tbody>
           <?php
-          // LOG TEMPORAL: Verificar datos recibidos
-          error_log("=== INICIO LOG NO CLIENTES ===");
-          error_log("Consultando clientes con estado 3...");
-          
           // Mostrar clientes con estado 3 (no-clientes - oportunidades perdidas)
           $noClientes = ControladorOportunidad::ctrMostrarClientes("estado", 3);
           
-          error_log("Número de clientes encontrados: " . count($noClientes));
           if (!empty($noClientes)) {
-              error_log("Clientes encontrados:");
-              foreach ($noClientes as $key => $value) {
-                  error_log("Cliente " . ($key+1) . ": ID=" . $value["id"] . ", Nombre=" . $value["nombre"] . ", Estado=" . $value["estado"]);
                   echo '<tr>';
                   echo '<td data-column="col-numero">'.($key+1).'</td>';
                   echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
@@ -164,11 +157,9 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
                   echo '</tr>';
               }
           } else {
-              error_log("No se encontraron clientes con estado 3");
               echo '<tr><td colspan="14" class="text-center">No hay clientes en esta lista</td></tr>';
           }
           
-          error_log("=== FIN LOG NO CLIENTES ===");
           ?>
           </tbody>
         </table>
