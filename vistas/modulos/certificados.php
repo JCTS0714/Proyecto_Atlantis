@@ -29,6 +29,7 @@
               <th>F. Vencimiento</th>
               <th>Estado</th>
               <th>Observación</th>
+              <th>Imagen</th>
               <th>Tipo</th>
               <th class="no-export">Acciones</th>
             </tr>
@@ -48,6 +49,13 @@
                 echo '<td>'.(!empty($c['fecha_vencimiento']) ? date('d/m/Y', strtotime($c['fecha_vencimiento'])) : '-').'</td>';
                 echo '<td>'.htmlspecialchars($c['estado']).'</td>';
                 echo '<td>'.nl2br(htmlspecialchars($c['observacion'])).'</td>';
+                // Imagen thumbnail
+                if (!empty($c['imagen'])) {
+                  $imgUrl = rtrim(BASE_URL,'/') . '/uploads/certificados/' . $c['imagen'];
+                  echo '<td data-column="col-imagen"><img src="'.$imgUrl.'" alt="thumb" class="certificado-thumb" style="max-width:48px;max-height:48px;cursor:pointer;" data-full="'.$imgUrl.'"></td>';
+                } else {
+                  echo '<td data-column="col-imagen">-</td>';
+                }
                 echo '<td>'.(isset($c['tipo']) ? htmlspecialchars($c['tipo']) : '-').'</td>';
                 echo '<td class="no-export">'
                    .'<button class="btn btn-warning btn-sm btnEditarCertificado" data-id="'.$c['id'].'"><i class="fa fa-pencil"></i></button> '
@@ -177,10 +185,19 @@ document.addEventListener('DOMContentLoaded', function(){
       if (!window._certificados_has_main_handler) {
         form.addEventListener('submit', function(e){
           e.preventDefault();
-          var formData = $(form).serialize() + '&accion=crear';
-          $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: formData, dataType: 'json' })
-          .done(function(resp){ if(resp == 'ok' || (resp && resp.success !== false)){ location.reload(); } else { alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear')); } })
-          .fail(function(){ alert('Error de conexión al crear certificado'); });
+          try{
+            var fd = new FormData(form);
+            fd.append('accion','crear');
+            $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: fd, processData: false, contentType: false, dataType: 'json' })
+            .done(function(resp){ if(resp == 'ok' || (resp && resp.success !== false)){ location.reload(); } else { alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear')); } })
+            .fail(function(){ alert('Error de conexión al crear certificado'); });
+          }catch(err){
+            // If FormData is not available, fallback to serialize (no files)
+            var formData = $(form).serialize() + '&accion=crear';
+            $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: formData, dataType: 'json' })
+            .done(function(resp){ if(resp == 'ok' || (resp && resp.success !== false)){ location.reload(); } else { alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear')); } })
+            .fail(function(){ alert('Error de conexión al crear certificado'); });
+          }
         });
       } else {
         console.log('certificados: inline fallback did not attach submit handler (main handler present)');

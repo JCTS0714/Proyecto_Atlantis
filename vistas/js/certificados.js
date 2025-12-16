@@ -33,6 +33,15 @@ $(document).ready(function(){
       var $tbody = $('#tablaCertificados tbody');
       // Build array of rows compatible with DataTables API
       var rows = eventos.map(function(c, idx){
+        // build image cell (thumbnail)
+        var imgCell = '-';
+        try{
+          if (c.imagen) {
+            var full = (window.BASE_URL || '') + '/uploads/certificados/' + c.imagen;
+            imgCell = '<img src="'+full+'" class="certificado-thumb" data-full="'+full+'" style="max-width:48px;max-height:48px;cursor:pointer;" />';
+          }
+        }catch(e){ imgCell = '-'; }
+
         return [
           (idx+1),
           (c.nombre ? htmlspecialchars(c.nombre) : ''),
@@ -43,6 +52,7 @@ $(document).ready(function(){
           (c.fecha_vencimiento ? formatDate(c.fecha_vencimiento) : '-'),
           (c.estado ? htmlspecialchars(c.estado) : ''),
           (c.observacion ? htmlspecialchars(c.observacion).replace(/\n/g, '<br>') : ''),
+          imgCell,
           (c.tipo ? htmlspecialchars(c.tipo) : '-'),
           '<button class="btn btn-warning btn-sm btnEditarCertificado" data-id="' + c.id + '"><i class="fa fa-pencil"></i></button> ' +
           '<button class="btn btn-danger btn-sm btnEliminarCertificado" data-id="' + c.id + '"><i class="fa fa-trash"></i></button>'
@@ -202,4 +212,43 @@ $(document).ready(function(){
     }, 50);
   });
 
+});
+
+// Image preview overlay and hover preview handlers (delegated)
+$(document).on('mouseenter', '.certificado-thumb', function(e){
+  var $t = $(this);
+  // small hover preview near cursor
+  var src = $t.data('full') || $t.attr('src');
+  var $p = $('#cert-preview');
+  if (!$p.length) { $p = $('<div id="cert-preview" style="position:absolute;z-index:1050;pointer-events:none;border:1px solid #333;background:#fff;padding:4px;display:none;box-shadow:0 2px 10px rgba(0,0,0,0.5);"></div>'); $('body').append($p); }
+  $p.html('<img src="'+src+'" style="max-width:200px;max-height:200px;display:block;"/>');
+  $p.css({left: e.pageX + 12, top: e.pageY + 12}).fadeIn(100);
+}).on('mousemove', '.certificado-thumb', function(e){
+  $('#cert-preview').css({left: e.pageX + 12, top: e.pageY + 12});
+}).on('mouseleave', '.certificado-thumb', function(){
+  $('#cert-preview').stop(true,true).fadeOut(80);
+});
+
+// Click to open immersive overlay viewer
+$(document).on('click', '.certificado-thumb', function(e){
+  e.preventDefault();
+  var src = $(this).data('full') || $(this).attr('src');
+  var $ov = $('#cert-overlay');
+  if (!$ov.length) {
+    $ov = $('<div id="cert-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;"></div>');
+    var $inner = $('<div style="position:relative;max-width:95%;max-height:95%;"></div>');
+    var $img = $('<img src="" style="max-width:100%;max-height:100%;display:block;border-radius:4px;box-shadow:0 4px 30px rgba(0,0,0,0.7);">');
+    var $btn = $('<button aria-label="Cerrar" style="position:absolute;top:8px;right:8px;background:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:bold;">✕</button>');
+    $btn.on('click', function(){ $ov.remove(); $(document).off('keydown.cert'); });
+    $inner.append($img).append($btn);
+    $ov.append($inner);
+    $('body').append($ov);
+    // close on backdrop click
+    $ov.on('click', function(ev){ if (ev.target === this) { $ov.remove(); $(document).off('keydown.cert'); } });
+    // esc key
+    $(document).on('keydown.cert', function(ev){ if (ev.key === 'Escape') { $ov.remove(); $(document).off('keydown.cert'); } });
+    $ov.data('img', $img);
+  }
+  $ov.show();
+  $ov.data('img').attr('src', src);
 });

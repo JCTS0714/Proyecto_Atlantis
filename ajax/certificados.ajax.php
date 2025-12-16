@@ -37,6 +37,15 @@ if ($accion === 'crear'){
     }
 
     try{
+        error_log('certificados.crear: START');
+        // Additional debug file inside workspace for environments where PHP log is not accessible
+        $dbgFile = __DIR__ . '/../logs/certificados_debug.log';
+        if (!is_dir(dirname($dbgFile))) @mkdir(dirname($dbgFile), 0755, true);
+        @file_put_contents($dbgFile, date('[Y-m-d H:i:s] ') . "START crear\n", FILE_APPEND);
+        @file_put_contents($dbgFile, "POST keys: " . json_encode(array_keys($_POST)) . "\n", FILE_APPEND);
+        $filesInfo = [];
+        foreach($_FILES as $k=>$v){ $filesInfo[$k] = ['name'=>$v['name'] ?? null, 'size'=>$v['size'] ?? null, 'tmp'=>$v['tmp_name'] ?? null, 'error'=>$v['error'] ?? null]; }
+        @file_put_contents($dbgFile, "FILES: " . json_encode($filesInfo) . "\n", FILE_APPEND);
         // Prevención de duplicados: si ya existe un certificado con mismo nombre + fecha_vencimiento
         // creado por el mismo usuario en los últimos 60 segundos, considerarlo duplicado y no insertar.
         $check = $db->prepare("SELECT COUNT(*) FROM certificados WHERE nombre = :nombre AND fecha_vencimiento = :fecha_vencimiento AND creado_por = :creado_por AND creado_en >= (NOW() - INTERVAL 60 SECOND)");
@@ -50,7 +59,9 @@ if ($accion === 'crear'){
 
         // Handle optional file upload
         $imagenFilename = null;
+            $lastUploadedPath = null;
         if (!empty($_FILES['imagen']) && isset($_FILES['imagen']['tmp_name']) && is_uploaded_file($_FILES['imagen']['tmp_name'])) {
+            error_log('certificados.crear: file upload detected, size=' . intval($_FILES['imagen']['size']));
             $uploadDir = __DIR__ . '/../uploads/certificados/';
             if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
             $allowed = ['image/jpeg','image/png','image/gif'];
@@ -62,24 +73,49 @@ if ($accion === 'crear'){
             $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
             $imagenFilename = time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
             $dest = $uploadDir . $imagenFilename;
-            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $dest)) { error_log('certificados.crear: move_uploaded_file failed'); echo json_encode(['success'=>false,'error'=>'upload_failed']); exit; }
+            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $dest)) { error_log('certificados.crear: move_uploaded_file failed dest=' . $dest); @file_put_contents($dbgFile, "move_uploaded_file FAILED dest=$dest\n", FILE_APPEND); echo json_encode(['success'=>false,'error'=>'upload_failed']); exit; }
+                $lastUploadedPath = $dest;
+            error_log('certificados.crear: moved uploaded file to ' . $dest . ' as ' . $imagenFilename);
+            @file_put_contents($dbgFile, "moved file to $dest as $imagenFilename\n", FILE_APPEND);
         }
 
         $db->beginTransaction();
-        $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, imagen, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:imagen,:creado_por,NOW())";
-        $stmt = $db->prepare($sql);
-        $ok = $stmt->execute([
-            ':nombre'=>$nombre, ':ruc'=>$ruc, ':usuario'=>$usuario, ':clave'=>$clave,
-            ':fecha_creacion'=>$fecha_creacion, ':fecha_vencimiento'=>$fecha_vencimiento, ':estado'=>$estado, ':observacion'=>$observacion,
-            ':tipo'=>$tipo, ':imagen'=>$imagenFilename, ':creado_por'=>$_SESSION['id']
-        ]);
+        if ($imagenFilename !== null) {
+            $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, imagen, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:imagen,:creado_por,NOW())";
+            $stmt = $db->prepare($sql);
+            error_log('certificados.crear: executing INSERT WITH imagen=' . $imagenFilename);
+            @file_put_contents($dbgFile, "EXEC INSERT WITH imagen=$imagenFilename\n", FILE_APPEND);
+            $ok = $stmt->execute([
+                ':nombre'=>$nombre, ':ruc'=>$ruc, ':usuario'=>$usuario, ':clave'=>$clave,
+                ':fecha_creacion'=>$fecha_creacion, ':fecha_vencimiento'=>$fecha_vencimiento, ':estado'=>$estado, ':observacion'=>$observacion,
+                ':tipo'=>$tipo, ':imagen'=>$imagenFilename, ':creado_por'=>$_SESSION['id']
+            ]);
+        } else {
+            $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:creado_por,NOW())";
+            $stmt = $db->prepare($sql);
+            error_log('certificados.crear: executing INSERT WITHOUT imagen');
+            @file_put_contents($dbgFile, "EXEC INSERT WITHOUT imagen\n", FILE_APPEND);
+            $ok = $stmt->execute([
+                ':nombre'=>$nombre, ':ruc'=>$ruc, ':usuario'=>$usuario, ':clave'=>$clave,
+                ':fecha_creacion'=>$fecha_creacion, ':fecha_vencimiento'=>$fecha_vencimiento, ':estado'=>$estado, ':observacion'=>$observacion,
+                ':tipo'=>$tipo, ':creado_por'=>$_SESSION['id']
+            ]);
+        }
         if ($ok) {
             $db->commit();
-            echo json_encode(['success'=>true,'duplicate'=>false]);
+            error_log('certificados.crear: INSERT ok, created by ' . $_SESSION['id']);
+            @file_put_contents($dbgFile, "INSERT OK imagen=" . ($imagenFilename ?? 'NULL') . "\n\n", FILE_APPEND);
+            echo json_encode(['success'=>true,'duplicate'=>false,'imagen'=> $imagenFilename]);
         } else {
             $db->rollBack();
             error_log('certificados.crear INSERT failed: ' . json_encode($stmt->errorInfo()));
-            echo json_encode(['success'=>false,'error'=>'insert_failed']);
+            @file_put_contents($dbgFile, "INSERT FAILED: " . json_encode($stmt->errorInfo()) . "\n\n", FILE_APPEND);
+                // if we uploaded a file but DB insert failed, remove the uploaded file to avoid orphan files
+                if (!empty($lastUploadedPath) && file_exists($lastUploadedPath)){
+                    @unlink($lastUploadedPath);
+                    @file_put_contents($dbgFile, "REMOVED_UPLOADED_FILE: $lastUploadedPath\n\n", FILE_APPEND);
+                }
+            echo json_encode(['success'=>false,'error'=>'insert_failed','info'=>$stmt->errorInfo()]);
         }
     } catch (Exception $e){
         try{ if($db->inTransaction()) $db->rollBack(); } catch(Exception $x){}
@@ -92,7 +128,7 @@ if ($accion === 'crear'){
 if ($accion === 'mostrar'){
     // Return all certificados
     try{
-        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion,tipo FROM certificados ORDER BY id DESC";
+        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion,tipo,imagen FROM certificados ORDER BY id DESC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
