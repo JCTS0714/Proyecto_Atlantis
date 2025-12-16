@@ -217,6 +217,7 @@ $(document).ready(function() {
                 }
                 
                 var tbody = $('#tablaIncidencias tbody');
+                console.debug('cargarIncidencias: server response', data);
                 tbody.empty();
 
                 var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
@@ -244,12 +245,15 @@ $(document).ready(function() {
                 } else {
                     tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
                 }
-
-                // Si DataTable ya está inicializado, destruirlo y reinicializarlo para refrescar
+                // Recreate DataTable reliably: destroy and remove extra DOM, then reinit
                 try {
                     if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
-                        $('#tablaIncidencias').DataTable().destroy();
+                        // remove parameter true to remove added elements and avoid duplicates
+                        $('#tablaIncidencias').DataTable().destroy(true);
                     }
+                    // Ensure any leftover wrapper elements are removed
+                    $('#tablaIncidencias').show();
+
                     // Reinicializar DataTable si hay datos
                     if (rows && rows.length > 0) {
                         $('#tablaIncidencias').DataTable({
@@ -283,8 +287,8 @@ $(document).ready(function() {
                             }
                         });
                     }
-                } catch(e) { 
-                    // Error silencioso al inicializar DataTable
+                } catch(e) {
+                    console.error('cargarIncidencias: DataTable init error', e);
                 }
             },
             error: function(xhr, status, error) {
