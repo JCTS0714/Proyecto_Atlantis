@@ -37,7 +37,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
 
     isInitialized = true;
-    console.log('[sticky-scroll] Initialized');
+    if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] Initialized');
     
     // Actualizar con varios intentos
     setTimeout(updateAll, 500);
@@ -89,13 +89,13 @@
     targetTable = findTable();
     
     if (!targetTable) {
-      console.log('[sticky-scroll] No table found');
+      if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] No table found');
       if (stickyWrapper) stickyWrapper.classList.remove('visible');
       return;
     }
     
     scrollContainer = findScrollContainer(targetTable);
-    console.log('[sticky-scroll] Table found:', targetTable.id || 'unnamed', 'width:', targetTable.scrollWidth);
+    if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] Table found:', targetTable.id || 'unnamed', 'width:', targetTable.scrollWidth);
     
     setupScrollSync();
     updateStickyWidth();
@@ -130,7 +130,7 @@
     var containerRect = scrollContainer.getBoundingClientRect();
     var visibleWidth = containerRect.width;
     
-    console.log('[sticky-scroll] tableWidth:', tableWidth, 'visibleWidth:', visibleWidth);
+    if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] tableWidth:', tableWidth, 'visibleWidth:', visibleWidth);
     
     // Si la tabla es más ancha que el contenedor visible
     if (tableWidth > visibleWidth + 10) {
@@ -151,7 +151,7 @@
     // No hay scroll horizontal necesario, ocultar
     if (tableWidth <= visibleWidth + 10) {
       stickyWrapper.classList.remove('visible');
-      console.log('[sticky-scroll] Hidden: table fits in container');
+      if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] Hidden: table fits in container');
       return;
     }
 
@@ -160,7 +160,7 @@
     var windowHeight = window.innerHeight;
     var tableInView = tableRect.top < windowHeight && tableRect.bottom > 0;
     
-    console.log('[sticky-scroll] tableInView:', tableInView, 'needsScroll:', tableWidth > visibleWidth);
+    if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] tableInView:', tableInView, 'needsScroll:', tableWidth > visibleWidth);
 
     if (tableInView) {
       stickyWrapper.classList.add('visible');
@@ -186,7 +186,7 @@
       setTimeout(init, 800);
       
       jQuery(document).on('draw.dt init.dt', function() {
-        console.log('[sticky-scroll] DataTable event detected');
+        if (window.STICKY_SCROLL_DEBUG) console.log('[sticky-scroll] DataTable event detected');
         setTimeout(updateAll, 300);
       });
     });

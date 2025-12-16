@@ -217,7 +217,7 @@ $(document).ready(function() {
                 }
                 
                 var tbody = $('#tablaIncidencias tbody');
-                console.debug('cargarIncidencias: server response', data);
+                console.log('cargarIncidencias: server response', data);
                 tbody.empty();
 
                 var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
