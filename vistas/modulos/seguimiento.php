@@ -147,7 +147,11 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
                       .'<option value="2"'.($cliente["estado"] == 2 ? ' selected' : '').'>Cliente</option>'
                       .'<option value="3"'.($cliente["estado"] == 3 ? ' selected' : '').'>No Cliente</option>'
                       .'<option value="4"'.($cliente["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
-              .'</td>';
+                            .'<option value="5"'.($cliente["estado"] == 5 ? ' selected' : '').'>Retirados</option>'
+                            .'</select>'
+              
+                          .'</td>';
+             
               echo '<td data-column="col-acciones">
                       <div class="btn-group">
                         <button class="btn btn-warning btnEditarCliente" idCliente="'.$cliente["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>

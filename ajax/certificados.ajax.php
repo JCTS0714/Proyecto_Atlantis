@@ -30,6 +30,7 @@ if ($accion === 'crear'){
     $fecha_vencimiento = $_POST['fecha_vencimiento'] ?? null;
     $estado = $_POST['estado'] ?? 'activo';
     $observacion = $_POST['observacion'] ?? '';
+    $tipo = $_POST['tipo'] ?? 'OSE';
 
     if (empty($nombre) || empty($fecha_vencimiento)){
         echo json_encode(['success'=>false,'error'=>'Faltan campos requeridos']); exit;
@@ -48,12 +49,12 @@ if ($accion === 'crear'){
         }
 
         $db->beginTransaction();
-        $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:creado_por,NOW())";
+        $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:creado_por,NOW())";
         $stmt = $db->prepare($sql);
         $ok = $stmt->execute([
             ':nombre'=>$nombre, ':ruc'=>$ruc, ':usuario'=>$usuario, ':clave'=>$clave,
             ':fecha_creacion'=>$fecha_creacion, ':fecha_vencimiento'=>$fecha_vencimiento, ':estado'=>$estado, ':observacion'=>$observacion,
-            ':creado_por'=>$_SESSION['id']
+            ':tipo'=>$tipo, ':creado_por'=>$_SESSION['id']
         ]);
         if ($ok) {
             $db->commit();
@@ -74,7 +75,7 @@ if ($accion === 'crear'){
 if ($accion === 'mostrar'){
     // Return all certificados
     try{
-        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion FROM certificados ORDER BY id DESC";
+        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion,tipo FROM certificados ORDER BY id DESC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -99,7 +100,7 @@ if ($accion === 'eliminar'){
 if ($accion === 'actualizar'){
     $id = intval($_POST['id'] ?? 0);
     if ($id<=0){ echo json_encode(['success'=>false,'error'=>'id_invalid']); exit; }
-    $fields = ['nombre','ruc','usuario','clave','fecha_creacion','fecha_vencimiento','estado','observacion'];
+    $fields = ['nombre','ruc','usuario','clave','fecha_creacion','fecha_vencimiento','estado','observacion','tipo'];
     $sets = [];
     $params = [':id'=>$id];
     foreach($fields as $f){ if (isset($_POST[$f])){ $sets[] = "{$f} = :{$f}"; $params[":{$f}"] = $_POST[$f]; } }
@@ -112,7 +113,7 @@ if ($accion === 'actualizar'){
 if ($accion === 'obtener_para_notificar'){
     // Devuelve certificados cuya fecha_vencimiento está a 7 o 3 días y limita a 2 envíos por día por certificado
     try{
-        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion, DATEDIFF(fecha_vencimiento, CURDATE()) as dias_restantes FROM certificados WHERE estado = 'activo' AND DATEDIFF(fecha_vencimiento, CURDATE()) IN (7,3) ORDER BY fecha_vencimiento ASC";
+        $sql = "SELECT id,nombre,ruc,usuario,clave,fecha_creacion,fecha_vencimiento,estado,observacion,tipo, DATEDIFF(fecha_vencimiento, CURDATE()) as dias_restantes FROM certificados WHERE estado = 'activo' AND DATEDIFF(fecha_vencimiento, CURDATE()) IN (7,3) ORDER BY fecha_vencimiento ASC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);

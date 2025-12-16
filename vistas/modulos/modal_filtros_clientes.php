@@ -117,6 +117,7 @@
                         <select class="form-control" id="filtro-estado" name="estado">
                             <option value="">Todos los estados</option>
                             <option value="2">Cliente</option>
+                            <option value="5">Retirados</option>
                         </select>
                     </div>
                 </form>

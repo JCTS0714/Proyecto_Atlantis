@@ -319,6 +319,7 @@
             $_GET["ruta"]=="crm"          ||
             $_GET["ruta"]=="seguimiento"  ||
             $_GET["ruta"]=="no-clientes"   ||
+            $_GET["ruta"]=="retirados"   ||
             $_GET["ruta"]=="zona-espera"   ||
             $_GET["ruta"]=="incidencias"   ||
             $_GET["ruta"]=="backlog"       ||

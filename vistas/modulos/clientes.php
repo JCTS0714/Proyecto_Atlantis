@@ -184,6 +184,7 @@
                       .'<option value="2"'.($value["estado"] == 2 ? ' selected' : '').'>Cliente</option>'
                       .'<option value="3"'.($value["estado"] == 3 ? ' selected' : '').'>No Cliente</option>'
                       .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
+                       .'<option value="5"'.($value["estado"] == 5 ? ' selected' : '').'>Retirados</option>'
                    .'</select>'
               .'</td>';
               echo '<td data-column="col-acciones">

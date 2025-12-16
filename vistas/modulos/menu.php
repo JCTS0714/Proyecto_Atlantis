@@ -72,6 +72,12 @@
                             <span>Zona de Espera</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?php echo BASE_URL; ?>/retirados">
+                            <i class="fa fa-circle-o"></i>
+                            <span>Retirados</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

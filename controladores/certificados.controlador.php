@@ -20,6 +20,7 @@ class ControladorCertificados{
         'fecha_vencimiento'=>$_POST['fecha_vencimiento'] ?? null,
         'estado'=>$_POST['estado'] ?? 'activo',
         'observacion'=>$_POST['observacion'] ?? '',
+        'tipo'=>$_POST['tipo'] ?? 'OSE',
         'creado_por'=> $_SESSION['id'] ?? 0
       ];
       $tabla = 'certificados';
@@ -30,6 +31,7 @@ class ControladorCertificados{
   static public function ctrEditarCertificado(){
     if(isset($_POST['id'])){
       $tabla = 'certificados';
+      $_POST['tipo'] = $_POST['tipo'] ?? 'OSE';
       return ModeloCertificados::mdlEditarCertificado($tabla, $_POST);
     }
   }

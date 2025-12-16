@@ -120,45 +120,47 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
           </thead>
           <tbody>
           <?php
-          // Mostrar clientes con estado 3 (no-clientes - oportunidades perdidas)
-          $noClientes = ControladorOportunidad::ctrMostrarClientes("estado", 3);
-          
-          if (!empty($noClientes)) {
-                  echo '<tr>';
-                  echo '<td data-column="col-numero">'.($key+1).'</td>';
-                  echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
-                  echo '<td data-column="col-tipo">'.$value["tipo"].'</td>';
-                  echo '<td data-column="col-documento">'.$value["documento"].'</td>';
-                  echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
-                  echo '<td data-column="col-correo">'.$value["correo"].'</td>'; // Muestra el valor almacenado en la columna 'correo' (ahora etiquetada Observacion)
-                  echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
-                  echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
-                  echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
-                  echo '<td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>';
-                  echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
-                  echo '<td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>';
-                  echo '<td data-column="col-cambiar-estado">'
-                       .'<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
-                          .'<option value="0"'.($value["estado"] == 0 ? ' selected' : '').'>Prospecto</option>'
-                          .'<option value="1"'.($value["estado"] == 1 ? ' selected' : '').'>Seguimiento</option>'
-                          .'<option value="2"'.($value["estado"] == 2 ? ' selected' : '').'>Cliente</option>'
-                          .'<option value="3"'.($value["estado"] == 3 ? ' selected' : '').'>No Cliente</option>'
-                          .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
-                       .'</select>'
-                  .'</td>';
-                  echo '<td data-column="col-acciones">
-                          <div class="btn-group">
-                            <button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>';
-                            if($_SESSION["perfil"] !== "Vendedor") {
-                              echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="no-clientes"><i class="fa fa-trash"></i></button>';
-                            }
-                  echo '    </div>
-                        </td>';
-                  echo '</tr>';
+            // Mostrar clientes con estado 3 (no-clientes - oportunidades perdidas)
+            $noClientes = ControladorOportunidad::ctrMostrarClientes("estado", 3);
+
+            if (!empty($noClientes)) {
+              foreach ($noClientes as $key => $value) {
+                echo '<tr>';
+                echo '<td data-column="col-numero">'.($key+1).'</td>';
+                echo '<td data-column="col-nombre">'.$value["nombre"].'</td>';
+                echo '<td data-column="col-tipo">'.$value["tipo"].'</td>';
+                echo '<td data-column="col-documento">'.$value["documento"].'</td>';
+                echo '<td data-column="col-telefono">'.$value["telefono"].'</td>';
+                echo '<td data-column="col-correo">'.$value["correo"].'</td>'; // Muestra el valor almacenado en la columna 'correo' (ahora etiquetada Observacion)
+                echo '<td data-column="col-ciudad">'.$value["ciudad"].'</td>';
+                echo '<td data-column="col-migracion">'.$value["migracion"].'</td>';
+                echo '<td data-column="col-referencia">'.$value["referencia"].'</td>';
+                echo '<td data-column="col-fecha-contacto">'.$value["fecha_contacto"].'</td>';
+                echo '<td data-column="col-empresa">'.$value["empresa"].'</td>';
+                echo '<td data-column="col-fecha-creacion">'.$value["fecha_creacion"].'</td>';
+                echo '<td data-column="col-cambiar-estado">';
+                echo '<select class="form-control input-sm select-estado-cliente" data-id="'.$value["id"].'">'
+                  .'<option value="0"'.($value["estado"] == 0 ? ' selected' : '').'>Prospecto</option>'
+                  .'<option value="1"'.($value["estado"] == 1 ? ' selected' : '').'>Seguimiento</option>'
+                  .'<option value="2"'.($value["estado"] == 2 ? ' selected' : '').'>Cliente</option>'
+                  .'<option value="3"'.($value["estado"] == 3 ? ' selected' : '').'>No Cliente</option>'
+                  .'<option value="4"'.($value["estado"] == 4 ? ' selected' : '').'>En Espera</option>'
+                  .'<option value="5"'.($value["estado"] == 5 ? ' selected' : '').'>Retirados</option>'
+                  .'</select>';
+                echo '</td>';
+                echo '<td data-column="col-acciones">';
+                echo '<div class="btn-group">';
+                echo '<button class="btn btn-warning btnEditarCliente" idCliente="'.$value["id"].'" data-toggle="modal" data-target="#modalActualizarClientes"><i class="fa fa-pencil"></i></button>';
+                if($_SESSION["perfil"] !== "Vendedor") {
+                  echo '<button class="btn btn-danger btnEliminarCliente" idCliente="'.$value["id"].'" data-ruta="no-clientes"><i class="fa fa-trash"></i></button>';
+                }
+                echo '</div>';
+                echo '</td>';
+                echo '</tr>';
               }
-          } else {
+            } else {
               echo '<tr><td colspan="14" class="text-center">No hay clientes en esta lista</td></tr>';
-          }
+            }
           
           ?>
           </tbody>

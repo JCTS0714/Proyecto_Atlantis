@@ -43,6 +43,7 @@ $(document).ready(function(){
           (c.fecha_vencimiento ? formatDate(c.fecha_vencimiento) : '-'),
           (c.estado ? htmlspecialchars(c.estado) : ''),
           (c.observacion ? htmlspecialchars(c.observacion).replace(/\n/g, '<br>') : ''),
+          (c.tipo ? htmlspecialchars(c.tipo) : '-'),
           '<button class="btn btn-warning btn-sm btnEditarCertificado" data-id="' + c.id + '"><i class="fa fa-pencil"></i></button> ' +
           '<button class="btn btn-danger btn-sm btnEliminarCertificado" data-id="' + c.id + '"><i class="fa fa-trash"></i></button>'
         ];
@@ -142,6 +143,7 @@ $(document).ready(function(){
       $('#editar_fecha_vencimiento').val(encontrado.fecha_vencimiento);
       $('#editar_estado').val(encontrado.estado);
       $('#editar_observacion').val(encontrado.observacion);
+      $('#editar_tipo').val(encontrado.tipo || 'OSE');
       $('#modalEditarCertificado').modal('show');
     }).fail(function(){ Swal.fire('Error','No se pudo obtener datos','error'); });
   });

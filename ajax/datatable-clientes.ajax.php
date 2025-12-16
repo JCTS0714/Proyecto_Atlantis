@@ -200,6 +200,7 @@ foreach ($rows as $k => $r) {
     .'<option value="2"'.($r['estado'] == 2 ? ' selected' : '').'>Cliente</option>'
     .'<option value="3"'.($r['estado'] == 3 ? ' selected' : '').'>No Cliente</option>'
     .'<option value="4"'.($r['estado'] == 4 ? ' selected' : '').'>En Espera</option>'
+    .'<option value="5"'.($r['estado'] == 5 ? ' selected' : '').'>Retirados</option>'
     .'</select>';
 
   // Preparar el link con protocolo si no lo tiene

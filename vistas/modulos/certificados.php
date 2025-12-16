@@ -1,121 +1,4 @@
-<!-- Certificados Module -->
-<script>
-  (function(){
-
-        function ensureCreateModal(){
-          // If the modal markup is missing in the page, create a minimal one and append to body
-          if (!document.getElementById('modalAgregarCertificado')){
-            var html = '' +
-              '<div class="modal fade" id="modalAgregarCertificado" tabindex="-1" role="dialog">' +
-                '<div class="modal-dialog" role="document">' +
-                  '<form id="formAgregarCertificado" method="post">' +
-                    '<div class="modal-content">' +
-                      '<div class="modal-header">' +
-                        '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
-                        '<h4 class="modal-title">Agregar Certificado</h4>' +
-                      '</div>' +
-                      '<div class="modal-body">' +
-                        '<input type="hidden" id="usuario_id" name="usuario_id" value="'+ (window.usuario_id || '') +'">' +
-                        '<div class="form-group"><label>Nombre</label><input type="text" class="form-control" name="nombre" required></div>' +
-                        '<div class="form-group"><label>RUC</label><input type="text" class="form-control" name="ruc"></div>' +
-                        '<div class="form-group"><label>Usuario</label><input type="text" class="form-control" name="usuario"></div>' +
-                        '<div class="form-group"><label>Clave</label><input type="text" class="form-control" name="clave"></div>' +
-                        '<div class="form-group"><label>F. Creación</label><input type="date" class="form-control" name="fecha_creacion"></div>' +
-                        '<div class="form-group"><label>F. Vencimiento</label><input type="date" class="form-control" name="fecha_vencimiento" required></div>' +
-                        '<div class="form-group"><label>Estado</label><select class="form-control" name="estado">' +
-                          '<option value="activo">activo</option><option value="inactivo">inactivo</option></select></div>' +
-                        '<div class="form-group"><label>Observación</label><textarea class="form-control" name="observacion"></textarea></div>' +
-                      '</div>' +
-                      '<div class="modal-footer">' +
-                        '<button type="submit" class="btn btn-primary">Guardar</button>' +
-                        '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>' +
-                      '</div>' +
-                    '</div>' +
-                  '</form>' +
-                '</div>' +
-              '</div>';
-            var temp = document.createElement('div');
-            temp.innerHTML = html;
-            // append modal element to body
-            while (temp.firstChild) document.body.appendChild(temp.firstChild);
-
-            // rebind fallback submit handler for the dynamically created form
-            var dynForm = document.getElementById('formAgregarCertificado');
-            if(dynForm){
-              dynForm.addEventListener('submit', function(ev){
-                ev.preventDefault();
-                try{
-                  var data = new FormData(dynForm);
-                  data.append('accion','crear');
-                  var obj = {};
-                  data.forEach(function(v,k){ obj[k]=v; });
-                  // send via jQuery if available
-                  if (typeof $ !== 'undefined'){
-                    $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: $(dynForm).serialize() + '&accion=crear', dataType: 'json' })
-                      .done(function(resp){
-                        if(resp && resp.success === true){
-                          try{ if(typeof $!== 'undefined' && $.fn && $.fn.modal){ $('#modalAgregarCertificado').modal('hide'); } }catch(e){}
-                          if (typeof window.certificados_reloadTable === 'function'){
-                            window.certificados_reloadTable();
-                          } else { location.reload(); }
-                        } else {
-                          alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear'));
-                        }
-                      })
-                      .fail(function(jqxhr,textStatus,errorThrown){ alert('Error de conexión al crear certificado'); });
-                  } else {
-                    // fallback using fetch
-                    fetch('ajax/certificados.ajax.php', { method: 'POST', body: data }).then(function(res){ return res.json().catch(function(){ return res.text(); }); }).then(function(resp){
-                      if(resp && resp.success === true){ if(typeof window.certificados_reloadTable === 'function'){ window.certificados_reloadTable(); } else { location.reload(); } } else { alert('Error: ' + (resp && resp.error ? resp.error : 'No se pudo crear')); }
-                    }).catch(function(err){ alert('Error de conexión al crear certificado'); });
-                  }
-                }catch(ex){ }
-              });
-            }
-          }
-        }
-
-        function clickHandler(e){
-          try{
-            var b = btn;
-            if(!b) return;
-            var rect = b.getBoundingClientRect();
-            var cx = rect.left + rect.width/2; var cy = rect.top + rect.height/2;
-            var topEl = document.elementFromPoint(cx, cy);
-
-            if (!modal){
-              ensureCreateModal();
-              modal = document.getElementById('modalAgregarCertificado');
-            }
-            if (modal){
-              if (typeof jQuery !== 'undefined' && jQuery && typeof jQuery.fn.modal === 'function'){
-                $('#modalAgregarCertificado').modal('show');
-              } else {
-                modal.style.display = 'block';
-                modal.classList.add('in');
-                modal.setAttribute('aria-hidden','false');
-                document.body.classList.add('modal-open');
-                makeBackdrop();
-              }
-            }
-          }catch(err){ }
-        }
-
-        if(btn){
-          // capture and bubble to ensure we get the event even if other handlers stopPropagation
-          btn.addEventListener('click', clickHandler, true);
-          btn.addEventListener('click', clickHandler, false);
-        }
-
-        // log modal visibility info periodically in case CSS changes
-        setTimeout(function(){
-          if(modal){ var cs = window.getComputedStyle(modal); }
-        },200);
-
-      }catch(e){ }
-    });
-  })();
-</script>
+<!-- Certificados Module (initial inline modal builder removed — dynamic loader and handlers below provide required behavior) -->
 
 <div class="content-wrapper">
   <section class="content-header">
@@ -146,6 +29,7 @@
               <th>F. Vencimiento</th>
               <th>Estado</th>
               <th>Observación</th>
+              <th>Tipo</th>
               <th class="no-export">Acciones</th>
             </tr>
           </thead>
@@ -164,6 +48,7 @@
                 echo '<td>'.(!empty($c['fecha_vencimiento']) ? date('d/m/Y', strtotime($c['fecha_vencimiento'])) : '-').'</td>';
                 echo '<td>'.htmlspecialchars($c['estado']).'</td>';
                 echo '<td>'.nl2br(htmlspecialchars($c['observacion'])).'</td>';
+                echo '<td>'.(isset($c['tipo']) ? htmlspecialchars($c['tipo']) : '-').'</td>';
                 echo '<td class="no-export">'
                    .'<button class="btn btn-warning btn-sm btnEditarCertificado" data-id="'.$c['id'].'"><i class="fa fa-pencil"></i></button> '
                    .'<button class="btn btn-danger btn-sm btnEliminarCertificado" data-id="'.$c['id'].'"><i class="fa fa-trash"></i></button>'
@@ -226,6 +111,13 @@
             <label>Observación</label>
             <textarea class="form-control" name="observacion"></textarea>
           </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select class="form-control" name="tipo">
+              <option value="OSE">OSE</option>
+              <option value="PSE">PSE</option>
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Guardar</button>
@@ -255,6 +147,7 @@
           <div class="form-group"><label>F. Vencimiento</label><input type="date" class="form-control" id="editar_fecha_vencimiento" name="fecha_vencimiento" required></div>
           <div class="form-group"><label>Estado</label><select class="form-control" id="editar_estado" name="estado"><option value="activo">activo</option><option value="inactivo">inactivo</option></select></div>
           <div class="form-group"><label>Observación</label><textarea class="form-control" id="editar_observacion" name="observacion"></textarea></div>
+          <div class="form-group"><label>Tipo</label><select class="form-control" id="editar_tipo" name="tipo"><option value="OSE">OSE</option><option value="PSE">PSE</option></select></div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Guardar cambios</button>
