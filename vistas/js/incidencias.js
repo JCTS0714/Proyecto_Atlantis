@@ -1,5 +1,7 @@
 // Archivo JavaScript para manejar funcionalidades de incidencias
 
+try { console.log('incidencias.js cargado'); } catch(e) {}
+
 $(document).ready(function() {
     // Verificar si hay parámetros en la URL para preseleccionar cliente
     var urlParams = new URLSearchParams(window.location.search);
@@ -146,170 +148,239 @@ $(document).ready(function() {
             return false;
         }
 
+        var $form = $(this);
+
         // Enviar formulario vía AJAX
         $.ajax({
-            url: $(this).attr('action'),
+            url: $form.attr('action'),
             method: 'POST',
-            data: $(this).serialize(),
+            data: $form.serialize(),
             dataType: 'json',
+            cache: false,
             success: function(response) {
-                if (response.status === 'success') {
+                if (response && response.status === 'success') {
                     $('#modalRegistrarIncidencia').modal('hide');
-                    $(this).trigger('reset'); // Limpiar formulario
-                    $('#idClienteSeleccionado').val(''); // Limpiar campo oculto
+                    $form[0].reset();
+                    $('#idClienteSeleccionado').val('');
                     Swal.fire({
                         icon: 'success',
                         title: '¡Éxito!',
                         text: response.message || 'Incidencia registrada correctamente',
                         confirmButtonText: 'Aceptar'
                     }).then(function() {
-                        // Recargar tabla de incidencias
-                        var tbody = $('#tablaIncidencias tbody');
-                        console.log('cargarIncidencias: server response', data);
-
-                        // Try several common envelope keys used across the project
-                        var rawRows = [];
-                        if (Array.isArray(data)) rawRows = data;
-                        else if (data && Array.isArray(data.incidencias)) rawRows = data.incidencias;
-                        else if (data && Array.isArray(data.eventos)) rawRows = data.eventos;
-                        else if (data && Array.isArray(data.data)) rawRows = data.data;
-                        else if (data && Array.isArray(data.rows)) rawRows = data.rows;
-                        else if (typeof data === 'string') {
-                            try { var parsed = JSON.parse(data); if (Array.isArray(parsed)) rawRows = parsed; else if (parsed && Array.isArray(parsed.incidencias)) rawRows = parsed.incidencias; } catch(e) { rawRows = []; }
-                        }
-                        console.log('cargarIncidencias: resolved rows count=', rawRows.length);
-                        // Helper to escape HTML
-                        function esc(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-                        // Build array-of-arrays for DataTables
-                        var dataRows = rawRows.map(function(incidencia, index){
-                            var actions = '<div class="btn-group">' +
-                                            '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-pencil"></i></button>' +
-                                            '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-trash"></i></button>' +
-                                          '</div>';
-                            return [
-                                (index + 1),
-                                esc(incidencia.correlativo || ''),
-                                esc(incidencia.nombre_incidencia || ''),
-                                esc(incidencia.nombre_cliente || ''),
-                                esc(incidencia.fecha || ''),
-                                esc(incidencia.prioridad || ''),
-                                esc(incidencia.observaciones || ''),
-                                esc(incidencia.fecha_creacion || ''),
-                                actions
-                            ];
-                        });
-
-                        // If DataTable already initialized, update via API
-                        try {
-                            if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
-                                var dt = $('#tablaIncidencias').DataTable();
-                                dt.clear();
-                                if (dataRows.length) {
-                                    dt.rows.add(dataRows);
-                                }
-                                dt.draw(false);
-                                console.log('cargarIncidencias: DataTable updated, rows=', dataRows.length);
-                                return;
-                            }
-                        } catch(e){ console.error('cargarIncidencias: update existing DataTable failed', e); }
-
-                        // Not initialized yet: populate tbody and init DataTable
-                        tbody.empty();
-                        if (dataRows.length) {
-                            dataRows.forEach(function(r){
-                                var tr = '<tr>' + r.map(function(cell){ return '<td>' + cell + '</td>'; }).join('') + '</tr>';
-                                tbody.append(tr);
-                            });
-                            $('#tablaIncidencias').DataTable({
-                                "responsive": true,
-                                "autoWidth": false,
-                                "pageLength": 10,
-                                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-                                "language": {
-                                    "sProcessing":     "Procesando...",
-                                    "sLengthMenu":     "Mostrar _MENU_ registros",
-                                    "sZeroRecords":    "No se encontraron resultados",
-                                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-                                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-                                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                                    "sInfoPostFix":    "",
-                                    "sSearch":         "Buscar:",
-                                    "sUrl":            "",
-                                    "sInfoThousands":  ",",
-                                    "sLoadingRecords": "Cargando...",
-                                    "oPaginate": {
-                                        "sFirst":    "Primero",
-                                        "sLast":     "Último",
-                                        "sNext":     "Siguiente",
-                                        "sPrevious": "Anterior"
-                                    },
-                                    "oAria": {
-                                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                                    }
-                                }
-                            });
-                        } else {
-                            tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
-                        }
-                            '</tr>';
-                        tbody.append(fila);
+                        cargarIncidencias();
                     });
                 } else {
-                    // No rows: ensure user sees the message even if DataTable unavailable
-                    tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
-                }
-
-                console.log('cargarIncidencias: rendered tbody rows=', $('#tablaIncidencias tbody tr').length);
-                // Recreate DataTable reliably: destroy and remove extra DOM, then reinit
-                try {
-                    if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
-                        // destroy without removing DOM element so we can reinitialize safely
-                        $('#tablaIncidencias').DataTable().destroy();
-                    }
-                    // Ensure any leftover wrapper elements are removed
-                    $('#tablaIncidencias').show();
-
-                    // Reinicializar DataTable si hay datos
-                    if (rows && rows.length > 0) {
-                        $('#tablaIncidencias').DataTable({
-                            "responsive": true,
-                            "autoWidth": false,
-                            "pageLength": 10,
-                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-                            "language": {
-                                "sProcessing":     "Procesando...",
-                                "sLengthMenu":     "Mostrar _MENU_ registros",
-                                "sZeroRecords":    "No se encontraron resultados",
-                                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-                                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
-                                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                                "sInfoPostFix":    "",
-                                "sSearch":         "Buscar:",
-                                "sUrl":            "",
-                                "sInfoThousands":  ",",
-                                "sLoadingRecords": "Cargando...",
-                                "oPaginate": {
-                                    "sFirst":    "Primero",
-                                    "sLast":     "Último",
-                                    "sNext":     "Siguiente",
-                                    "sPrevious": "Anterior"
-                                },
-                                "oAria": {
-                                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                                }
-                            }
-                        });
-                    }
-                } catch(e) {
-                    console.error('cargarIncidencias: DataTable init error', e);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: (response && response.message) ? response.message : 'Error al registrar la incidencia',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
             },
             error: function(xhr, status, error) {
+                console.error('Error AJAX crear incidencia:', status, error, xhr && xhr.responseText);
+                var msg = 'Error al registrar la incidencia';
+                try { var srv = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null; if (srv && (srv.message || srv.error)) msg = srv.message || srv.error; } catch(e) {}
+                Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonText: 'Aceptar' });
+            }
+        });
+    });
+
+    // Function: cargarIncidencias - carga datos desde el servidor y actualiza la tabla
+    function cargarIncidencias() {
+        var $tabla = $('#tablaIncidencias');
+        var $tbody = $tabla.find('tbody');
+
+        // Debug panel removed in production: no visual debug elements created
+
+        $.ajax({
+            url: 'ajax/incidencias.ajax.php',
+            method: 'GET',
+            data: { action: 'mostrarIncidencias', _t: Date.now() },
+            dataType: 'json',
+            cache: false,
+            success: function(data) {
+                // server response received
+
+                var rawRows = [];
+                if (Array.isArray(data)) rawRows = data;
+                else if (data && Array.isArray(data.incidencias)) rawRows = data.incidencias;
+                else if (data && Array.isArray(data.data)) rawRows = data.data;
+                else if (data && Array.isArray(data.rows)) rawRows = data.rows;
+                else if (typeof data === 'string') {
+                    try { var parsed = JSON.parse(data); if (Array.isArray(parsed)) rawRows = parsed; else if (parsed && Array.isArray(parsed.incidencias)) rawRows = parsed.incidencias; } catch(e) { rawRows = []; }
+                }
+
+                // resolved rows count:
+                // resolved rows count processed
+
+                // Force-show table and tbody in case CSS hides it
+                try { $tabla.css('display','table'); $tabla.find('tbody tr').css('display','table-row'); } catch(e) {}
+
+                // diagnostics removed
+
+                // Helper to escape HTML
+                function esc(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;'); }
+
+                var dataRows = rawRows.map(function(incidencia, index){
+                    var actions = '<div class="btn-group">' +
+                                    '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-pencil"></i></button>' +
+                                    '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-trash"></i></button>' +
+                                  '</div>';
+                    return [
+                        (index + 1),
+                        esc(incidencia.correlativo || ''),
+                        esc(incidencia.nombre_incidencia || ''),
+                        esc(incidencia.nombre_cliente || ''),
+                        esc(incidencia.fecha || ''),
+                        esc(incidencia.prioridad || ''),
+                        esc(incidencia.observaciones || ''),
+                        esc(incidencia.fecha_creacion || ''),
+                        actions
+                    ];
+                });
+
+                // Update via DataTables API if initialized
+                try {
+                    if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
+                        var dt = $tabla.DataTable();
+                        dt.clear();
+                        if (dataRows.length) dt.rows.add(dataRows);
+                        dt.draw(false);
+                        console.log('cargarIncidencias: DataTable updated, rows=', dataRows.length);
+                        // DataTable updated
+
+                        // If DataTable reports rows but tbody is empty, try a safe retry to handle race conditions
+                        var rendered = $tabla.find('tbody tr').length;
+                        console.log('cargarIncidencias: rendered tbody rows=', rendered);
+                        if (dataRows.length > 0 && rendered === 0) {
+                            console.warn('cargarIncidencias: detected zero rendered rows after update — retrying reflow');
+                            try {
+                                dt.columns.adjust();
+                                // small retry after paint
+                                setTimeout(function(){
+                                    try {
+                                        dt.clear();
+                                        dt.rows.add(dataRows);
+                                        dt.draw(false);
+                                        // after retry
+                                        $tabla.find('tbody').promise().done(function(){
+                                            console.log('cargarIncidencias: retry draw rendered tbody rows=', $tabla.find('tbody tr').length);
+                                            // If still zero, force-rebuild the table DOM as last resort
+                                            var renderedAfter = $tabla.find('tbody tr').length;
+                                                if (renderedAfter === 0) {
+                                                console.error('cargarIncidencias: rows still not rendered after retry — rebuilding table DOM');
+                                                // sample rows suppressed in production
+                                                // Build new table HTML
+                                                var newTableHtml = '<table class="table table-bordered table-striped dt-responsive tabla" id="tablaIncidencias">' +
+                                                    '<thead>' +
+                                                    '<tr>' +
+                                                    '<th>#</th><th>Correlativo</th><th>Nombre de la Incidencia</th><th>Nombre del Cliente</th><th>Fecha</th><th>Prioridad</th><th>Observaciones</th><th>Fecha Creación</th><th class="no-export">Acciones</th>' +
+                                                    '</tr>' +
+                                                    '</thead>' +
+                                                    '<tbody></tbody>' +
+                                                    '</table>';
+
+                                                // Replace old table and re-populate
+                                                $tabla.replaceWith(newTableHtml);
+                                                $tabla = $('#tablaIncidencias');
+                                                var $newTbody = $tabla.find('tbody');
+                                                dataRows.forEach(function(r){
+                                                    var tr = '<tr>' + r.map(function(cell){ return '<td>' + cell + '</td>'; }).join('') + '</tr>';
+                                                    $newTbody.append(tr);
+                                                });
+                                                try {
+                                                    $tabla.DataTable({
+                                                        "responsive": true,
+                                                        "autoWidth": false,
+                                                        "pageLength": 10,
+                                                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                                                        "language": {
+                                                            "sProcessing":     "Procesando...",
+                                                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                                                            "sZeroRecords":    "No se encontraron resultados",
+                                                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                                                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                                                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+                                                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                                                            "sInfoPostFix":    "",
+                                                            "sSearch":         "Buscar:",
+                                                            "sUrl":            "",
+                                                            "sInfoThousands":  ",",
+                                                            "sLoadingRecords": "Cargando...",
+                                                            "oPaginate": {
+                                                                "sFirst":    "Primero",
+                                                                "sLast":     "Último",
+                                                                "sNext":     "Siguiente",
+                                                                "sPrevious": "Anterior"
+                                                            },
+                                                            "oAria": {
+                                                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                                                            }
+                                                        }
+                                                    });
+                                                } catch(e) { console.error('cargarIncidencias: reinit after rebuild failed', e); }
+                                            }
+                                        });
+                                    } catch(e2) { console.error('cargarIncidencias: retry failed', e2); }
+                                }, 80);
+                            } catch(e2) { console.error('cargarIncidencias: reflow error', e2); }
+                        }
+
+                        return;
+                    }
+                } catch(e) { console.error('cargarIncidencias: update existing DataTable failed', e); }
+
+                // Not initialized: render tbody and init DataTable if needed
+                $tbody.empty();
+                if (dataRows.length) {
+                    dataRows.forEach(function(r){
+                        var tr = '<tr>' + r.map(function(cell){ return '<td>' + cell + '</td>'; }).join('') + '</tr>';
+                        $tbody.append(tr);
+                    });
+
+                    $tabla.DataTable({
+                        "responsive": true,
+                        "autoWidth": false,
+                        "pageLength": 10,
+                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                        "language": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
+                        }
+                    });
+                } else {
+                    $tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
+                }
+
+                console.log('cargarIncidencias: rendered tbody rows=', $tabla.find('tbody tr').length);
+                // rendered tbody rows counted
+            },
+            error: function(xhr, status, error) {
+                console.error('cargarIncidencias: AJAX error', status, error, xhr && xhr.responseText);
                 try {
                     var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
                     var msg = server && (server.message || server.error) ? (server.message || server.error) : null;
@@ -590,5 +661,10 @@ $(document).ready(function() {
                 });
             }
         });
+
     });
+
+    // Cargar incidencias inicialmente (al terminar inicialización de handlers)
+    try { cargarIncidencias(); } catch(e) { console.error('cargarIncidencias inicial error', e); }
+
 });

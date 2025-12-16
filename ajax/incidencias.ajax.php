@@ -34,6 +34,8 @@ class AjaxIncidencias {
 
     public function ajaxMostrarIncidencias() {
         $respuesta = ControladorIncidencias::ctrMostrarIncidencias();
+
+        // Return response
         echo json_encode($respuesta);
     }
 
