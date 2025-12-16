@@ -167,7 +167,17 @@ $(document).ready(function() {
                         var tbody = $('#tablaIncidencias tbody');
                         console.log('cargarIncidencias: server response', data);
 
-                        var rawRows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
+                        // Try several common envelope keys used across the project
+                        var rawRows = [];
+                        if (Array.isArray(data)) rawRows = data;
+                        else if (data && Array.isArray(data.incidencias)) rawRows = data.incidencias;
+                        else if (data && Array.isArray(data.eventos)) rawRows = data.eventos;
+                        else if (data && Array.isArray(data.data)) rawRows = data.data;
+                        else if (data && Array.isArray(data.rows)) rawRows = data.rows;
+                        else if (typeof data === 'string') {
+                            try { var parsed = JSON.parse(data); if (Array.isArray(parsed)) rawRows = parsed; else if (parsed && Array.isArray(parsed.incidencias)) rawRows = parsed.incidencias; } catch(e) { rawRows = []; }
+                        }
+                        console.log('cargarIncidencias: resolved rows count=', rawRows.length);
                         // Helper to escape HTML
                         function esc(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -195,8 +205,11 @@ $(document).ready(function() {
                             if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
                                 var dt = $('#tablaIncidencias').DataTable();
                                 dt.clear();
-                                if (dataRows.length) dt.rows.add(dataRows);
+                                if (dataRows.length) {
+                                    dt.rows.add(dataRows);
+                                }
                                 dt.draw(false);
+                                console.log('cargarIncidencias: DataTable updated, rows=', dataRows.length);
                                 return;
                             }
                         } catch(e){ console.error('cargarIncidencias: update existing DataTable failed', e); }
@@ -245,8 +258,11 @@ $(document).ready(function() {
                         tbody.append(fila);
                     });
                 } else {
+                    // No rows: ensure user sees the message even if DataTable unavailable
                     tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
                 }
+
+                console.log('cargarIncidencias: rendered tbody rows=', $('#tablaIncidencias tbody tr').length);
                 // Recreate DataTable reliably: destroy and remove extra DOM, then reinit
                 try {
                     if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
