@@ -237,7 +237,7 @@ $(document).on('click', '.certificado-thumb', function(e){
   if (!$ov.length) {
     $ov = $('<div id="cert-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;"></div>');
     var $inner = $('<div style="position:relative;max-width:95%;max-height:95%;"></div>');
-    var $img = $('<img src="" style="max-width:100%;max-height:100%;display:block;border-radius:4px;box-shadow:0 4px 30px rgba(0,0,0,0.7);">');
+    var $img = $('<img src="" style="width:auto;height:auto;max-width:calc(100vw - 40px);max-height:calc(100vh - 80px);display:block;border-radius:4px;box-shadow:0 4px 30px rgba(0,0,0,0.7);object-fit:contain;">');
     var $btn = $('<button aria-label="Cerrar" style="position:absolute;top:8px;right:8px;background:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:bold;">✕</button>');
     $btn.on('click', function(){ $ov.remove(); $(document).off('keydown.cert'); });
     $inner.append($img).append($btn);
