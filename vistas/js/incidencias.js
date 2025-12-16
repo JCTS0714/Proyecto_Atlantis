@@ -204,8 +204,10 @@ $(document).ready(function() {
         $.ajax({
             url: 'ajax/incidencias.ajax.php',
             method: 'GET',
-            data: { action: 'mostrarIncidencias' },
+            data: { action: 'mostrarIncidencias', _t: Date.now() }, // cache-buster
             dataType: 'json',
+            cache: false,
+            timeout: 10000,
             success: function(data) {
                 // Verificar si hay error de autenticación
                 if (data && data.status === 'error') {
