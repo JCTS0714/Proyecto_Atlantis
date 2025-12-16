@@ -248,8 +248,8 @@ $(document).ready(function() {
                 // Recreate DataTable reliably: destroy and remove extra DOM, then reinit
                 try {
                     if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
-                        // remove parameter true to remove added elements and avoid duplicates
-                        $('#tablaIncidencias').DataTable().destroy(true);
+                        // destroy without removing DOM element so we can reinitialize safely
+                        $('#tablaIncidencias').DataTable().destroy();
                     }
                     // Ensure any leftover wrapper elements are removed
                     $('#tablaIncidencias').show();
