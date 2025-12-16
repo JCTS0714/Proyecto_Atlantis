@@ -164,81 +164,83 @@ $(document).ready(function() {
                         confirmButtonText: 'Aceptar'
                     }).then(function() {
                         // Recargar tabla de incidencias
-                        cargarIncidencias();
-                        // Notificar a otras pestañas (backlog) que se creó una incidencia
+                        var tbody = $('#tablaIncidencias tbody');
+                        console.log('cargarIncidencias: server response', data);
+
+                        var rawRows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
+                        // Helper to escape HTML
+                        function esc(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+                        // Build array-of-arrays for DataTables
+                        var dataRows = rawRows.map(function(incidencia, index){
+                            var actions = '<div class="btn-group">' +
+                                            '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-pencil"></i></button>' +
+                                            '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + esc(incidencia.id) + '"><i class="fa fa-trash"></i></button>' +
+                                          '</div>';
+                            return [
+                                (index + 1),
+                                esc(incidencia.correlativo || ''),
+                                esc(incidencia.nombre_incidencia || ''),
+                                esc(incidencia.nombre_cliente || ''),
+                                esc(incidencia.fecha || ''),
+                                esc(incidencia.prioridad || ''),
+                                esc(incidencia.observaciones || ''),
+                                esc(incidencia.fecha_creacion || ''),
+                                actions
+                            ];
+                        });
+
+                        // If DataTable already initialized, update via API
                         try {
-                            localStorage.setItem('incidencia_creada', JSON.stringify({ id: response.id || null, ts: Date.now() }));
-                        } catch (e) { /* ignore */ }
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'Error al registrar la incidencia',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            }.bind(this),
-            error: function(xhr, status, error) {
-                console.error('Error AJAX crear incidencia:', status, error, xhr && xhr.responseText);
-                // Intentar parsear JSON de error del servidor
-                try {
-                    var server = xhr && xhr.responseText ? JSON.parse(xhr.responseText) : null;
-                    var msg = server && (server.message || server.error) ? (server.message || server.error) : 'Error al registrar la incidencia';
-                } catch(e) { var msg = 'Error al registrar la incidencia'; }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: msg,
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-        });
-    });
+                            if ($.fn.DataTable.isDataTable('#tablaIncidencias')) {
+                                var dt = $('#tablaIncidencias').DataTable();
+                                dt.clear();
+                                if (dataRows.length) dt.rows.add(dataRows);
+                                dt.draw(false);
+                                return;
+                            }
+                        } catch(e){ console.error('cargarIncidencias: update existing DataTable failed', e); }
 
-    // Cargar datos de incidencias en la tabla al cargar la página
-    cargarIncidencias();
-
-    // Función para cargar incidencias (llenado de tbody, plantilla.js inicializará DataTable)
-    function cargarIncidencias() {
-        $.ajax({
-            url: 'ajax/incidencias.ajax.php',
-            method: 'GET',
-            data: { action: 'mostrarIncidencias', _t: Date.now() }, // cache-buster
-            dataType: 'json',
-            cache: false,
-            timeout: 10000,
-            success: function(data) {
-                // Verificar si hay error de autenticación
-                if (data && data.status === 'error') {
-                    var tbody = $('#tablaIncidencias tbody');
-                    tbody.html('<tr><td colspan="9" class="text-center text-danger">Error: ' + data.message + '</td></tr>');
-                    return;
-                }
-                
-                var tbody = $('#tablaIncidencias tbody');
-                console.log('cargarIncidencias: server response', data);
-                tbody.empty();
-
-                var rows = Array.isArray(data) ? data : (data && Array.isArray(data.incidencias) ? data.incidencias : []);
-
-                if (rows && rows.length > 0) {
-                    rows.forEach(function(incidencia, index) {
-                        var fila = '<tr>' +
-                                '<td>' + (index + 1) + '</td>' +
-                                '<td>' + (incidencia.correlativo || '') + '</td>' +
-                                '<td>' + (incidencia.nombre_incidencia || '') + '</td>' +
-                                '<td>' + (incidencia.nombre_cliente || '') + '</td>' +
-                                '<td>' + (incidencia.fecha || '') + '</td>' +
-                                '<td>' + (incidencia.prioridad || '') + '</td>' +
-                                '<td>' + (incidencia.observaciones || '') + '</td>' +
-                                '<td>' + (incidencia.fecha_creacion || '') + '</td>' +
-                                '<td>' +
-                                    '<div class="btn-group">' +
-                                        '<button class="btn btn-warning btnEditarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-pencil"></i></button>' +
-                                        '<button class="btn btn-danger btnEliminarIncidencia" idIncidencia="' + incidencia.id + '"><i class="fa fa-trash"></i></button>' +
-                                    '</div>' +
-                                '</td>' +
+                        // Not initialized yet: populate tbody and init DataTable
+                        tbody.empty();
+                        if (dataRows.length) {
+                            dataRows.forEach(function(r){
+                                var tr = '<tr>' + r.map(function(cell){ return '<td>' + cell + '</td>'; }).join('') + '</tr>';
+                                tbody.append(tr);
+                            });
+                            $('#tablaIncidencias').DataTable({
+                                "responsive": true,
+                                "autoWidth": false,
+                                "pageLength": 10,
+                                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                                "language": {
+                                    "sProcessing":     "Procesando...",
+                                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                                    "sZeroRecords":    "No se encontraron resultados",
+                                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+                                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0",
+                                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                                    "sInfoPostFix":    "",
+                                    "sSearch":         "Buscar:",
+                                    "sUrl":            "",
+                                    "sInfoThousands":  ",",
+                                    "sLoadingRecords": "Cargando...",
+                                    "oPaginate": {
+                                        "sFirst":    "Primero",
+                                        "sLast":     "Último",
+                                        "sNext":     "Siguiente",
+                                        "sPrevious": "Anterior"
+                                    },
+                                    "oAria": {
+                                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                                    }
+                                }
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="9" class="text-center">No hay incidencias registradas</td></tr>');
+                        }
                             '</tr>';
                         tbody.append(fila);
                     });
