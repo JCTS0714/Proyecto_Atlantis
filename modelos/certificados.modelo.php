@@ -17,7 +17,7 @@ class ModeloCertificados{
   }
 
   static public function mdlCrearCertificado($tabla, $datos){
-    $sql = "INSERT INTO $tabla (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:creado_por,NOW())";
+    $sql = "INSERT INTO $tabla (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, imagen, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:imagen,:creado_por,NOW())";
     $stmt = Conexion::conectar()->prepare($sql);
     $stmt->bindParam(':nombre', $datos['nombre'], PDO::PARAM_STR);
     $stmt->bindParam(':ruc', $datos['ruc'], PDO::PARAM_STR);
@@ -28,6 +28,7 @@ class ModeloCertificados{
     $stmt->bindParam(':estado', $datos['estado'], PDO::PARAM_STR);
     $stmt->bindParam(':observacion', $datos['observacion'], PDO::PARAM_STR);
     $stmt->bindParam(':tipo', $datos['tipo'], PDO::PARAM_STR);
+    $stmt->bindParam(':imagen', $datos['imagen'] ?? null, PDO::PARAM_STR);
     $stmt->bindParam(':creado_por', $datos['creado_por'], PDO::PARAM_INT);
     try{ if($stmt->execute()) return 'ok'; else { error_log('mdlCrearCertificado ERROR: '.json_encode($stmt->errorInfo())); return 'error'; } } catch(PDOException $e){ error_log('mdlCrearCertificado EXCEPTION: '.$e->getMessage()); return 'error'; }
   }
@@ -35,7 +36,7 @@ class ModeloCertificados{
   static public function mdlEditarCertificado($tabla, $datos){
     $sets = [];
     $params = [];
-    foreach(['nombre','ruc','usuario','clave','fecha_creacion','fecha_vencimiento','estado','observacion','tipo'] as $f){ if(isset($datos[$f])){ $sets[] = "$f = :$f"; $params[":$f"] = $datos[$f]; } }
+    foreach(['nombre','ruc','usuario','clave','fecha_creacion','fecha_vencimiento','estado','observacion','tipo','imagen'] as $f){ if(isset($datos[$f])){ $sets[] = "$f = :$f"; $params[":$f"] = $datos[$f]; } }
     if(empty($sets)) return 'error';
     $params[':id'] = $datos['id'];
     $sql = "UPDATE $tabla SET ".implode(',', $sets)." WHERE id = :id";

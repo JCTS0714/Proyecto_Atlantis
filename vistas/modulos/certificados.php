@@ -68,7 +68,7 @@
 <!-- MODULO_CERTIFICADOS_PRESENTE: confirma inclusión del archivo 'modulos/certificados.php' en el HTML servido -->
 <div class="modal fade" id="modalAgregarCertificado" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
-    <form id="formAgregarCertificado" method="post">
+    <form id="formAgregarCertificado" method="post" enctype="multipart/form-data">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -118,6 +118,11 @@
               <option value="PSE">PSE</option>
             </select>
           </div>
+          <div class="form-group">
+            <label>Imagen (opcional)</label>
+            <input type="file" class="form-control" name="imagen" accept="image/*">
+            <p class="help-block">Puede subir una imagen opcional para este certificado (jpg, png, gif).</p>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Guardar</button>
@@ -131,7 +136,7 @@
 <!-- Modal Editar (se completará via JS) -->
 <div class="modal fade" id="modalEditarCertificado" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
-    <form id="formEditarCertificado" method="post">
+    <form id="formEditarCertificado" method="post" enctype="multipart/form-data">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -148,6 +153,7 @@
           <div class="form-group"><label>Estado</label><select class="form-control" id="editar_estado" name="estado"><option value="activo">activo</option><option value="inactivo">inactivo</option></select></div>
           <div class="form-group"><label>Observación</label><textarea class="form-control" id="editar_observacion" name="observacion"></textarea></div>
           <div class="form-group"><label>Tipo</label><select class="form-control" id="editar_tipo" name="tipo"><option value="OSE">OSE</option><option value="PSE">PSE</option></select></div>
+          <div class="form-group"><label>Imagen (opcional)</label><input type="file" class="form-control" id="editar_imagen" name="imagen" accept="image/*"><p class="help-block">Sube una nueva imagen para reemplazar la existente (opcional).</p></div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Guardar cambios</button>

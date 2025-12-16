@@ -95,25 +95,27 @@ $(document).ready(function(){
 
   $(document).on('submit', '#formAgregarCertificado', function(e){
     e.preventDefault();
-    var form = $(this);
-    var data = form.serialize();
-    data += '&accion=crear';
+    var form = $(this)[0];
+    var fd = new FormData(form);
+    fd.append('accion','crear');
     $.ajax({
       url: 'ajax/certificados.ajax.php',
       method: 'POST',
-      data: data,
+      data: fd,
+      processData: false,
+      contentType: false,
       dataType: 'json'
     }).done(function(resp){
       if(resp == 'ok' || (resp && resp.success !== false)){
         $('#modalAgregarCertificado').modal('hide');
-        // recargar tabla sin reload
         reloadTable();
       } else {
         var msg = (resp && resp.error) ? resp.error : 'Error al crear certificado';
         Swal.fire('Error', msg, 'error');
       }
-    }).fail(function(){
-      Swal.fire('Error','No se pudo conectar al servidor','error');
+    }).fail(function(jqxhr){
+      var msg = (jqxhr && jqxhr.responseText) ? jqxhr.responseText : 'No se pudo conectar al servidor';
+      Swal.fire('Error',msg,'error');
     });
   });
 
@@ -151,9 +153,10 @@ $(document).ready(function(){
   // Enviar edición
   $(document).on('submit', '#formEditarCertificado', function(e){
     e.preventDefault();
-    var data = $(this).serialize();
-    data += '&accion=actualizar';
-    $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: data, dataType: 'json' })
+    var form = $(this)[0];
+    var fd = new FormData(form);
+    fd.append('accion','actualizar');
+    $.ajax({ url: 'ajax/certificados.ajax.php', method: 'POST', data: fd, processData: false, contentType: false, dataType: 'json' })
     .done(function(resp){
       if(resp && resp.success === true){
         $('#modalEditarCertificado').modal('hide');
@@ -162,7 +165,7 @@ $(document).ready(function(){
         $('#modalEditarCertificado').modal('hide');
         reloadTable();
       } else { var msg = (resp && resp.error) ? resp.error : 'Error al actualizar'; Swal.fire('Error', msg, 'error'); }
-    }).fail(function(){ Swal.fire('Error','No se pudo conectar al servidor','error'); });
+    }).fail(function(jqxhr){ var msg = (jqxhr && jqxhr.responseText) ? jqxhr.responseText : 'No se pudo conectar al servidor'; Swal.fire('Error',msg,'error'); });
   });
 
   // Eliminar (confirmación)

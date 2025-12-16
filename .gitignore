@@ -19,3 +19,6 @@ logs/*.log
 vistas/img/usuarios/*
 !vistas/img/usuarios/default/
 !vistas/img/usuarios/default/perfil.png
+
+# Carpeta para imágenes de certificados (no versionar)
+uploads/certificados/

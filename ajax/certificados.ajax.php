@@ -48,13 +48,30 @@ if ($accion === 'crear'){
             exit;
         }
 
+        // Handle optional file upload
+        $imagenFilename = null;
+        if (!empty($_FILES['imagen']) && isset($_FILES['imagen']['tmp_name']) && is_uploaded_file($_FILES['imagen']['tmp_name'])) {
+            $uploadDir = __DIR__ . '/../uploads/certificados/';
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+            $allowed = ['image/jpeg','image/png','image/gif'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
+            finfo_close($finfo);
+            if (!in_array($mime, $allowed)) { echo json_encode(['success'=>false,'error'=>'tipo_archivo_no_permitido']); exit; }
+            if ($_FILES['imagen']['size'] > 5 * 1024 * 1024) { echo json_encode(['success'=>false,'error'=>'archivo_demasiado_grande']); exit; }
+            $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+            $imagenFilename = time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+            $dest = $uploadDir . $imagenFilename;
+            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $dest)) { error_log('certificados.crear: move_uploaded_file failed'); echo json_encode(['success'=>false,'error'=>'upload_failed']); exit; }
+        }
+
         $db->beginTransaction();
-        $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:creado_por,NOW())";
+        $sql = "INSERT INTO certificados (nombre, ruc, usuario, clave, fecha_creacion, fecha_vencimiento, estado, observacion, tipo, imagen, creado_por, creado_en) VALUES (:nombre,:ruc,:usuario,:clave,:fecha_creacion,:fecha_vencimiento,:estado,:observacion,:tipo,:imagen,:creado_por,NOW())";
         $stmt = $db->prepare($sql);
         $ok = $stmt->execute([
             ':nombre'=>$nombre, ':ruc'=>$ruc, ':usuario'=>$usuario, ':clave'=>$clave,
             ':fecha_creacion'=>$fecha_creacion, ':fecha_vencimiento'=>$fecha_vencimiento, ':estado'=>$estado, ':observacion'=>$observacion,
-            ':tipo'=>$tipo, ':creado_por'=>$_SESSION['id']
+            ':tipo'=>$tipo, ':imagen'=>$imagenFilename, ':creado_por'=>$_SESSION['id']
         ]);
         if ($ok) {
             $db->commit();
@@ -104,6 +121,23 @@ if ($accion === 'actualizar'){
     $sets = [];
     $params = [':id'=>$id];
     foreach($fields as $f){ if (isset($_POST[$f])){ $sets[] = "{$f} = :{$f}"; $params[":{$f}"] = $_POST[$f]; } }
+    // Handle optional uploaded image for update
+    if (!empty($_FILES['imagen']) && isset($_FILES['imagen']['tmp_name']) && is_uploaded_file($_FILES['imagen']['tmp_name'])) {
+        $uploadDir = __DIR__ . '/../uploads/certificados/';
+        if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
+        $allowed = ['image/jpeg','image/png','image/gif'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($mime, $allowed)) { echo json_encode(['success'=>false,'error'=>'tipo_archivo_no_permitido']); exit; }
+        if ($_FILES['imagen']['size'] > 5 * 1024 * 1024) { echo json_encode(['success'=>false,'error'=>'archivo_demasiado_grande']); exit; }
+        $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+        $imagenFilename = time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+        $dest = $uploadDir . $imagenFilename;
+        if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $dest)) { error_log('certificados.actualizar: move_uploaded_file failed'); echo json_encode(['success'=>false,'error'=>'upload_failed']); exit; }
+        $sets[] = "imagen = :imagen";
+        $params[':imagen'] = $imagenFilename;
+    }
     if (empty($sets)){ echo json_encode(['success'=>false,'error'=>'no_fields']); exit; }
     $sql = 'UPDATE certificados SET ' . implode(',', $sets) . ' WHERE id = :id';
     try{ $stmt = $db->prepare($sql); $stmt->execute($params); echo json_encode(['success'=>true]); } catch(Exception $e){ echo json_encode(['success'=>false,'error'=>'update_failed']); }
