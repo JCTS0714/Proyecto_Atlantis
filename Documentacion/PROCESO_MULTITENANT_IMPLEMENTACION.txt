@@ -1,0 +1,102 @@
+PROCESO — Implementación Multi-tenant (BD por tenant)
+Proyecto: Proyecto_Atlantis (Producción)
+Fecha: 2025-12-19
+
+1) Objetivo
+- Mantener UN solo código (una sola app) y servir múltiples clientes por subdominio.
+- Aislar datos por cliente usando UNA base de datos por tenant.
+- Tener un panel administrativo separado para gestionar tenants (crear/activar/suspender) sin que sea accesible desde el sistema del cliente.
+
+2) Restricción de hosting (Hostinger Premium Web Hosting)
+- En hosting compartido no se puede asumir privilegio para CREATE DATABASE desde PHP.
+- Solución adoptada: enfoque SEMI-AUTOMÁTICO.
+  - La BD del tenant se crea manualmente en hPanel/phpMyAdmin.
+  - El sistema automatiza: detección por subdominio, selección de BD, panel para registrar tenants.
+
+3) Decisión de arquitectura
+- Resolución del tenant por host (HTTP_HOST):
+  - PANEL_HOST (ej: admin.grupoatlantiscrm.eu) => modo panel
+  - MAIN_HOST (ej: grupoatlantiscrm.eu) => modo principal
+  - {subdominio}.MAIN_HOST => modo tenant
+- Aislamiento: BD por tenant (credenciales guardadas en tablas master).
+- Código compartido: la misma carpeta/instalación sirve a todos los subdominios.
+
+4) Componentes implementados
+A) Tablas master (catálogo de tenants)
+- Archivo: scripts/migrations/2025-12-19_multitenant_master_tables.sql
+- Crea tablas principales:
+  - tenants (subdomain, ruc, status, timestamps)
+  - tenant_db (host, name, user, pass, charset)
+  - admin_users (usuarios del panel)
+  - audit_log (auditoría básica)
+
+B) Conexión con override / env robusto
+- Archivo: modelos/conexion.php
+- Cambios:
+  - Soporte de lectura de variables por $_ENV cuando getenv() viene vacío (común en shared hosting).
+  - Parseo de .env (quita comillas). Siempre llena $_ENV; intenta putenv si está disponible.
+  - setConfigOverride(array|null) para cambiar credenciales por request.
+
+C) Bootstrap multi-tenant
+- Archivo: multitenant/bootstrap.php
+- Función:
+  - Detecta host actual.
+  - Si host = panel => APP_MODE=panel (BD master)
+  - Si host = main/www => APP_MODE=tenant principal (BD master actual)
+  - Si host = subdominio.main => busca en tenants + tenant_db.
+    - Si status != active => bloquea (403)
+    - Si existe => aplica credenciales del tenant.
+- Compatibilidad:
+  - Si Conexion::setConfigOverride no existe (deploy parcial/opcache), hace fallback seteando DB_* en $_ENV/putenv.
+
+D) Integración al entrypoint
+- Archivo: index.php
+- Incluye multitenant/bootstrap.php al inicio.
+- Si APP_MODE=panel => delega a panel/index.php.
+
+E) Panel administrativo mínimo
+- Carpeta: panel/
+- Archivo principal: panel/index.php
+- Funciones:
+  - Login admin (admin_users) en BD master
+  - Listado de tenants
+  - Alta de tenant (inserta tenants + tenant_db + audit_log)
+
+F) Endpoints de diagnóstico (para producción)
+- panel/ping.php : confirma ejecución PHP en el host del panel
+- panel/health.php : prueba conexión a master
+- panel/diag.php : muestra info de env/archivos/conteos en master
+- panel/version.php : confirma que index.php en servidor tiene bootstrap/switch
+- tenant_health.php : confirma que un subdominio tenant conecta a su BD correcta
+
+5) Comportamiento validado
+- Panel operativo en Hostinger usando ruta /panel/ (limitación: no se pudo cambiar docroot del subdominio ya creado).
+  - Ejemplo: https://admin.grupoatlantiscrm.eu/panel/
+- Tenant de prueba:
+  - Host: cliente1.grupoatlantiscrm.eu
+  - BD: u652153415_cliente1
+  - tenant_health.php confirma APP_MODE=tenant y DATABASE()=u652153415_cliente1
+
+6) Configuración recomendada
+- Definir en .env (en el docroot del proyecto):
+  - PANEL_HOST=admin.grupoatlantiscrm.eu
+  - MAIN_HOST=grupoatlantiscrm.eu
+  - DB_HOST/DB_NAME/DB_USER/DB_PASS = credenciales de la BD master
+
+7) Operación (resumen)
+- La creación de un tenant implica:
+  - Subdominio (DNS/hPanel)
+  - BD + usuario (hPanel)
+  - Import de estructura/datos base (phpMyAdmin)
+  - Registro del tenant en el panel
+  - Activación
+
+8) Troubleshooting
+- Pantalla en blanco en tenant:
+  - Probar https://{tenant}/tenant_health.php
+  - Si ok=false: revisar error, archivo, línea.
+  - Si ok=true y la app en blanco: es un 500 dentro de la app del tenant (consultas/tablas faltantes/datos seed).
+- getenv() vacío en Hostinger:
+  - Ya mitigado: se usa $_ENV como fuente principal después de cargar .env.
+
+Fin.
