@@ -10,6 +10,13 @@
 
 require_once __DIR__ . '/../modelos/conexion.php';
 
+function mt_env($key, $default = '') {
+    $val = getenv($key);
+    if ($val !== false && $val !== '') return $val;
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
+    return $default;
+}
+
 function mt_normalize_host($hostRaw) {
     $hostRaw = strtolower(trim((string)$hostRaw));
     if ($hostRaw === '') return '';
@@ -42,13 +49,13 @@ function mt_subdomain_for_host($host, $mainHost) {
 $host = mt_normalize_host($_SERVER['HTTP_HOST'] ?? '');
 
 // Configuración por entorno (preferir variables de entorno)
-$panelHost = mt_normalize_host(getenv('PANEL_HOST') ?: '');
+$panelHost = mt_normalize_host(mt_env('PANEL_HOST', ''));
 if ($panelHost === '') {
     // fallback: el usuario indicó este host
     $panelHost = 'admin.grupoatlantiscrm.eu';
 }
 
-$mainHost = mt_normalize_host(getenv('MAIN_HOST') ?: '');
+$mainHost = mt_normalize_host(mt_env('MAIN_HOST', ''));
 if ($mainHost === '') {
     $mainHost = mt_parent_domain_from_panel_host($panelHost);
 }
