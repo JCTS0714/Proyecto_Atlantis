@@ -1,0 +1,80 @@
+AVANCES DEL DÍA - 2025-12-17
+Proyecto: Proyecto_Atlantis / produccion_worktree
+
+Resumen ejecutivo
+- Se migró el módulo de Contadores al wrapper JSON común con auth y HTTP codes.
+- Se corrigió un bug que impedía editar Incidencias (faltaba enviar idIncidencia).
+- Se incorporó un sistema de “DevTools” habilitado solo para el usuario id=28, con botón “Autollenar” en el footer de todos los modales y relleno avanzado (incluye Select2/AJAX).
+- Se investigó un artefacto visual en SweetAlert2 (modo oscuro) y se aseguró la carga del stylesheet de tema personalizado.
+
+1) Contadores: normalización AJAX + compatibilidad
+- Archivo: ajax/contadores.ajax.php
+  - Añadido bootstrap común: _error_handler.php, _timezone.php, _json.php.
+  - Auth mínima por sesión (401 si no hay $_SESSION['id']).
+  - Respuestas normalizadas con ajax_json_normalize + ajax_json_respond.
+  - HTTP codes coherentes:
+    - 200 en OK
+    - 400 en parámetros inválidos (ej. contador_id)
+    - 404 si no se encuentra el contador
+    - 500 en fallos de servidor
+  - Endpoints cubiertos:
+    - buscarEmpresas (Select2) -> mantiene estructura results
+    - getClientesContador
+    - asignarClientes
+    - obtener por id (POST idContador)
+    - next_nro
+
+- Archivo: vistas/js/contadores.js
+  - Se hizo tolerante al wrapper: desempaqueta resp.data cuando existe.
+  - Ajuste aplicado en:
+    - Cargar datos al abrir modal editar
+    - Cargar próximo N° al abrir modal crear
+
+2) SweetAlert2 (modo oscuro): carga del tema + mitigaciones
+- Archivo: assets/css/sweetalert-theme.css
+  - Se realizaron varias pruebas/overrides para eliminar artefactos visuales del icono de éxito en modo oscuro.
+  - Resultado clave: el CSS de tema debía estar realmente cargado globalmente para que cualquier fix surta efecto.
+
+- Archivo: vistas/plantilla.php
+  - Se añadió el link al CSS del tema:
+    - assets/css/sweetalert-theme.css
+
+3) Incidencias: fix de edición (Undefined array key "idIncidencia")
+- Problema
+  - Al enviar el formulario de edición, no se enviaba idIncidencia.
+  - En ControladorIncidencias se accedía a $_POST['idIncidencia'] y, por el _error_handler, el warning se convertía en excepción.
+
+- Archivo: vistas/modulos/incidencias.php
+  - Se añadió el hidden faltante dentro del modal editar:
+    - <input type="hidden" name="idIncidencia" id="editarIdIncidencia">
+
+- Archivo: controladores/ControladorIncidencias.php
+  - Se hizo la lectura del id segura y con fallback:
+    - idIncidencia o editarIdIncidencia
+  - Si no viene el id, ahora devuelve error estructurado (en vez de reventar por warning).
+
+4) DevTools (solo usuario id=28): botón Autollenar + relleno avanzado
+- Archivo: utils/dev_tools.php
+  - Helper is_dev_user() habilitado solo cuando $_SESSION['id'] === 28.
+
+- Archivo: vistas/plantilla.php
+  - Se expone un flag:
+    - window.__DEVTOOLS__ = { enabled: true/false, userId: <id> }
+  - Carga condicional del script solo para usuario dev.
+
+- Archivo: vistas/js/devtools.js
+  - Inserta botón "Autollenar" en el footer de todos los modales al evento shown.bs.modal.
+  - Relleno de inputs/textareas/selects con datos aleatorios.
+  - Relleno avanzado para Select2 AJAX:
+    - Detecta configuración AJAX de Select2 y hace request al endpoint
+    - Elige un resultado real y lo selecciona
+  - Ajuste específico para Incidencias:
+    - Evita rellenar inputs ocultos por CSS (ej. input legacy oculto cuando se usa Select2)
+    - Setea correctamente el hidden requerido idClienteSeleccionado / editarIdClienteSeleccionado
+    - Setea también el texto legacy nuevoNombreCliente/editarNombreCliente por compatibilidad
+
+Notas / estado actual
+- Contadores funcionando con wrapper y frontend compatible.
+- Edición de Incidencias funcionando (ya no falla por idIncidencia inexistente).
+- DevTools activo solo para id=28 y útil para crear registros rápido (incluye Select2).
+- SweetAlert2: el tema personalizado ya se carga globalmente.

@@ -91,6 +91,8 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/theme-toggle.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/animations.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/tooltips.css">
+    <!-- SweetAlert2 custom theme (incluye fixes de icono en modo oscuro) -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/sweetalert-theme.css">
 
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 
@@ -192,6 +194,19 @@
   <script src="<?php echo BASE_URL; ?>/vistas/js/export-tables.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <?php
+    require_once __DIR__ . '/../utils/dev_tools.php';
+    $isDevUser = function_exists('is_dev_user') ? is_dev_user() : false;
+  ?>
+  <script>
+    window.__DEVTOOLS__ = {
+      enabled: <?php echo $isDevUser ? 'true' : 'false'; ?>,
+      userId: <?php echo isset($_SESSION['id']) ? (int)$_SESSION['id'] : 0; ?>
+    };
+  </script>
+  <?php if ($isDevUser) { ?>
+    <script src="<?php echo BASE_URL; ?>/vistas/js/devtools.js"></script>
+  <?php } ?>
   <script>
     // Global SweetAlert2 safety wrapper: ensure dialogs always close and remove lingering backdrop
     (function(){

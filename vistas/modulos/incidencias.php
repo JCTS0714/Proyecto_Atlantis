@@ -141,6 +141,7 @@
         <!-- Modal Body -->
         <div class="modal-body">
           <div class="box-body">
+            <input type="hidden" name="idIncidencia" id="editarIdIncidencia">
             <!-- Correlativo -->
             <div class="form-group">
               <div class="input-group">

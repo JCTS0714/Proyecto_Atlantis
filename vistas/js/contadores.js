@@ -129,7 +129,8 @@ $(document).ready(function() {
       method: 'POST',
       data: { idContador: id },
       dataType: 'json'
-    }).done(function(data) {
+    }).done(function(resp) {
+      var data = (resp && resp.data) ? resp.data : resp;
       if (!data || !data.id) return;
       
       $('#idContador').val(data.id);
@@ -259,8 +260,9 @@ $(document).ready(function() {
       data: { next_nro: 1 },
       dataType: 'json'
     }).done(function(resp) {
-      if (resp && resp.next_nro) {
-        $('#nuevoNro').val(resp.next_nro);
+      var data = (resp && resp.data) ? resp.data : resp;
+      if (data && data.next_nro) {
+        $('#nuevoNro').val(data.next_nro);
       }
     }).fail(function(){ /* ignore */ });
   });

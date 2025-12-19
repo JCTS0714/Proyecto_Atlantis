@@ -428,9 +428,12 @@ $(document).ready(function() {
                 // Aceptar diferentes formatos de respuesta:
                 // - Array directo: [{...}]
                 // - Objeto con clave `incidencias`: { success:true, incidencias: [{...}] }
+                // - Objeto con clave `data`: { ok:true, data: [{...}] }
                 var incidencia = null;
                 if (Array.isArray(data) && data.length > 0) {
                     incidencia = data[0];
+                } else if (data && Array.isArray(data.data) && data.data.length > 0) {
+                    incidencia = data.data[0];
                 } else if (data && data.incidencias && Array.isArray(data.incidencias) && data.incidencias.length > 0) {
                     incidencia = data.incidencias[0];
                 }

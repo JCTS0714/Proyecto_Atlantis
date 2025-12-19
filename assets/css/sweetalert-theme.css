@@ -58,7 +58,12 @@
   padding: 8px 14px;
 }
 
-/* Fix: normalizar la animación del icono de éxito para evitar efecto adelante/atrás */
+/* Fix: normalizar la animación del icono de éxito para evitar efecto adelante/atrás (aplica a todos los Swal2) */
+.swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-fix,
+.swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-icon.swal2-success .swal2-success-line-long,
 .swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-right,
 .swal2-custom-popup .swal2-icon.swal2-success .swal2-success-circular-line-left,
 .swal2-custom-popup .swal2-icon.swal2-success .swal2-success-fix,
@@ -69,9 +74,67 @@
   animation-fill-mode: forwards !important;
 }
 
-/* Ocultar elemento 'fix' que a veces crea un artefacto visual */
+/* Ocultar elemento 'fix' que a veces crea un artefacto visual (doble animación detrás) */
+.swal2-icon.swal2-success .swal2-success-fix,
 .swal2-custom-popup .swal2-icon.swal2-success .swal2-success-fix{
   display: none !important;
+}
+
+/* Desactivar todas las animaciones del icono de éxito para evitar parpadeo/ghost en modo oscuro */
+.swal2-icon.swal2-success,
+.swal2-icon.swal2-success .swal2-success-ring,
+.swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-icon.swal2-success .swal2-success-line-long,
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-circular-line-right{
+  animation: none !important;
+}
+
+/* Simplificar el icono: ocultar las semi-circunferencias que dejan “fantasma” */
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-icon.swal2-success .swal2-success-fix{
+  display: none !important;
+}
+
+/* Mantener solo la circunferencia principal y el check */
+.swal2-icon.swal2-success .swal2-success-ring{
+  border: 3px solid rgba(76, 175, 80, 0.25) !important;
+}
+
+/* Hard override: reemplazar icono de éxito por un check plano para evitar artefactos/animaciones dobles */
+.swal2-icon.swal2-success {
+  position: relative !important;
+  width: 5rem !important;
+  height: 5rem !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.swal2-icon.swal2-success > * {
+  display: none !important;
+}
+
+.swal2-icon.swal2-success::before {
+  content: '\2713';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #53b86b;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
+}
+
+/* Desactivar animación de popup para evitar superposición de efectos (usar animación por defecto de SweetAlert o ninguna) */
+.swal2-popup,
+.swal2-show {
+  animation: none !important;
 }
 
 /* Alternativa: si quieres desactivar por completo la animación del icono */

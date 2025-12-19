@@ -90,8 +90,13 @@ class ControladorIncidencias {
                 return array("success" => false, "message" => "Usuario no autenticado.");
             }
 
+            $idIncidencia = $_POST["idIncidencia"] ?? ($_POST["editarIdIncidencia"] ?? null);
+            if (empty($idIncidencia)) {
+                return array("status" => "error", "message" => "ID de incidencia requerido para actualizar.");
+            }
+
             $datos = array(
-                "id" => $_POST["idIncidencia"],
+                "id" => $idIncidencia,
                 "nombre_incidencia" => $_POST["editarNombreIncidencia"],
                 "cliente_id" => $_POST["editarIdClienteSeleccionado"],
                 "usuario_id" => $_SESSION["id"],
