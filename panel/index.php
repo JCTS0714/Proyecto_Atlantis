@@ -22,8 +22,13 @@ if (!defined('PANEL_ERROR_HANDLER_INSTALLED')) {
     });
 
     set_error_handler(function($severity, $message, $file, $line) {
+        // No tumbar el panel por warnings/notices (muy comunes en hosting compartido).
+        $ignored = [E_NOTICE, E_USER_NOTICE, E_DEPRECATED, E_USER_DEPRECATED, E_STRICT, E_WARNING, E_USER_WARNING];
         error_log("PHP error [$severity]: $message in $file:$line");
-        // Convertir a excepción para flujo consistente
+        if (in_array($severity, $ignored, true)) {
+            return true;
+        }
+        // Errores más severos: convertir a excepción
         throw new ErrorException($message, 0, $severity, $file, $line);
     });
 
