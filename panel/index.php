@@ -1,6 +1,40 @@
 <?php
 require_once __DIR__ . '/../modelos/conexion.php';
 
+// Panel error handling: avoid blank screens in production.
+// Logs to /logs/panel_errors.log (relative to project root).
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../logs/panel_errors.log');
+
+if (!defined('PANEL_ERROR_HANDLER_INSTALLED')) {
+    define('PANEL_ERROR_HANDLER_INSTALLED', true);
+
+    set_exception_handler(function($e) {
+        error_log("Uncaught exception: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: text/plain; charset=utf-8');
+        }
+        echo "Panel error. Revisa logs/panel_errors.log";
+        exit;
+    });
+
+    set_error_handler(function($severity, $message, $file, $line) {
+        error_log("PHP error [$severity]: $message in $file:$line");
+        // Convertir a excepción para flujo consistente
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
+
+    register_shutdown_function(function() {
+        $err = error_get_last();
+        if ($err && in_array($err['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+            error_log('Shutdown fatal: ' . print_r($err, true));
+        }
+    });
+}
+
 if (!defined('APP_MODE') || APP_MODE !== 'panel') {
     http_response_code(404);
     echo 'Not found';
