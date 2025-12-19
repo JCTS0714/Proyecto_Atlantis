@@ -17,6 +17,34 @@ function mt_env($key, $default = '') {
     return $default;
 }
 
+function mt_apply_db_override($cfgOrNull) {
+    // Prefer native override if available
+    if (class_exists('Conexion') && method_exists('Conexion', 'setConfigOverride')) {
+        Conexion::setConfigOverride($cfgOrNull);
+        return;
+    }
+
+    // Fallback: overwrite env vars so older Conexion implementations work
+    if ($cfgOrNull === null) {
+        return;
+    }
+
+    $map = [
+        'DB_HOST' => $cfgOrNull['host'] ?? null,
+        'DB_NAME' => $cfgOrNull['name'] ?? null,
+        'DB_USER' => $cfgOrNull['user'] ?? null,
+        'DB_PASS' => $cfgOrNull['pass'] ?? null,
+        'DB_CHARSET' => $cfgOrNull['charset'] ?? null,
+    ];
+    foreach ($map as $k => $v) {
+        if ($v === null) continue;
+        $_ENV[$k] = $v;
+        if (function_exists('putenv')) {
+            @putenv($k . '=' . $v);
+        }
+    }
+}
+
 function mt_normalize_host($hostRaw) {
     $hostRaw = strtolower(trim((string)$hostRaw));
     if ($hostRaw === '') return '';
@@ -67,7 +95,7 @@ $mainHostWww = ($mainHost !== '') ? ('www.' . $mainHost) : '';
 if ($host !== '' && $panelHost !== '' && $host === $panelHost) {
     if (!defined('APP_MODE')) define('APP_MODE', 'panel');
     // Panel siempre usa BD master (sin override)
-    Conexion::setConfigOverride(null);
+    mt_apply_db_override(null);
     return;
 }
 
@@ -77,7 +105,7 @@ if ($host !== '' && ($host === $mainHost || $host === $mainHostWww || $mainHost 
     if (!defined('TENANT_SUBDOMAIN')) define('TENANT_SUBDOMAIN', null);
     if (!defined('TENANT_ID')) define('TENANT_ID', null);
     // Dominio principal: BD master actual (sin override)
-    Conexion::setConfigOverride(null);
+    mt_apply_db_override(null);
     return;
 }
 
@@ -112,7 +140,7 @@ try {
     }
 
     // Aplicar override de conexión para el resto del request
-    Conexion::setConfigOverride([
+    mt_apply_db_override([
         'host' => $row['db_host'],
         'name' => $row['db_name'],
         'user' => $row['db_user'],
