@@ -21,6 +21,12 @@ return [
     // Base host override (optional). Leave null to detect dynamically.
     'BASE_HOST' => null,
 
+    // Multi-tenant hosts
+    // MAIN_HOST: dominio principal (tenant principal). Ej: grupoatlantiscrm.eu
+    // PANEL_HOST: host del panel admin (separado). Ej: admin.grupoatlantiscrm.eu
+    'MAIN_HOST' => null,
+    'PANEL_HOST' => null,
+
     // Force HTTP (not recommended) - set to true only for special cases
     'FORCE_HTTP' => false,
 

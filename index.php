@@ -79,6 +79,18 @@ if (!defined('APP_ERROR_HANDLER_INSTALLED')) {
     });
 }
 
+// --- Multi-tenant bootstrap (host -> tenant DB) ---
+// IMPORTANT: must run before controllers/models are loaded.
+if (file_exists(__DIR__ . '/multitenant/bootstrap.php')) {
+    require_once __DIR__ . '/multitenant/bootstrap.php';
+}
+
+// If panel host, do NOT load the main app.
+if (defined('APP_MODE') && APP_MODE === 'panel') {
+    require_once __DIR__ . '/panel/index.php';
+    exit;
+}
+
 
 /**REQUERIMOS CONFIGURACIÓN */
 require_once "config/estados.php";
