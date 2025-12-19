@@ -40,13 +40,34 @@ if (!defined('PANEL_ERROR_HANDLER_INSTALLED')) {
     });
 }
 
-if (!defined('APP_MODE') || APP_MODE !== 'panel') {
+// Allow running as its own docroot (recommended on shared hosting):
+// admin.grupoatlantiscrm.eu -> /public_html/panel
+// In that case index.php isn't executed, so we start the session here.
+
+$expectedHost = strtolower((string)(getenv('PANEL_HOST') ?: 'admin.grupoatlantiscrm.eu'));
+$currentHost = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+if ($currentHost !== '' && $expectedHost !== '' && $currentHost !== $expectedHost) {
     http_response_code(404);
     echo 'Not found';
     exit;
 }
 
-// Session already started by main index.php.
+if (session_status() === PHP_SESSION_NONE) {
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+    if (defined('PHP_VERSION_ID') && PHP_VERSION_ID >= 70300) {
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'domain' => $currentHost,
+            'secure' => $secure,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    } else {
+        session_set_cookie_params(0, '/', $currentHost, $secure, true);
+    }
+    session_start();
+}
 
 function panel_is_logged_in(): bool {
     return !empty($_SESSION['panel_admin_id']);

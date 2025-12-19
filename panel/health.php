@@ -2,14 +2,14 @@
 // Minimal health check for the admin panel.
 // Safe output (no credentials). Intended for temporary diagnostics.
 
-require_once __DIR__ . '/../multitenant/bootstrap.php';
 require_once __DIR__ . '/../modelos/conexion.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-$host = $_SERVER['HTTP_HOST'] ?? '';
+$host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+$panelHost = strtolower((string)(getenv('PANEL_HOST') ?: 'admin.grupoatlantiscrm.eu'));
 
-if (!defined('APP_MODE') || APP_MODE !== 'panel') {
+if ($host !== '' && $panelHost !== '' && $host !== $panelHost) {
     http_response_code(404);
     echo json_encode(['ok' => false, 'error' => 'not_panel_host', 'host' => $host], JSON_UNESCAPED_UNICODE);
     exit;
@@ -22,7 +22,6 @@ try {
 
     echo json_encode([
         'ok' => true,
-        'app_mode' => APP_MODE,
         'host' => $host,
         'db_ok' => (bool)($row && (int)$row['ok'] === 1),
         'db_name' => getenv('DB_NAME') ?: null,
