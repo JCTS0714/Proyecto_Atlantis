@@ -6,13 +6,24 @@ include 'modelos/conexion.php'; // Asegúrate de que la ruta sea correcta
 
 // Verificar si se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validar que se haya enviado el nombre de la tabla
+    if (!isset($_POST['tabla']) || empty($_POST['tabla'])) {
+        die("Error: No se especificó la tabla a exportar.");
+    }
+
+    $tabla = $_POST['tabla'];
+
     // Consulta para obtener los datos de la tabla
-    $query = "SELECT * FROM tu_tabla"; // Cambia "tu_tabla" por el nombre de tu tabla
+    $query = "SELECT * FROM $tabla";
     $result = $conn->query($query);
 
-    if ($result && $result->num_rows > 0) {
+    if (!$result) {
+        die("Error en la consulta: " . $conn->error);
+    }
+
+    if ($result->num_rows > 0) {
         // Nombre del archivo CSV
-        $filename = "exportacion_" . date('Ymd') . ".csv";
+        $filename = "exportacion_" . $tabla . "_" . date('Ymd') . ".csv";
 
         // Encabezados para forzar la descarga del archivo
         header('Content-Type: text/csv; charset=utf-8');
