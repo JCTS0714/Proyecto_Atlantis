@@ -1,6 +1,9 @@
 <?php
 // Bootstrap for AJAX: session, headers and error handling
 require_once __DIR__ . '/_error_handler.php';
+// Ensure multi-tenant bootstrap runs before models/connections
+require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 require_once "../controladores/clientes.controlador.php";
 require_once "../modelos/clientes.modelo.php";
 

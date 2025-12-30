@@ -1,0 +1,24 @@
+
+
+
+
+.DS_Store
+
+node_modules/*
+custom/*
+
+docs/index.md
+
+# Archivos de configuración local - NUNCA subir a producción
+.env
+config/local.php
+config/production.php
+logs/*.log
+
+# Fotos de usuarios - Ignorar todas excepto la imagen por defecto
+vistas/img/usuarios/*
+!vistas/img/usuarios/default/
+!vistas/img/usuarios/default/perfil.png
+
+# Carpeta para imágenes de certificados (no versionar)
+uploads/certificados/

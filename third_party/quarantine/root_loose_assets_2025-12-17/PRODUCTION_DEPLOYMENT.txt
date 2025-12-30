@@ -1,0 +1,84 @@
+INSTRUCCIONES DE DESPLIEGUE (Producción)
+
+Resumen rápido
+- Mantener la rama `Produccion` como la rama desplegada en el servidor (public_html).
+- Los assets deben existir localmente en `vistas/dist/` y `vistas/bower_components/` para que la web cargue sin depender de CDN.
+- Antes de mergear cualquier cambio en `Produccion`, crear un backup de la rama actual.
+
+Flujo recomendado (PowerShell, desde el workspace):
+
+1) Trabajar en una rama feature
+--------------------------------
+# crear y moverte a una rama de trabajo
+git checkout -b feature/mi-cambio
+# hacer cambios, probar localmente
+# luego commit y push
+git add -A
+git commit -m "Descripción del cambio"
+git push -u origin feature/mi-cambio
+
+2) Abrir PR y revisión
+-----------------------
+- Crear PR hacia `Produccion` (o hacia `Produccion-assets-full` si son solo assets) y pedir revisión.
+- Revisar: rutas de assets, cambios en `vistas/plantilla.php`, `.htaccess` y cualquier cambio en `config/paths.php`.
+
+3) Preparar merge a Produccion (pasos seguros)
+-----------------------------------------------
+# Traer la rama Produccion actual
+git fetch origin
+git checkout Produccion
+git pull origin Produccion
+# Crear copia de seguridad de Produccion (siempre hacer esto)
+git branch backup-Produccion-before-<fecha>
+git push origin backup-Produccion-before-<fecha>
+
+# Fusionar la rama aprobada (ejemplo: Produccion-assets-full)
+git merge --no-ff Produccion-assets-full -m "Merge: restore vendor assets for production"
+# Resolver conflictos si aparecen, probar localmente
+
+# Empujar Produccion actualizada
+git push origin Produccion
+
+4) Verificación post-merge (importante)
+----------------------------------------
+- En el servidor (o local XAMPP si despliegas ahí): comprobar que `public_html` contiene los archivos actualizados.
+- Comprobar en navegador (Inspector → Network): que las rutas siguientes respondan 200:
+  - `/vistas/dist/css/AdminLTE.min.css`
+  - `/vistas/dist/js/adminlte.min.js`
+  - `/vistas/bower_components/jquery/dist/jquery.min.js`
+  - `/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css`
+- Limpiar cache del navegador (Ctrl+F5) y, si procede, vaciar caches del servidor.
+- Revisar consola del navegador por errores JS y la pestaña Network por 404s.
+
+Comandos útiles de diagnóstico (PowerShell):
+
+# listar unos archivos de assets
+Get-ChildItem -Recurse .\vistas\dist | Select-Object -First 20
+Get-ChildItem -Recurse .\vistas\bower_components | Select-Object -First 20
+
+# probar una petición local (ajusta host/ruta si no es localhost)
+Invoke-WebRequest http://localhost/proyecto/vistas/dist/css/AdminLTE.min.css -UseBasicParsing
+
+# ver últimos logs de Apache (XAMPP típico)
+Get-Content 'C:\xampp\apache\logs\error.log' -Tail 100
+
+Rollback (si algo sale mal)
+----------------------------
+# volver al backup (cuidado: esto reescribe Produccion localmente)
+git checkout Produccion
+git reset --hard backup-Produccion-before-<fecha>
+git push --force origin Produccion
+
+Notas y consideraciones
+------------------------
+- .htaccess: el routing friendly-URL depende de un `.htaccess` en root con las reglas de `mod_rewrite`. No eliminarlo.
+- `config/paths.php` y `vistas/plantilla.php` construyen `BASE_URL` y `BASE_PATH` — usar rutas relativas/BASE_URL coherentes evita problemas con assets.
+- DNS: los problemas de resolución del dominio no están relacionados con el repositorio. Revisar el panel del registrador / proveedor DNS si la web no resuelve.
+- Tamaño del repo: los vendor assets son voluminosos; si el repositorio se hace demasiado grande, considerar usar un artefacto/zip en el servidor o un submódulo/asset bundle. Para simplicidad y disponibilidad off-line hemos incorporado los `vistas` aquí.
+
+Contacto y control de cambios
+-----------------------------
+- Antes de un despliegue fuera de horario, informar al responsable del hosting.
+- Mantener ramas `Produccion-assets-full` y `backup-Produccion-before-<fecha>` como puntos de recuperación.
+
+Fin del archivo. Mantener este archivo actualizado con cambios de proceso.

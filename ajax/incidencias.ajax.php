@@ -8,6 +8,9 @@ if (!isset($_SESSION["id"])) {
     exit;
 }
 
+// Ensure multi-tenant bootstrap runs before models/connections
+require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 require_once __DIR__ . "/../modelos/conexion.php";
 require_once __DIR__ . "/../modelos/ModeloIncidencias.php";
 require_once __DIR__ . "/../controladores/ControladorIncidencias.php";

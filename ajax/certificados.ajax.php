@@ -10,6 +10,8 @@ if (!isset($_SESSION['id'])) {
 }
 
 require_once __DIR__ . '/../modelos/conexion.php';
+// Ensure multi-tenant bootstrap runs before models/connections
+require_once __DIR__ . '/../multitenant/bootstrap.php';
 
 try{
     $db = Conexion::conectar();

@@ -2,6 +2,9 @@
 // Ensure consistent timezone + session for AJAX
 require_once __DIR__ . '/_timezone.php';
 
+// Ensure multi-tenant bootstrap runs before controllers/models that open DB
+require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 require_once "../controladores/ControladorOportunidad.php";
 require_once "../modelos/ModeloCRM.php";
 

@@ -122,6 +122,9 @@ try {
     ]);
 }
 
+        // Ensure multi-tenant bootstrap runs before models/connections
+        require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 /**
  * =====================================================
  * FUNCIONES DE EXPORTACIÓN POR TABLA

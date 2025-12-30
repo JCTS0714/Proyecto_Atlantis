@@ -1,0 +1,175 @@
+                 <!DOCTYPE html>
+  <html lang="es-PE">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> GRUPO | ATLANTIS</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!--=================================
+    PLUGINS DE CSS
+  =====================================-->
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/Ionicons/css/ionicons.min.css">
+
+    <!-- fullCalendar -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/fullcalendar/dist/fullcalendar.min.css">
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/fullcalendar/dist/fullcalendar.print.min.css" media="print">
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/jquery-ui/jquery-ui.min.css">
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/select2/dist/css/select2.min.css">
+    
+    <!-- Column Toggle CSS - Sistema mostrar/ocultar columnas -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/css/column-toggle.css">
+    
+    <!-- Estilos personalizados para Kanban -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/css/estilos_kanban.css">
+    
+    <!-- Responsive Tables CSS -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/css/responsive-tables.css">
+
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
+
+    <!--=================================
+    CAMBIAMOS LA HOJA DE ESTILO DE AdminLTE a solo.cc
+  =====================================-->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/dist/css/AdminLTE.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+        folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/dist/css/skins/_all-skins.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+    <!-- Custom background style -->
+    <style>
+    body {
+      background-image: url('../fonds.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .content-wrapper {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    </style>
+
+    
+    <!--=================================
+    ==========PLUGINS DE JAVASCRIP
+    =====================================-->
+  <!-- jQuery 3 -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/jquery/dist/jquery.min.js"></script>
+
+  <!-- jQuery UI -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/jquery-ui/jquery-ui.min.js"></script>
+  <!-- fullCalendar -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/moment/moment.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+  <!-- Select2 JS -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/select2/dist/js/select2.min.js"></script>
+  <!-- Calendario JS -->
+  <!-- moved to end of body to avoid duplicate execution -->
+    <!-- Chart.js para gr├íficos del dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Bootstrap 3.3.7 -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!-- SlimScroll -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <!-- FastClick -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/fastclick/lib/fastclick.js"></script>
+  <!-- AdminLTE App -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/dist/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/dist/js/demo.js"></script>
+
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Sistema de Mostrar/Ocultar Columnas v2 -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/column-toggle-v2.js"></script>
+  
+  <!-- Responsive Tables Script -->
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/responsive-tables.js"></script>
+
+  </head>
+    <body class="hold-transition skin-blue sidebar-collapse sidebar-mini login-page">
+  <!-- Site wrapper -->
+
+  <script>
+    window.BASE_URL = 'http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas';
+  </script>
+
+
+      <div id="back"></div><!--ID PARA LLAMAR EN EL CSS AGREGAR UN FONDO AL LOGIN-->
+    <div class="login-box">
+        <div class="login-logo">
+           <!-- <img src="vistas/img/plantilla/logo.png" class="img-responsive" style="padding:330px 100px 0px 100px">-->
+            <a href="#"><b>Admin</b>LTE</a>
+        </div>
+        <div class="login-box-body">
+            <p class="login-box-msg">Ingresar al Sistema</p>
+
+        <form method="post" class="login-form">
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" placeholder="Usuario" name="ingUsuario" requerid>
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" placeholder="Contrase├▒a" name="ingPassword" requerid>
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+            <div class="col-xs-8">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="remember_me" value="on"> Recordarme
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <button type="submit" class="btn btn-primary btn-block btn-flat">Ingresar</button>
+                </div>
+            </div>
+            <!--LLAMAR AL M├ëTPDO PARA INICIAR SESI├ôN-->
+                    </form>
+    </div>
+</div>
+  <!-- ./wrapper -->
+
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/plantilla.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/usuarios.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/clientes.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/incidencias.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/ventas.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/oportunidades.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/prospectos.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/calendario.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/evento.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/dashboard.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/notificaciones.module.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/notificaciones.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/alarma.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/modal-detalles.js"></script>
+  <script src="http://localhostC:\xampp\htdocs\Proyecto_Atlantis\Ventas/vistas/js/advanced_search.js"></script>
+
+  </body>
+  </html>

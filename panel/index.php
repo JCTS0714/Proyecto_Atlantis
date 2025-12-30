@@ -150,14 +150,14 @@ function panel_test_tenant_db(array $dbRow): array {
     if ($name === '' || $user === '') {
         return ['ok' => false, 'message' => 'Credenciales incompletas.'];
     }
-    $dsn = "mysql:host={$host};dbname={$name};charset={$charset}";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    // Use Conexion::testConnection() helper so tests respect connection logic
+    return Conexion::testConnection([
+        'host' => $host,
+        'name' => $name,
+        'user' => $user,
+        'pass' => $pass,
+        'charset' => $charset,
     ]);
-    $one = $pdo->query('SELECT 1 AS ok')->fetchColumn();
-    $db = $pdo->query('SELECT DATABASE()')->fetchColumn();
-    return ['ok' => ((int)$one === 1), 'message' => 'Conexión OK', 'db' => $db];
 }
 
 // Routing (panel only)

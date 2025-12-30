@@ -4,6 +4,9 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Ensure multi-tenant bootstrap runs before controllers/models that open DB
+require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 require_once __DIR__ . '/../controladores/ControladorOportunidad.php';
 require_once __DIR__ . '/../modelos/ModeloCRM.php';
 

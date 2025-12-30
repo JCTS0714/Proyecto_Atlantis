@@ -1,0 +1,130 @@
+Implementación propuesta — API WhatsApp y funciones secundarias para Proyecto_Atlantis/Ventas
+
+Fecha: 2025-11-29
+
+Resumen
+- Contenido: propuesta de funciones secundarias, priorización, diseño técnico para una API de WhatsApp (MVP), esquema SQL, endpoints AJAX, worker para envíos programados, consideraciones legales y pasos siguientes.
+- Estado actual: el equipo está a la espera de retroalimentación; este documento prepara la implementación mientras tanto.
+
+Funciones secundarias sugeridas (valor / por qué)
+1) WhatsApp programado (alto) — Envío de mensajes preprogramados y plantillas. Mejora el seguimiento automatizado.
+2) Plantillas con variables (alto) — Plantillas con {nombre}, {producto}, {fecha} para personalizar mensajes.
+3) Registro y métricas de envíos (alto) — Tabla de historial con estado, intentos y errores.
+4) Modo sandbox / testing (alto) — Evitar envíos reales en pruebas.
+5) Opt-in / consentimiento (alto) — Registrar consentimiento para cumplir normativas.
+6) Multicanal (fallback) (medio) — Si falla WhatsApp, reintentar por SMS o email.
+7) Recepción y logging de respuestas (medio) — Registrar respuestas entrantes en el CRM.
+8) Recordatorios automáticos -> crear `clientes_actividades` (medio) — Transformar envíos en tareas follow-up.
+9) Dashboard de campañas (bajo) — KPIs: enviados, entregados, fallidos, respuestas.
+10) Importar/exportar masivo (CSV) (bajo) — Para listas de envío.
+
+Prioridad recomendada (MVP inmediato)
+- Implementar primero: WhatsApp programado + Plantillas + Registro/estado + Modo sandbox.
+- Siguientes: Opt-in/Consentimiento, Recepción de respuestas, Multicanal.
+
+Proveedor recomendado para comenzar
+- Twilio (rápido para pruebas con sandbox). Alternativas: 360dialog, WATI, Meta Business API (más complejo).
+
+Esquema SQL sugerido (MVP)
+-- Tabla: whatsapp_plantillas
+CREATE TABLE IF NOT EXISTS whatsapp_plantillas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  contenido TEXT NOT NULL,
+  tipo ENUM('texto','multimedia') DEFAULT 'texto',
+  creado_por INT NULL,
+  creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla: programados_whatsapp
+CREATE TABLE IF NOT EXISTS programados_whatsapp (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cliente_id INT NULL,
+  telefono VARCHAR(30) NOT NULL,
+  plantilla_id INT NULL,
+  mensaje TEXT NOT NULL,
+  datos_personalizacion JSON NULL,
+  programado_para DATETIME NOT NULL,
+  estado ENUM('pendiente','enviado','error','cancelado') DEFAULT 'pendiente',
+  intentos INT DEFAULT 0,
+  proveedor VARCHAR(50) NULL,
+  proveedor_id VARCHAR(100) NULL,
+  creado_en DATETIME DEFAULT CURRENT_TIMESTAMP,
+  creado_por INT NULL,
+  actualizado_en DATETIME NULL
+);
+
+-- Tabla opcional: logs de envío
+CREATE TABLE IF NOT EXISTS programados_whatsapp_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  programado_id INT NOT NULL,
+  respuesta_proveedor TEXT NULL,
+  codigo_error VARCHAR(50) NULL,
+  creado_en DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (programado_id) REFERENCES programados_whatsapp(id) ON DELETE CASCADE
+);
+
+Diseño backend y endpoints
+- Archivos a crear:
+  - `modelos/whatsapp.modelo.php` : consultas a DB (insertar plantilla, listar plantillas, insertar programado, actualizar estado, logs).
+  - `controladores/whatsapp.controlador.php` : lógica para validar datos y orquestar modelo.
+  - `ajax/whatsapp.ajax.php` : actions: `guardarPlantilla`, `listarPlantillas`, `programarMensaje`, `listarProgramados`, `cancelarProgramado`, `enviarAhora`.
+  - `scripts/worker_whatsapp.php` : worker CLI que selecciona programados pendientes y llama al proveedor.
+
+- Flujo típico:
+  1. Usuario crea plantilla -> AJAX -> `ControladorWhatsApp::ctrGuardarPlantilla` -> `ModeloWhatsApp::mdlGuardarPlantilla`.
+  2. Usuario programa envío -> AJAX -> guardar en `programados_whatsapp` con estado `pendiente`.
+  3. Worker (Task Scheduler) ejecuta `worker_whatsapp.php` periódicamente: selecciona filas `pendiente` con `programado_para <= NOW()` e intenta enviar.
+  4. Al enviar: actualizar `estado` a `enviado` o `error`, incrementar `intentos`, guardar log.
+
+Worker: recomendaciones
+- Implementar con PHP CLI: `C:\xampp\php\php.exe -f "C:\xampp\htdocs\Proyecto_Atlantis\Ventas\scripts\worker_whatsapp.php"`.
+- En Windows: crear tarea en Task Scheduler que ejecute cada 1-5 minutos.
+- Lógica de reintentos: max 3 intentos con backoff (ej.: 1m, 5m, 30m) o simplemente contar intentos y dejar para intervención manual.
+
+Integración con Twilio (resumen rápido)
+- Guardar `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER` en `.env` o config.
+- En el worker, usar cURL para POST a Twilio API o usar su SDK.
+- Para pruebas: usar Twilio Sandbox for WhatsApp y números de prueba.
+
+Seguridad y cumplimiento
+- Implementar opt-in y un sistema para marcar `consentimiento_whatsapp` en la ficha del cliente.
+- Respetar plantillas aprobadas por Meta si envíos fuera de ventana de 24h.
+- Validar formato internacional (E.164) de números.
+
+UI y UX
+- Crear módulo en `vistas/modulos/whatsapp.php` (o dentro de `vistas/modulos/` existente) con:
+  - Gestión de plantillas.
+  - Formulario para programar envíos: seleccionar plantilla, cliente(s) o número, fecha/hora, vista previa.
+  - Tabla de programados con estados y opción de reenviar/cancelar.
+  - Modo sandbox toggle para usuarios con permiso `Administrador`.
+
+Permisos
+- Validar `$_SESSION['perfil']` antes de permitir crear/editar/cancelar programados.
+- Registrar `creado_por` en tablas.
+
+Checklist de implementación (pasos prácticos)
+1) Crear tablas SQL en la DB de proyecto.
+2) Crear `modelos/whatsapp.modelo.php` y pruebas unitarias manuales de consultas.
+3) Crear `controladores/whatsapp.controlador.php` con validaciones básicas.
+4) Crear `ajax/whatsapp.ajax.php` con endpoints y respuestas JSON.
+5) Crear `scripts/worker_whatsapp.php` con modo `--dry-run` (solo muestra qué enviaría).
+6) Crear UI en `vistas/modulos/` y `vistas/js/whatsapp.js` (AJAX + validaciones).
+7) Configurar Task Scheduler en el servidor Windows local; documentar pasos.
+8) Probar en sandbox y revisar logs, manejar errores.
+
+Siguientes decisiones (elige)
+- Proveedor para empezar: Twilio (recomendado) / 360dialog / otro.
+- ¿Quieres que genere los archivos scaffold (`modelos/`, `controladores/`, `ajax/` y `scripts/`) ahora?
+- ¿Quieres que incluya el SQL en un archivo `scripts/create_whatsapp_tables.sql` listo para ejecutar?
+
+Notas finales
+- Documentar claramente en README de la carpeta `scripts/` cómo activar el Task Scheduler y cómo cambiar credenciales.
+- Mantener modo sandbox por defecto en entorno de desarrollo.
+
+Contacto y próximos pasos propuestos
+- Si quieres, puedo: (A) generar SQL + scaffold backend (archivos PHP) ahora; (B) además crear la UI mínima; (C) sólo dejar la documentación y el SQL para que lo integres.
+- Indica proveedor si ya tienes uno en mente.
+
+---
+Documento generado automáticamente por la propuesta entregada al equipo.

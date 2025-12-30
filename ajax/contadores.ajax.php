@@ -4,6 +4,9 @@ require_once __DIR__ . '/_error_handler.php';
 require_once __DIR__ . '/_timezone.php';
 require_once __DIR__ . '/_json.php';
 
+// Ensure multi-tenant bootstrap runs before models/connections
+require_once __DIR__ . '/../multitenant/bootstrap.php';
+
 require_once "../modelos/contador.modelo.php";
 require_once "../modelos/conexion.php";
 

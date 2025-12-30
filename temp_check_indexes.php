@@ -1,5 +1,7 @@
 <?php
-$pdo = new PDO('mysql:host=127.0.0.1;dbname=u652153415_atlantisdb;charset=utf8','root','');
+// Use Conexion::conectar() so this utility respects multitenant override when present
+require_once __DIR__ . '/modelos/conexion.php';
+$pdo = Conexion::conectar();
 // Columns
 $stmt = $pdo->query("SHOW CREATE TABLE clientes");
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
