@@ -237,6 +237,17 @@ var ExportTables = (function($) {
         }
       },
       {
+        extend: 'csvHtml5',
+        text: '<i class="fa fa-file-text-o"></i> CSV',
+        className: 'btn btn-info btn-sm export-btn',
+        title: tableConfig.title,
+        filename: function() {
+          return generateFilename(tableConfig.filename, tableId);
+        },
+        exportOptions: exportOptions,
+        bom: true
+      },
+      {
         extend: 'copyHtml5',
         text: '<i class="fa fa-copy"></i> Copiar',
         className: 'btn btn-default btn-sm export-btn',

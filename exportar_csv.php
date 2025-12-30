@@ -1,128 +1,99 @@
 <?php
 // Archivo: exportar_csv.php
+// Exportador CSV temporal (robusto): PDO, whitelist y manejo de errores.
 
-// Conexión a la base de datos
-include 'modelos/conexion.php'; // Asegúrate de que la ruta sea correcta
+declare(strict_types=1);
 
-// Verificar si se envió el formulario
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validar que se haya enviado el nombre de la tabla
-    $tabla = 'prospectos';
-
-    // Consulta para obtener los datos de la tabla
-    $query = "SELECT * FROM $tabla";
-    $result = $conn->query($query);
-
-    if (!$result) {
-        die("Error en la consulta: " . $conn->error);
+function csv_fail(int $status, string $message, ?string $logMessage = null): void {
+    if (!headers_sent()) {
+        http_response_code($status);
+        header('Content-Type: text/plain; charset=utf-8');
     }
+    echo $message;
+    if ($logMessage) {
+        error_log($logMessage);
+    }
+    exit;
+}
 
-    if ($result->num_rows > 0) {
-        // Nombre del archivo CSV
-        $filename = "exportacion_" . $tabla . "_" . date('Ymd') . ".csv";
+$conexionPath = __DIR__ . '/modelos/conexion.php';
+if (!file_exists($conexionPath)) {
+    csv_fail(500, 'Error interno: no se encontró el archivo de conexión.', 'exportar_csv.php: no existe ' . $conexionPath);
+}
+require_once $conexionPath;
 
-        // Encabezados para forzar la descarga del archivo
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=' . $filename);
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    csv_fail(405, 'Método no permitido.');
+}
 
-        // Crear un archivo temporal en memoria
-        <?php
-        // Archivo: exportar_csv.php
-        // Versión robusta: usa PDO (Conexion::conectar()), whitelist de tablas y manejo de errores.
+$tablaParam = isset($_POST['tabla']) ? trim((string)$_POST['tabla']) : '';
+if ($tablaParam === '') {
+    csv_fail(400, 'Error: no se especificó la tabla a exportar.');
+}
 
-        // Evitar cualquier output antes de headers
-        try {
-            require_once __DIR__ . '/modelos/conexion.php';
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo "Error interno: no se pudo cargar la configuración de conexión.";
-            error_log("exportar_csv.php: fallo al incluir conexion.php: " . $e->getMessage());
-            exit;
-        }
+// Lista blanca (evita inyección SQL por identificadores)
+$allowedTables = [
+    'prospectos' => 'prospectos',
+    'clientes' => 'clientes',
+    'certificados' => 'certificados',
+    'contadores' => 'contadores',
+    'ventas' => 'ventas',
+    'incidencias' => 'incidencias',
+    'reuniones_pasadas' => 'reuniones_pasadas',
+];
 
-        // Lista blanca de tablas permitidas (ajusta según tus tablas reales)
-        $allowedTables = [
-            'prospectos' => 'prospectos',
-            'clientes' => 'clientes',
-            'certificados' => 'certificados',
-            'contadores' => 'contadores',
-            'ventas' => 'ventas',
-            'incidencias' => 'incidencias',
-            'reuniones_pasadas' => 'reuniones_pasadas'
-        ];
+if (!isset($allowedTables[$tablaParam])) {
+    csv_fail(400, 'Error: tabla no permitida para exportación.');
+}
 
-        try {
-            $pdo = Conexion::conectar();
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo "Error interno: no se pudo conectar a la base de datos.";
-            error_log("exportar_csv.php: fallo al conectar a DB: " . $e->getMessage());
-            exit;
-        }
+$tableName = $allowedTables[$tablaParam];
+$safeTableName = str_replace('`', '', $tableName);
 
-        // Solo aceptar POST desde los botones de la UI
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo "Método no permitido.";
-            exit;
-        }
+try {
+    $pdo = Conexion::conectar();
+} catch (Throwable $e) {
+    csv_fail(500, 'Error interno: no se pudo conectar a la base de datos.', 'exportar_csv.php: conectar() ' . $e->getMessage());
+}
 
-        // Obtener tabla enviada por el formulario
-        $tablaParam = isset($_POST['tabla']) ? trim($_POST['tabla']) : '';
-        if ($tablaParam === '') {
-            http_response_code(400);
-            echo "Error: no se especificó la tabla a exportar.";
-            exit;
-        }
+$sql = "SELECT * FROM `{$safeTableName}`";
+try {
+    $stmt = $pdo->query($sql);
+    if ($stmt === false) {
+        csv_fail(500, 'Error en la consulta a la base de datos.', 'exportar_csv.php: query() devolvió false | SQL=' . $sql);
+    }
+} catch (Throwable $e) {
+    csv_fail(500, 'Error en la consulta a la base de datos.', 'exportar_csv.php: query() ' . $e->getMessage() . ' | SQL=' . $sql);
+}
 
-        // Validar contra whitelist
-        if (!array_key_exists($tablaParam, $allowedTables)) {
-            http_response_code(400);
-            echo "Error: tabla no permitida para exportación.";
-            exit;
-        }
+$firstRow = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($firstRow === false) {
+    csv_fail(200, 'No hay datos para exportar.');
+}
 
-        $tableName = $allowedTables[$tablaParam];
+// Preparar descarga
+$filename = 'exportacion_' . $safeTableName . '_' . date('Ymd_His') . '.csv';
+header('Content-Type: text/csv; charset=utf-8');
+header('Content-Disposition: attachment; filename="' . $filename . '"');
 
-        // Preparar y ejecutar la consulta de forma segura (no se pueden enlazar identificadores, por eso la whitelist)
-        $sql = "SELECT * FROM `" . str_replace('`','', $tableName) . "`";
-        try {
-            $stmt = $pdo->query($sql);
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo "Error en la consulta a la base de datos.";
-            error_log("exportar_csv.php: error en consulta ($sql): " . $e->getMessage());
-            exit;
-        }
+$out = fopen('php://output', 'w');
+if ($out === false) {
+    csv_fail(500, 'Error interno: no se pudo escribir el CSV.', 'exportar_csv.php: fopen(php://output) falló');
+}
 
-        if (empty($rows)) {
-            // No hay datos: informar al usuario
-            echo "No hay datos para exportar.";
-            exit;
-        }
+// BOM para Excel (UTF-8)
+fwrite($out, "\xEF\xBB\xBF");
 
-        // Enviar headers CSV (sin output previo)
-        $filename = "exportacion_" . $tableName . "_" . date('Ymd_His') . ".csv";
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
+$headers = array_keys($firstRow);
+fputcsv($out, $headers);
+fputcsv($out, array_map(static fn($h) => $firstRow[$h] ?? '', $headers));
 
-        // Abrir salida y escribir CSV
-        $out = fopen('php://output', 'w');
-        // Encabezados de columnas (usar keys del primer registro)
-        $headers = array_keys($rows[0]);
-        // Opcional: convertir encoding si necesitas ISO-8859-1 en Excel antiguo
-        // fputcsv($out, $headers);
-        fputcsv($out, $headers);
+while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
+    $line = [];
+    foreach ($headers as $h) {
+        $line[] = $row[$h] ?? '';
+    }
+    fputcsv($out, $line);
+}
 
-        foreach ($rows as $row) {
-            // Asegurarse de mantener el orden de columnas
-            $line = [];
-            foreach ($headers as $h) {
-                $line[] = isset($row[$h]) ? $row[$h] : '';
-            }
-            fputcsv($out, $line);
-        }
-
-        fclose($out);
-        exit;
+fclose($out);
+exit;
