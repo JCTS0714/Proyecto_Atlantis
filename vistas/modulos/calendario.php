@@ -260,15 +260,7 @@
   </div>
 </div>
 
-<!-- Botón para exportar como CSV -->
-<div class="row" style="margin-top: 20px;">
-  <div class="col-md-12">
-    <form method="POST" action="exportar_csv.php">
-      <input type="hidden" name="tabla" value="reuniones_pasadas">
-      <button type="submit" class="btn btn-primary">Exportar como CSV</button>
-    </form>
-  </div>
-</div>
+<!-- Exportación: se maneja vía DataTables Buttons en la tabla correspondiente -->
 
 <script>
 // Agrupa los eventos en páginas de 5

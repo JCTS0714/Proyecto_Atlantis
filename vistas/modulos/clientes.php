@@ -25,13 +25,8 @@
           <i class="fa fa-plus"></i> Agregar Cliente
         </button>
         
-        <!-- NUEVO: Contenedor para botones de exportación -->
-        <div class="export-buttons-container pull-right" id="export-tablaClientes">
-          <form method="POST" action="exportar_csv.php" style="display:inline;">
-            <input type="hidden" name="tabla" value="clientes">
-            <button type="submit" class="btn btn-primary btn-exportar-csv"><i class="fa fa-file-csv"></i> Exportar como CSV</button>
-          </form>
-        </div>
+        <!-- Contenedor para botones de exportación (DataTables Buttons) -->
+        <div class="export-buttons-container pull-right" id="export-tablaClientes"></div>
       </div>
         
       <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->

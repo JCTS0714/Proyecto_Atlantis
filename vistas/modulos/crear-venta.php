@@ -371,6 +371,3 @@
   </div>
 </div>
 
-<form method="POST" action="exportar_csv.php">
-  <button type="submit" class="btn btn-primary">Exportar como CSV</button>
-</form>
