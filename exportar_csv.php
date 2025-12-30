@@ -7,11 +7,7 @@ include 'modelos/conexion.php'; // Asegúrate de que la ruta sea correcta
 // Verificar si se envió el formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar que se haya enviado el nombre de la tabla
-    if (!isset($_POST['tabla']) || empty($_POST['tabla'])) {
-        die("Error: No se especificó la tabla a exportar.");
-    }
-
-    $tabla = $_POST['tabla'];
+    $tabla = 'prospectos';
 
     // Consulta para obtener los datos de la tabla
     $query = "SELECT * FROM $tabla";
