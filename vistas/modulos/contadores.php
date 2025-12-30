@@ -19,7 +19,8 @@
         
         <!-- NUEVO: Contenedor para botones de exportación -->
         <div class="export-buttons-container pull-right" id="export-tablaContadores">
-          <form method="POST" action="exportar_csv.php" style="display:inline;">
+          <form method="POST" action="exportar_csv.php">
+            <input type="hidden" name="tabla" value="contadores">
             <button type="submit" class="btn btn-primary btn-xs" title="Exportar como CSV">
               <i class="fa fa-file-csv"></i> Exportar como CSV
             </button>

@@ -263,7 +263,8 @@
 <!-- Botón para exportar como CSV -->
 <div class="row" style="margin-top: 20px;">
   <div class="col-md-12">
-    <form method="POST" action="exportar_csv.php" style="text-align: right;">
+    <form method="POST" action="exportar_csv.php">
+      <input type="hidden" name="tabla" value="reuniones_pasadas">
       <button type="submit" class="btn btn-primary">Exportar como CSV</button>
     </form>
   </div>
