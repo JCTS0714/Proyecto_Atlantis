@@ -26,7 +26,11 @@
         </button>
         
         <!-- NUEVO: Contenedor para botones de exportación -->
-        <div class="export-buttons-container pull-right" id="export-tablaClientes"></div>
+        <div class="export-buttons-container pull-right" id="export-tablaClientes">
+          <form method="POST" action="exportar_csv.php" style="display:inline;">
+            <button type="submit" class="btn btn-primary btn-exportar-csv"><i class="fa fa-file-csv"></i> Exportar como CSV</button>
+          </form>
+        </div>
       </div>
         
       <!-- Botón Mostrar/Ocultar Columnas (igual que prospectos) -->

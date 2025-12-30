@@ -18,7 +18,13 @@
         </button>
         
         <!-- NUEVO: Contenedor para botones de exportación -->
-        <div class="export-buttons-container pull-right" id="export-tablaContadores"></div>
+        <div class="export-buttons-container pull-right" id="export-tablaContadores">
+          <form method="POST" action="exportar_csv.php" style="display:inline;">
+            <button type="submit" class="btn btn-primary btn-xs" title="Exportar como CSV">
+              <i class="fa fa-file-csv"></i> Exportar como CSV
+            </button>
+          </form>
+        </div>
         
         <!-- Botón Mostrar/Ocultar Columnas -->
         <div class="column-toggle-container" style="margin-top:10px;">
@@ -72,13 +78,7 @@
         <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">
           <thead>
             <tr>
-              <th style="width: 50px;" data-column="col-numero">N°</th>
-              <th data-column="col-comercios">Comercio(s)</th>
-              <th data-column="col-nombre">Nombre Contador</th>
-              <th data-column="col-nombre-celular">Nombre en Celular</th>
-              <th data-column="col-telefono">Teléfono</th>
-              <th data-column="col-link">Link</th>
-              <th data-column="col-usuario">Usuario</th>
+              <th style="width: 50px;" data-column="col-numero">N°
               <th data-column="col-contrasena">Contraseña</th>
               <th data-column="col-servidor">Servidor</th>
               <th style="width: 100px;" class="no-export">Acciones</th>

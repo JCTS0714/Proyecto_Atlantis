@@ -69,6 +69,12 @@
         </table>
       </div>
     </div>
+    <!-- Botón para exportar a CSV -->
+    <div class="box-footer">
+      <form method="POST" action="exportar_csv.php">
+        <button type="submit" class="btn btn-primary">Exportar como CSV</button>
+      </form>
+    </div>
   </section>
 </div>
 
