@@ -30,7 +30,11 @@ if (isset($_POST["editarNombre"]) && isset($_POST["idCliente"])) {
         </button>
         
         <!-- NUEVO: Contenedor para botones de exportación -->
-        <div class="export-buttons-container pull-right" id="export-tablaProspectos"></div>
+        <div class="export-buttons-container pull-right" id="export-tablaProspectos">
+          <form method="POST" action="exportar_csv.php" style="display:inline;">
+            <button type="submit" class="btn btn-primary">Exportar como CSV</button>
+          </form>
+        </div>
         
         <!-- Botón Mostrar/Ocultar Columnas -->
         <div class="column-toggle-container">
