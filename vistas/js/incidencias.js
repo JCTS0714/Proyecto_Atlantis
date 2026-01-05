@@ -378,6 +378,12 @@ $(document).ready(function() {
 
                 console.log('cargarIncidencias: rendered tbody rows=', $tabla.find('tbody tr').length);
                 // rendered tbody rows counted
+                // Inicializar botones de exportación (CSV/Excel/Copiar) si está disponible
+                try {
+                    if (window.ExportTables && typeof window.ExportTables.init === 'function') {
+                        ExportTables.init('tablaIncidencias');
+                    }
+                } catch(e) { console.error('Error inicializando ExportTables para tablaIncidencias', e); }
             },
             error: function(xhr, status, error) {
                 console.error('cargarIncidencias: AJAX error', status, error, xhr && xhr.responseText);
