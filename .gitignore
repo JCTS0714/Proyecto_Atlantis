@@ -22,3 +22,6 @@ vistas/img/usuarios/*
 
 # Carpeta para imágenes de certificados (no versionar)
 uploads/certificados/
+
+# Notas/archivos locales (no versionar)
+tablas_y_atributos.txt
