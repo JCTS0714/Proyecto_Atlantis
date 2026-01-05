@@ -68,11 +68,19 @@
           </div>
         </div>
 
+      </div>
+
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive" id="tablaContadores">
           <thead>
             <tr>
-              <th style="width: 50px;" data-column="col-numero">N°
+              <th style="width: 50px;" data-column="col-numero">N°</th>
+              <th data-column="col-comercios">Comercio(s)</th>
+              <th data-column="col-nombre">Nombre Contador</th>
+              <th data-column="col-nombre-celular">Nombre en Celular</th>
+              <th data-column="col-telefono">Teléfono</th>
+              <th data-column="col-link">Link</th>
+              <th data-column="col-usuario">Usuario</th>
               <th data-column="col-contrasena">Contraseña</th>
               <th data-column="col-servidor">Servidor</th>
               <th style="width: 100px;" class="no-export">Acciones</th>
