@@ -84,6 +84,11 @@ if ($out === false) {
 fwrite($out, "\xEF\xBB\xBF");
 
 $headers = array_keys($firstRow);
+
+// Excluir columna de imagen para certificados
+if ($safeTableName === 'certificados') {
+    $headers = array_values(array_filter($headers, static fn($h) => $h !== 'imagen'));
+}
 fputcsv($out, $headers);
 fputcsv($out, array_map(static fn($h) => $firstRow[$h] ?? '', $headers));
 

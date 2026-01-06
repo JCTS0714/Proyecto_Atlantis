@@ -103,47 +103,20 @@ $(document).ready(function(){
     }
   });
 
-  // Importar CSV
-  $(document).on('click', '#btnImportarCertificados', function(e){
+  // Exportar CSV (excluye columna imagen en el servidor)
+  $(document).on('click', '#btnExportarCertificados', function(e){
     e.preventDefault();
-    if (typeof $.fn.modal !== 'function') {
-      console.error('Bootstrap modal plugin not available ($.fn.modal is undefined)');
-      return;
-    }
-    $('#modalImportarCertificados').modal('show');
-  });
+    var base = (window.BASE_URL || '').replace(/\/$/, '');
+    var actionUrl = (base ? (base + '/exportar_csv.php') : 'exportar_csv.php');
 
-  $(document).on('submit', '#formImportarCertificados', function(e){
-    e.preventDefault();
-    var form = $(this)[0];
-    var fd = new FormData(form);
-    fd.append('accion','importar_csv');
-    $.ajax({
-      url: (window.BASE_URL || '') + '/ajax/certificados.ajax.php',
-      method: 'POST',
-      data: fd,
-      processData: false,
-      contentType: false,
-      dataType: 'json'
-    }).done(function(resp){
-      if(resp && resp.success === true){
-        $('#modalImportarCertificados').modal('hide');
-        try{ form.reset(); }catch(e){}
-        reloadTable();
+    var $form = $('<form method="POST" style="display:none;"></form>');
+    $form.attr('action', actionUrl);
+    $form.append('<input type="hidden" name="tabla" value="certificados">');
 
-        var msg = 'Importación finalizada.';
-        if (typeof resp.imported !== 'undefined' || typeof resp.updated !== 'undefined' || typeof resp.skipped !== 'undefined') {
-          msg = 'Importados: ' + (resp.imported || 0) + '\nActualizados: ' + (resp.updated || 0) + '\nOmitidos: ' + (resp.skipped || 0);
-        }
-        Swal.fire('OK', msg, 'success');
-      } else {
-        var err = (resp && resp.error) ? resp.error : 'No se pudo importar el CSV';
-        Swal.fire('Error', err, 'error');
-      }
-    }).fail(function(jqxhr){
-      var msg = (jqxhr && jqxhr.responseText) ? jqxhr.responseText : 'No se pudo conectar al servidor';
-      Swal.fire('Error', msg, 'error');
-    });
+    // Submit and remove
+    $('body').append($form);
+    $form.trigger('submit');
+    setTimeout(function(){ try{ $form.remove(); }catch(e){} }, 1000);
   });
 
   $(document).on('submit', '#formAgregarCertificado', function(e){
