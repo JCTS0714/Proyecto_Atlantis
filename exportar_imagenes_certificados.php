@@ -50,21 +50,43 @@ try {
     img_export_fail(500, 'Error interno: no se pudo conectar a la base de datos.', 'exportar_imagenes_certificados.php: conectar() ' . $e->getMessage());
 }
 
-// Obtener certificados con imagen y tratar de relacionar con cliente por documento=ruc
-$sql = "SELECT c.id AS certificado_id, c.ruc, c.imagen, cl.id AS cliente_id, cl.empresa, cl.nombre AS cliente_nombre
-        FROM certificados c
-        LEFT JOIN clientes cl ON cl.documento = c.ruc
-        WHERE c.imagen IS NOT NULL AND c.imagen <> ''
-        ORDER BY c.id ASC";
+// Obtener certificados con imagen y tratar de relacionar con cliente.
+// En algunos tenants la tabla/columnas de clientes pueden variar; si el JOIN falla, hacemos fallback.
+$sqlJoin = "SELECT c.id AS certificado_id, c.ruc, c.imagen, cl.id AS cliente_id, cl.empresa, cl.nombre AS cliente_nombre
+            FROM certificados c
+            LEFT JOIN clientes cl ON cl.documento = c.ruc
+            WHERE c.imagen IS NOT NULL AND c.imagen <> ''
+            ORDER BY c.id ASC";
+
+$sqlFallback = "SELECT id AS certificado_id, ruc, imagen
+                FROM certificados
+                WHERE imagen IS NOT NULL AND imagen <> ''
+                ORDER BY id ASC";
 
 try {
-    $stmt = $pdo->query($sql);
+    $stmt = $pdo->query($sqlJoin);
     if ($stmt === false) {
-        img_export_fail(500, 'Error en la consulta a la base de datos.', 'exportar_imagenes_certificados.php: query() devolvió false');
+        $err = $pdo->errorInfo();
+        error_log('exportar_imagenes_certificados.php: JOIN query() devolvió false | err=' . json_encode($err));
+        $stmt = $pdo->query($sqlFallback);
+        if ($stmt === false) {
+            $err2 = $pdo->errorInfo();
+            img_export_fail(500, 'Error en la consulta a la base de datos.', 'exportar_imagenes_certificados.php: fallback query() false | err=' . json_encode($err2));
+        }
     }
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) {
-    img_export_fail(500, 'Error en la consulta a la base de datos.', 'exportar_imagenes_certificados.php: query() ' . $e->getMessage());
+    error_log('exportar_imagenes_certificados.php: JOIN exception: ' . $e->getMessage());
+    try {
+        $stmt2 = $pdo->query($sqlFallback);
+        if ($stmt2 === false) {
+            $err2 = $pdo->errorInfo();
+            img_export_fail(500, 'Error en la consulta a la base de datos.', 'exportar_imagenes_certificados.php: fallback exception then false | err=' . json_encode($err2));
+        }
+        $rows = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e2) {
+        img_export_fail(500, 'Error en la consulta a la base de datos.', 'exportar_imagenes_certificados.php: fallback exception: ' . $e2->getMessage());
+    }
 }
 
 if (empty($rows)) {
