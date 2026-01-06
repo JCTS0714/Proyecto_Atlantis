@@ -15,6 +15,7 @@
         <h3 class="box-title">Administrar Certificados</h3>
         <!-- Removed data-toggle/data-target to avoid duplicate bootstrap handlers; JS controls the modal -->
         <button id="btnAgregarCertificado" class="btn btn-success pull-right" style="margin-left:8px;"><i class="fa fa-plus"></i> Agregar</button>
+        <button id="btnExportarImagenesCertificados" class="btn btn-primary pull-right" style="margin-left:8px;"><i class="fa fa-file-zip-o"></i> Exportar Imágenes</button>
         <button id="btnExportarCertificados" class="btn btn-primary pull-right"><i class="fa fa-download"></i> Exportar CSV</button>
       </div>
       <div class="box-body">

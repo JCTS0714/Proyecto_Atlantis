@@ -119,6 +119,19 @@ $(document).ready(function(){
     setTimeout(function(){ try{ $form.remove(); }catch(e){} }, 1000);
   });
 
+  // Exportar imágenes (ZIP)
+  $(document).on('click', '#btnExportarImagenesCertificados', function(e){
+    e.preventDefault();
+    var base = (window.BASE_URL || '').replace(/\/$/, '');
+    var actionUrl = (base ? (base + '/exportar_imagenes_certificados.php') : 'exportar_imagenes_certificados.php');
+
+    var $form = $('<form method="POST" style="display:none;"></form>');
+    $form.attr('action', actionUrl);
+    $('body').append($form);
+    $form.trigger('submit');
+    setTimeout(function(){ try{ $form.remove(); }catch(e){} }, 1000);
+  });
+
   $(document).on('submit', '#formAgregarCertificado', function(e){
     e.preventDefault();
     var form = $(this)[0];
