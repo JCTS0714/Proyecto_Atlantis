@@ -14,7 +14,8 @@
       <div class="box-header with-border">
         <h3 class="box-title">Administrar Certificados</h3>
         <!-- Removed data-toggle/data-target to avoid duplicate bootstrap handlers; JS controls the modal -->
-        <button id="btnAgregarCertificado" class="btn btn-success pull-right"><i class="fa fa-plus"></i> Agregar</button>
+        <button id="btnAgregarCertificado" class="btn btn-success pull-right" style="margin-left:8px;"><i class="fa fa-plus"></i> Agregar</button>
+        <button id="btnImportarCertificados" class="btn btn-primary pull-right"><i class="fa fa-upload"></i> Importar CSV</button>
       </div>
       <div class="box-body">
         <table class="table table-bordered table-striped dt-responsive tabla" id="tablaCertificados">
@@ -71,6 +72,31 @@
     </div>
     <!-- Botones de exportación: se insertan vía DataTables Buttons -->
   </section>
+</div>
+
+<!-- Modal Importar CSV -->
+<div class="modal fade" id="modalImportarCertificados" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <form id="formImportarCertificados" method="post" enctype="multipart/form-data">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Importar Certificados (CSV)</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Archivo CSV</label>
+            <input type="file" class="form-control" name="archivo_csv" id="archivo_csv" accept=".csv,text/csv" required>
+            <p class="help-block">Se importarán columnas compatibles con la tabla. La columna <b>imagen</b> será ignorada.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Importar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Modal Agregar -->
@@ -250,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function(){
       }
       moveModalToBody('modalAgregarCertificado');
       moveModalToBody('modalEditarCertificado');
+      moveModalToBody('modalImportarCertificados');
 
       if (btn) {
         btn.addEventListener('click', function(e){
