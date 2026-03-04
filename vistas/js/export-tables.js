@@ -32,6 +32,14 @@ var ExportTables = (function($) {
       orthogonal: 'export',
       format: {
         body: function(data, row, column, node) {
+          // Para celdas de link, exportar la URL real en lugar del texto del botón
+          if (node && node.getAttribute && node.getAttribute('data-column') === 'col-link') {
+            var anchor = node.querySelector ? node.querySelector('a[href]') : null;
+            if (anchor) {
+              return (anchor.getAttribute('href') || '').trim();
+            }
+          }
+
           // Limpiar HTML de los datos
           if (typeof data === 'string') {
             // Remover tags HTML
